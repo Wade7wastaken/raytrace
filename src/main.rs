@@ -1,27 +1,31 @@
-use std::io::{self, Write};
+use std::{
+    f64::INFINITY,
+    io::{self, Write},
+    rc::Rc,
+};
 
+use hittable::Hittable;
+use hittable_list::HittableList;
+use interval::Interval;
 use ppm_image_writer::PPMImageWriter;
 use ray::Ray;
+use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
 
 mod color;
+mod hittable;
+mod hittable_list;
+mod interval;
 mod ppm_image_writer;
 mod ray;
+mod sphere;
 mod vec3;
 
-fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> bool {
-    let oc = center - r.orig;
-    let a = r.dir.dot(r.dir);
-    let b = -2.0 * r.dir.dot(oc);
-    let c = oc.dot(oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
-    discriminant >= 0.0
-}
-
-fn ray_color(r: Ray) -> Color {
-    if hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, &r) {
-        return Color::new(1.0, 0.0, 0.0);
+fn ray_color(r: &Ray, world: &HittableList) -> Color {
+    if let Some(rec) = world.hit(r, Interval::new(0.0, INFINITY)) {
+        return 0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0));
     }
+
     let unit_direction = r.dir.unit_vector();
     let t = 0.5 * (unit_direction.y + 1.0);
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
@@ -36,6 +40,13 @@ fn main() {
     // ensure dimensions are more than 0
     assert!(image_width > 0);
     assert!(image_height > 0);
+
+    // World
+
+    let mut world = HittableList::empty();
+
+    world.add(Rc::new(Sphere::new(Vec3::new(0.0, 0.1, -7.0), 0.5)));
+    world.add(Rc::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
 
     let focal_length = 1.0;
     let viewport_height = 2.0;
@@ -67,7 +78,7 @@ fn main() {
             let ray_direction = pixel_center - camera_center;
             let r = Ray::new(camera_center, ray_direction);
 
-            let pixel_color = ray_color(r);
+            let pixel_color = ray_color(&r, &world);
 
             w.write_pixel(pixel_color);
         }
