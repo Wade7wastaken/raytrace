@@ -1,4 +1,3 @@
-use std::ops::{Range, RangeInclusive};
 
 use crate::{
     hittable::{HitRecord, Hittable},

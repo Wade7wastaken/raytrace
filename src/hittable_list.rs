@@ -1,4 +1,4 @@
-use std::{ops::{Range, RangeInclusive}, rc::Rc};
+use std::{rc::Rc};
 
 use crate::{
     hittable::{HitRecord, Hittable}, interval::Interval, ray::Ray

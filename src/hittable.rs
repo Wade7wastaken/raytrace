@@ -1,4 +1,3 @@
-use std::ops::{Range, RangeInclusive};
 
 use crate::{
     interval::Interval, ray::Ray, vec3::{Point3, Vec3}
