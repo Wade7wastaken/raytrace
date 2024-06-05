@@ -1,58 +1,63 @@
-use std::{
-    fs::File,
-    io::{self, Write},
-};
+use std::io::{self, Write};
 
-use vec3::Color;
+use ppm_image_writer::PPMImageWriter;
+use ray::Ray;
+use vec3::{Color, Point3, Vec3};
 
 mod color;
+mod ppm_image_writer;
+mod ray;
 mod vec3;
 
-struct ImageWriter {
-    f: File,
-}
-
-impl ImageWriter {
-    fn new(path: &str) -> Self {
-        Self {
-            f: File::create(path).unwrap(),
-        }
-    }
-
-    fn write(&mut self, data: &str) {
-        self.f.write_all(data.as_bytes()).unwrap();
-    }
-
-    fn write_pixel(&mut self, pixel_color: Color) {
-        let r = pixel_color.x;
-        let g = pixel_color.y;
-        let b = pixel_color.z;
-
-        let ir = ((r * 256.0) as i32).clamp(0, 255);
-        let ig = ((g * 256.0) as i32).clamp(0, 255);
-        let ib = ((b * 256.0) as i32).clamp(0, 255);
-
-        self.write(format!("{} {} {}\n", ir, ig, ib).as_str());
-    }
+fn ray_color(r: Ray) -> Color {
+    let unit_direction = r.dir.unit_vector();
+    let t = 0.5 * (unit_direction.y + 1.0);
+    (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
 }
 
 fn main() {
-    let image_width = 256;
-    let image_height = 256;
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
 
-    let mut f = ImageWriter::new("./output.ppm");
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
 
-    f.write(format!("P3\n{} {}\n255\n", image_width, image_height).as_str());
+    // ensure dimensions are more than 0
+    assert!(image_width > 0);
+    assert!(image_height > 0);
+
+    let focal_length = 1.0;
+    let viewport_height = 2.0;
+    let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
+    let camera_center = Point3::empty();
+
+    let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
+    let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
+
+    let pixel_delta_u = viewport_u / image_width as f64;
+    let pixel_delta_v = viewport_v / image_height as f64;
+
+    let viewport_upper_left =
+        camera_center - Vec3::new(0.0, 0.0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
+
+    let pixel100_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+
+    let mut w = PPMImageWriter::new("./output.ppm");
+
+    w.write_header(image_width, image_height);
 
     for y in 0..image_height {
         print!("\rScanlines remaining: {}", image_height - y);
         io::stdout().flush().unwrap();
         for x in 0..image_width {
-            let r = x as f64 / (image_width - 1) as f64;
-            let g = y as f64 / (image_height - 1) as f64;
-            let b = 0.0;
+            let pixel_center =
+                pixel100_loc + (x as f64 * pixel_delta_u) + (y as f64 * pixel_delta_v);
 
-            f.write_pixel(Color::new(r, g, b));
+            let ray_direction = pixel_center - camera_center;
+            let r = Ray::new(camera_center, ray_direction);
+
+            let pixel_color = ray_color(r);
+
+            w.write_pixel(pixel_color);
         }
     }
     println!("\nDone!");

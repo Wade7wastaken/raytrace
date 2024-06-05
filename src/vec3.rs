@@ -129,6 +129,13 @@ impl ops::Mul<f64> for Vec3 {
     }
 }
 
+impl ops::Mul<Vec3> for f64 {
+    type Output = Vec3;
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        rhs * self
+    }
+}
+
 impl ops::Div<f64> for Vec3 {
     type Output = Vec3;
     fn div(self, rhs: f64) -> Self::Output {
@@ -136,5 +143,5 @@ impl ops::Div<f64> for Vec3 {
     }
 }
 
-pub type Pixel = Vec3;
 pub type Color = Vec3;
+pub type Point3 = Vec3;
