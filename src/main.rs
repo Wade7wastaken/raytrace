@@ -12,7 +12,6 @@ use ray::Ray;
 use sphere::Sphere;
 use vec3::{Color, Point3, Vec3};
 
-mod color;
 mod hittable;
 mod hittable_list;
 mod interval;
