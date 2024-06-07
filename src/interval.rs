@@ -1,6 +1,5 @@
 use std::f64::{INFINITY, NEG_INFINITY};
 
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Interval {
     pub min: f64,
@@ -9,11 +8,17 @@ pub struct Interval {
 
 impl Interval {
     pub fn empty() -> Self {
-        Self { min: INFINITY, max: NEG_INFINITY }
+        Self {
+            min: INFINITY,
+            max: NEG_INFINITY,
+        }
     }
 
     pub fn universe() -> Self {
-        Self { min: NEG_INFINITY, max: INFINITY }
+        Self {
+            min: NEG_INFINITY,
+            max: INFINITY,
+        }
     }
 
     pub fn new(min: f64, max: f64) -> Self {
@@ -32,5 +37,4 @@ impl Interval {
     pub fn surrounds(&self, x: f64) -> bool {
         self.min < x && x < self.max
     }
-
 }

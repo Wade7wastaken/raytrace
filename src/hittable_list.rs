@@ -1,7 +1,9 @@
-use std::{rc::Rc};
+use std::rc::Rc;
 
 use crate::{
-    hittable::{HitRecord, Hittable}, interval::Interval, ray::Ray
+    hittable::{HitRecord, Hittable},
+    interval::Interval,
+    ray::Ray,
 };
 
 pub struct HittableList {

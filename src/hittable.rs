@@ -1,6 +1,7 @@
-
 use crate::{
-    interval::Interval, ray::Ray, vec3::{Point3, Vec3}
+    interval::Interval,
+    ray::Ray,
+    vec3::{Point3, Vec3},
 };
 
 #[derive(Debug)]
@@ -24,7 +25,12 @@ impl HitRecord {
     }
 
     pub fn empty() -> Self {
-        Self { p: Vec3::empty(), normal: Vec3::empty(), t: 0.0, front_face: false }
+        Self {
+            p: Vec3::empty(),
+            normal: Vec3::empty(),
+            t: 0.0,
+            front_face: false,
+        }
     }
 }
 

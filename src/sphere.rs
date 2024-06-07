@@ -1,4 +1,3 @@
-
 use crate::{
     hittable::{HitRecord, Hittable},
     interval::Interval,

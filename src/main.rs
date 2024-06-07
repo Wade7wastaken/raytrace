@@ -1,17 +1,10 @@
-use std::{
-    f64::INFINITY,
-    io::{self, Write},
-    rc::Rc,
-};
+use std::rc::Rc;
 
 use camera::Camera;
-use hittable::Hittable;
 use hittable_list::HittableList;
-use interval::Interval;
 use ppm_image_writer::PPMImageWriter;
-use ray::Ray;
 use sphere::Sphere;
-use vec3::{Color, Point3, Vec3};
+use vec3::{Point3, Vec3};
 
 mod camera;
 mod hittable;
