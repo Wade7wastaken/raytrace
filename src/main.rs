@@ -1,10 +1,10 @@
 use std::rc::Rc;
 
-use camera::Camera;
+use camera::{Camera, CameraOptions};
 use hittable_list::HittableList;
 use ppm_image_writer::PPMImageWriter;
 use sphere::Sphere;
-use vec3::{Point3, Vec3};
+use vec3::Vec3;
 
 mod camera;
 mod hittable;
@@ -26,12 +26,9 @@ fn main() {
 
     let mut cam = Camera::new(
         PPMImageWriter::new("./output.ppm"),
-        16.0 / 9.0,
-        400,
-        1.0,
-        10,
-        2.0,
-        Point3::new(0.0, 0.0, 0.0),
+        CameraOptions {
+            ..Default::default()
+        },
     );
 
     cam.render(world);

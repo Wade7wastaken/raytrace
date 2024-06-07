@@ -10,6 +10,28 @@ use crate::{
 use std::f64::INFINITY;
 use std::io::{self, Write};
 
+pub struct CameraOptions {
+    pub aspect_ratio: f64,
+    pub image_width: u32,
+    pub focal_length: f64,
+    pub samples_per_pixel: u32,
+    pub viewport_height: f64,
+    pub camera_center: Point3,
+}
+
+impl Default for CameraOptions {
+    fn default() -> Self {
+        Self {
+            aspect_ratio: 16.0 / 9.0,
+            image_width: 400,
+            focal_length: 1.0,
+            samples_per_pixel: 10,
+            viewport_height: 2.0,
+            camera_center: Vec3::empty(),
+        }
+    }
+}
+
 pub struct Camera {
     pub image_writer: PPMImageWriter,
     pub aspect_ratio: f64,
@@ -28,13 +50,9 @@ pub struct Camera {
 impl Camera {
     pub fn new(
         image_writer: PPMImageWriter,
-        aspect_ratio: f64,
-        image_width: u32,
-        focal_length: f64,
-        samples_per_pixel: u32,
-        viewport_height: f64,
-        camera_center: Point3,
+        options: CameraOptions,
     ) -> Self {
+        let CameraOptions { aspect_ratio, image_width, focal_length, samples_per_pixel, viewport_height, camera_center } = options;
         let image_height = (image_width as f64 / aspect_ratio) as u32;
 
         // ensure dimensions are more than 0
