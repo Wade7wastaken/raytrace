@@ -11,6 +11,7 @@ mod hittable;
 mod hittable_list;
 mod interval;
 mod ppm_image_writer;
+mod rand;
 mod ray;
 mod sphere;
 mod vec3;
@@ -28,6 +29,7 @@ fn main() {
         16.0 / 9.0,
         400,
         1.0,
+        10,
         2.0,
         Point3::new(0.0, 0.0, 0.0),
     );
