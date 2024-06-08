@@ -3,7 +3,6 @@ use crate::{
     hittable_list::HittableList,
     image_writer::ImageWriter,
     interval::Interval,
-    ppm_image_writer::PPMImageWriter,
     rand::rand,
     ray::Ray,
     vec3::{Color, Point3, Vec3},
