@@ -2,6 +2,7 @@ use std::rc::Rc;
 
 use camera::{Camera, CameraOptions};
 use hittable_list::HittableList;
+use image_writer::ImageWriter;
 use ppm_image_writer::PPMImageWriter;
 use sphere::Sphere;
 use vec3::Vec3;
@@ -9,6 +10,7 @@ use vec3::Vec3;
 mod camera;
 mod hittable;
 mod hittable_list;
+mod image_writer;
 mod interval;
 mod ppm_image_writer;
 mod rand;
@@ -25,7 +27,7 @@ fn main() {
     world.add(Rc::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
 
     let mut cam = Camera::new(
-        PPMImageWriter::new("./output.ppm"),
+        Box::new(PPMImageWriter::new("./output.ppm").unwrap()),
         CameraOptions {
             ..Default::default()
         },

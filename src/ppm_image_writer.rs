@@ -1,27 +1,33 @@
-use std::{fs::File, io::Write};
+use std::{fs::File, io::Write, path::Path};
 
-use crate::vec3::Color;
+use crate::{image_writer::ImageWriter, vec3::Color};
 
 pub struct PPMImageWriter {
     f: File,
 }
 
 impl PPMImageWriter {
-    pub fn new(path: &str) -> Self {
-        Self {
-            f: File::create(path).unwrap(),
-        }
-    }
-
     pub fn write(&mut self, data: String) {
         self.f.write_all(data.as_bytes()).unwrap();
     }
+}
 
-    pub fn write_header(&mut self, image_width: u32, image_height: u32) {
+impl ImageWriter for PPMImageWriter {
+    fn new(path: impl AsRef<Path>) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        if let Ok(f) = File::create(path) {
+            return Some(Self { f });
+        }
+        None
+    }
+
+    fn init(&mut self, image_width: u32, image_height: u32) {
         self.write(format!("P3\n{} {}\n255\n", image_width, image_height));
     }
 
-    pub fn write_pixel(&mut self, pixel_color: Color) {
+    fn write_pixel(&mut self, pixel_color: Color) {
         let r = pixel_color.x;
         let g = pixel_color.y;
         let b = pixel_color.z;

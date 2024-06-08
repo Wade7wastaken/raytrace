@@ -1,6 +1,7 @@
 use crate::{
     hittable::Hittable,
     hittable_list::HittableList,
+    image_writer::ImageWriter,
     interval::Interval,
     ppm_image_writer::PPMImageWriter,
     rand::rand,
@@ -33,7 +34,7 @@ impl Default for CameraOptions {
 }
 
 pub struct Camera {
-    pub image_writer: PPMImageWriter,
+    pub image_writer: Box<dyn ImageWriter>,
     pub aspect_ratio: f64,
     image_height: u32,
     pub image_width: u32,
@@ -48,11 +49,15 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(
-        image_writer: PPMImageWriter,
-        options: CameraOptions,
-    ) -> Self {
-        let CameraOptions { aspect_ratio, image_width, focal_length, samples_per_pixel, viewport_height, camera_center } = options;
+    pub fn new(image_writer: Box<dyn ImageWriter>, options: CameraOptions) -> Self {
+        let CameraOptions {
+            aspect_ratio,
+            image_width,
+            focal_length,
+            samples_per_pixel,
+            viewport_height,
+            camera_center,
+        } = options;
         let image_height = (image_width as f64 / aspect_ratio) as u32;
 
         // ensure dimensions are more than 0
@@ -88,11 +93,10 @@ impl Camera {
         }
     }
     pub fn render(&mut self, world: HittableList) {
-        self.image_writer
-            .write_header(self.image_width, self.image_height);
+        self.image_writer.init(self.image_width, self.image_height);
 
         for y in 0..self.image_height {
-            print!("\rScanlines remaining: {}", self.image_height - y);
+            print!("\rScanlines remaining: {:05}", self.image_height - y);
             io::stdout().flush().unwrap();
             for x in 0..self.image_width {
                 let mut pixel_color = Color::empty();
