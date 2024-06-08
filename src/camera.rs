@@ -7,7 +7,7 @@ use crate::{
     ray::Ray,
     vec3::{Color, Point3, Vec3},
 };
-use std::f64::INFINITY;
+use std::{f64::INFINITY, rc::Rc};
 use std::io::{self, Write};
 
 pub struct CameraOptions {
@@ -96,7 +96,7 @@ impl Camera {
             pixel_delta_v,
         }
     }
-    pub fn render(&mut self, world: HittableList) {
+    pub fn render(&mut self, world: Rc<dyn Hittable>) {
         self.image_writer.init(self.image_width, self.image_height);
 
         for y in 0..self.image_height {
@@ -106,7 +106,7 @@ impl Camera {
                 let mut pixel_color = Color::empty();
                 for _ in 0..self.samples_per_pixel {
                     let r = self.get_ray(x, y);
-                    pixel_color += Camera::ray_color(&r, self.max_depth, &world);
+                    pixel_color += Camera::ray_color(&r, self.max_depth, world.clone()); // cloning an rc is cheap
                 }
 
                 self.image_writer
@@ -132,7 +132,7 @@ impl Camera {
         Vec3::new(rand() - 0.5, rand() - 0.5, 0.0)
     }
 
-    fn ray_color(r: &Ray, depth: u32, world: &HittableList) -> Color {
+    fn ray_color(r: &Ray, depth: u32, world: Rc<dyn Hittable>) -> Color {
         // if we hit the bounce limit, no more light it gathered
         if depth == 0 {
             return Color::empty();
