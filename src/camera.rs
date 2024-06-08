@@ -1,14 +1,13 @@
 use crate::{
     hittable::Hittable,
-    hittable_list::HittableList,
     image_writer::ImageWriter,
     interval::Interval,
     rand::rand,
     ray::Ray,
     vec3::{Color, Point3, Vec3},
 };
-use std::{f64::INFINITY, rc::Rc};
 use std::io::{self, Write};
+use std::{f64::INFINITY, rc::Rc};
 
 pub struct CameraOptions {
     pub aspect_ratio: f64,
@@ -106,7 +105,8 @@ impl Camera {
                 let mut pixel_color = Color::empty();
                 for _ in 0..self.samples_per_pixel {
                     let r = self.get_ray(x, y);
-                    pixel_color += Camera::ray_color(&r, self.max_depth, world.clone()); // cloning an rc is cheap
+                    // cloning an rc is cheap
+                    pixel_color += Camera::ray_color(&r, self.max_depth, world.clone());
                 }
 
                 self.image_writer
