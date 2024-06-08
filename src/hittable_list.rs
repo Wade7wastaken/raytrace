@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::{
     hittable::{HitRecord, Hittable},
     interval::Interval,
@@ -8,7 +6,7 @@ use crate::{
 
 pub struct HittableList {
     // would rather call them hittables
-    pub objects: Vec<Rc<dyn Hittable>>,
+    pub objects: Vec<Box<dyn Hittable>>,
 }
 
 impl HittableList {
@@ -18,13 +16,13 @@ impl HittableList {
         }
     }
 
-    pub fn new(object: Rc<dyn Hittable>) -> Self {
+    pub fn new(object: Box<dyn Hittable>) -> Self {
         Self {
             objects: vec![object],
         }
     }
 
-    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+    pub fn add(&mut self, object: Box<dyn Hittable>) {
         self.objects.push(object);
     }
 }

@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use camera::{Camera, CameraOptions};
 use hittable_list::HittableList;
 use image_writer::ImageWriter;
@@ -23,8 +21,8 @@ fn main() {
 
     let mut world = HittableList::empty();
 
-    world.add(Rc::new(Sphere::new(Vec3::new(0.0, 0.1, -1.0), 0.5)));
-    world.add(Rc::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.1, -1.0), 0.5)));
+    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
 
     let mut cam = Camera::new(
         Box::new(PPMImageWriter::new("./output.ppm").unwrap()),
