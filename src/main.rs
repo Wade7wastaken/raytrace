@@ -8,6 +8,7 @@ use sphere::Sphere;
 use vec3::Vec3;
 
 mod camera;
+mod color;
 mod hittable;
 mod hittable_list;
 mod image_writer;
@@ -20,6 +21,8 @@ mod vec3;
 
 /*
 TODO:
+* no copy on vec3 and friends
+* timer logging
 * from_str for parsing world objects
 * PNG saving
 * write to pre-allocated buffer, then write to file

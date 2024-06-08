@@ -1,6 +1,6 @@
 use std::{fs::File, io::Write, path::Path};
 
-use crate::{image_writer::ImageWriter, vec3::Color};
+use crate::{color::Color, image_writer::ImageWriter};
 
 pub struct PPMImageWriter {
     f: File,
@@ -36,9 +36,9 @@ impl ImageWriter for PPMImageWriter {
     }
 
     fn write_pixel(&mut self, pixel_color: Color) {
-        let r = Self::linear_to_gamma(pixel_color.x);
-        let g = Self::linear_to_gamma(pixel_color.y);
-        let b = Self::linear_to_gamma(pixel_color.z);
+        let r = Self::linear_to_gamma(pixel_color.r);
+        let g = Self::linear_to_gamma(pixel_color.g);
+        let b = Self::linear_to_gamma(pixel_color.b);
 
         let ir = ((r * 256.0) as i32).clamp(0, 255);
         let ig = ((g * 256.0) as i32).clamp(0, 255);

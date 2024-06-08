@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::vec3::Color;
+use crate::color::Color;
 
 pub trait ImageWriter {
     fn new(path: impl AsRef<Path>) -> Option<Self>

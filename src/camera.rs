@@ -1,10 +1,5 @@
 use crate::{
-    hittable::Hittable,
-    image_writer::ImageWriter,
-    interval::Interval,
-    rand::rand,
-    ray::Ray,
-    vec3::{Color, Point3, Vec3},
+    color::Color, hittable::Hittable, image_writer::ImageWriter, interval::Interval, rand::rand, ray::Ray, vec3::{Point3, Vec3}
 };
 use std::io::{self, Write};
 use std::{f64::INFINITY, rc::Rc};
