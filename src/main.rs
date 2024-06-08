@@ -27,6 +27,8 @@ fn main() {
     let mut cam = Camera::new(
         Box::new(PPMImageWriter::new("./output.ppm").unwrap()),
         CameraOptions {
+            max_depth: 50,
+            samples_per_pixel: 30,
             ..Default::default()
         },
     );

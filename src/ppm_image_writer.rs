@@ -10,6 +10,14 @@ impl PPMImageWriter {
     pub fn write(&mut self, data: String) {
         self.f.write_all(data.as_bytes()).unwrap();
     }
+
+    fn linear_to_gamma(linear_component: f64) -> f64 {
+        if linear_component > 0.0 {
+            linear_component.sqrt()
+        } else {
+            0.0
+        }
+    }
 }
 
 impl ImageWriter for PPMImageWriter {
@@ -28,9 +36,9 @@ impl ImageWriter for PPMImageWriter {
     }
 
     fn write_pixel(&mut self, pixel_color: Color) {
-        let r = pixel_color.x;
-        let g = pixel_color.y;
-        let b = pixel_color.z;
+        let r = Self::linear_to_gamma(pixel_color.x);
+        let g = Self::linear_to_gamma(pixel_color.y);
+        let b = Self::linear_to_gamma(pixel_color.z);
 
         let ir = ((r * 256.0) as i32).clamp(0, 255);
         let ig = ((g * 256.0) as i32).clamp(0, 255);

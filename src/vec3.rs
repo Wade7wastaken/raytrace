@@ -1,5 +1,9 @@
 use std::fmt;
 use std::ops;
+use std::ops::Range;
+
+use crate::rand::rand;
+use crate::rand::rand_range;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {
@@ -18,6 +22,45 @@ impl Vec3 {
             x: 0.0,
             y: 0.0,
             z: 0.0,
+        }
+    }
+
+    pub fn random() -> Self {
+        Self {
+            x: rand(),
+            y: rand(),
+            z: rand(),
+        }
+    }
+
+    pub fn random_range(range: Range<f64>) -> Self {
+        Self {
+            x: rand_range(range.to_owned()),
+            y: rand_range(range.to_owned()),
+            z: rand_range(range.to_owned()),
+        }
+    }
+
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let p = Self::random_range(-1.0..1.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
+    pub fn random_unit_vector() -> Self {
+        Self::random_in_unit_sphere().unit_vector()
+    }
+
+    pub fn random_on_hemisphere(normal: Vec3) -> Self {
+        let on_unit_sphere = Self::random_unit_vector();
+        if on_unit_sphere.dot(normal) > 0.0 {
+            // In the same hemisphere as normal
+            on_unit_sphere
+        } else {
+            -on_unit_sphere
         }
     }
 
