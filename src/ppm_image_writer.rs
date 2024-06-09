@@ -1,6 +1,5 @@
-use std::{fmt::Write as WriteFmt, fs::File, io::Write as WriteIo, path::Path};
-
 use crate::{color::Color, image_writer::ImageWriter};
+use std::{fmt::Write as WriteFmt, fs::File, io::Write as WriteIo, path::Path};
 
 pub struct PPMImageWriter {
     f: File,

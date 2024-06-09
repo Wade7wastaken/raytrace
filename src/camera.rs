@@ -7,8 +7,10 @@ use crate::{
     ray::{ray, Ray},
     vec3::{vec3, Point3, Vec3},
 };
-use std::io::{self, Write};
-use std::{f64::INFINITY, rc::Rc};
+use std::{
+    io::{self, Write},
+    {f64::INFINITY, rc::Rc},
+};
 
 pub struct CameraOptions {
     pub aspect_ratio: f64,

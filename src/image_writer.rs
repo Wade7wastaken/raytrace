@@ -1,6 +1,5 @@
-use std::path::Path;
-
 use crate::color::Color;
+use std::path::Path;
 
 pub trait ImageWriter {
     fn new(path: impl AsRef<Path>) -> Option<Self>

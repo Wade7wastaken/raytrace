@@ -1,11 +1,9 @@
+use crate::rand::rand;
+use crate::rand::rand_range;
+use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::fmt;
 use std::ops;
 use std::ops::Range;
-
-use crate::rand::rand;
-use crate::rand::rand_range;
-
-use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(
     Debug,
