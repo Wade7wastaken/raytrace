@@ -5,7 +5,7 @@ use hittable_list::HittableList;
 use image_writer::ImageWriter;
 use ppm_image_writer::PPMImageWriter;
 use sphere::Sphere;
-use vec3::{vec3, Vec3};
+use vec3::vec3;
 
 mod camera;
 mod color;
