@@ -51,3 +51,8 @@ impl Hittable for Sphere {
         Some(rec)
     }
 }
+
+// helper initializer to make code look pretty
+pub fn sphere(center: Point3, radius: f64) -> Sphere {
+    Sphere::new(center, radius)
+}

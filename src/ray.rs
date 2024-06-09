@@ -22,3 +22,8 @@ impl Ray {
         self.orig + self.dir * t
     }
 }
+
+// helper initializer to make code look pretty
+pub fn ray(orig: Point3, dir: Vec3) -> Ray {
+    Ray::new(orig, dir)
+}

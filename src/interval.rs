@@ -38,3 +38,8 @@ impl Interval {
         self.min < x && x < self.max
     }
 }
+
+// helper initializer to make code look pretty
+pub fn interval(min: f64, max: f64) -> Interval {
+    Interval::new(min, max)
+}

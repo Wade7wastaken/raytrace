@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::{
     hittable::{HitRecord, Hittable},
-    interval::Interval,
+    interval::{interval, Interval},
     ray::Ray,
 };
 
@@ -36,7 +36,7 @@ impl Hittable for HittableList {
         let mut rec = None;
 
         for object in &self.objects {
-            if let Some(temp_rec) = object.hit(r, Interval::new(ray_t.min, closest_so_far)) {
+            if let Some(temp_rec) = object.hit(r, interval(ray_t.min, closest_so_far)) {
                 closest_so_far = temp_rec.t;
                 rec = Some(temp_rec);
             }

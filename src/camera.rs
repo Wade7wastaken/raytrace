@@ -1,11 +1,11 @@
 use crate::{
-    color::Color,
+    color::{color, Color},
     hittable::Hittable,
     image_writer::ImageWriter,
-    interval::Interval,
+    interval::{interval, Interval},
     rand::rand,
-    ray::Ray,
-    vec3::{Point3, Vec3},
+    ray::{ray, Ray},
+    vec3::{vec3, Point3, Vec3},
 };
 use std::io::{self, Write};
 use std::{f64::INFINITY, rc::Rc};
@@ -69,14 +69,14 @@ impl Camera {
 
         let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
 
-        let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
+        let viewport_u = vec3(viewport_width, 0.0, 0.0);
+        let viewport_v = vec3(0.0, -viewport_height, 0.0);
 
         let pixel_delta_u = viewport_u / image_width as f64;
         let pixel_delta_v = viewport_v / image_height as f64;
 
         let viewport_upper_left =
-            camera_center - Vec3::new(0.0, 0.0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
+            camera_center - vec3(0.0, 0.0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
 
         let pixel_00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
@@ -128,11 +128,11 @@ impl Camera {
         let ray_origin = self.camera_center;
         let ray_direction = pixel_sample - ray_origin;
 
-        Ray::new(ray_origin, ray_direction)
+        ray(ray_origin, ray_direction)
     }
 
     fn sample_square() -> Vec3 {
-        Vec3::new(rand() - 0.5, rand() - 0.5, 0.0)
+        vec3(rand() - 0.5, rand() - 0.5, 0.0)
     }
 
     fn ray_color(r: &Ray, depth: u32, world: Rc<dyn Hittable>) -> Color {
@@ -141,13 +141,13 @@ impl Camera {
             return Color::empty();
         }
 
-        if let Some(rec) = world.hit(r, Interval::new(0.001, INFINITY)) {
+        if let Some(rec) = world.hit(r, interval(0.001, INFINITY)) {
             let direction = rec.normal + Vec3::random_unit_vector();
-            return 0.5 * Self::ray_color(&Ray::new(rec.p, direction), depth - 1, world);
+            return 0.5 * Self::ray_color(&ray(rec.p, direction), depth - 1, world);
         }
 
         let unit_direction = r.dir.unit_vector();
         let t = 0.5 * (unit_direction.y + 1.0);
-        (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
+        (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0)
     }
 }
