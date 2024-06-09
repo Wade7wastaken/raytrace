@@ -69,6 +69,18 @@ impl ops::Mul<Color> for f64 {
     }
 }
 
+// hack for multiplying two colors together
+impl ops::Mul<Color> for Color {
+    type Output = Color;
+    fn mul(self, rhs: Color) -> Self::Output {
+        Color {
+            r: self.r * rhs.r,
+            b: self.b * rhs.b,
+            g: self.g * rhs.g,
+        }
+    }
+}
+
 // helper initializer to make code look pretty
 pub fn color(r: f64, g: f64, b: f64) -> Color {
     Color::new(r, g, b)
