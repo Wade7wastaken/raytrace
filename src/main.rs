@@ -4,7 +4,7 @@ use camera::{Camera, CameraOptions};
 use hittable_list::HittableList;
 use image_writer::ImageWriter;
 use ppm_image_writer::PPMImageWriter;
-use sphere::{sphere, Sphere};
+use sphere::sphere;
 use vec3::vec3;
 
 mod camera;

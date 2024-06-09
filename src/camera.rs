@@ -2,7 +2,7 @@ use crate::{
     color::{color, Color},
     hittable::Hittable,
     image_writer::ImageWriter,
-    interval::{interval, Interval},
+    interval::interval,
     rand::rand,
     ray::{ray, Ray},
     vec3::{vec3, Point3, Vec3},
