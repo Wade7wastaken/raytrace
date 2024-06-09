@@ -13,6 +13,7 @@ mod hittable;
 mod hittable_list;
 mod image_writer;
 mod interval;
+mod material;
 mod ppm_image_writer;
 mod rand;
 mod ray;
