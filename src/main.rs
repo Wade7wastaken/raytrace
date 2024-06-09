@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{rc::Rc, time::Instant};
 
 use camera::{Camera, CameraOptions};
 use hittable_list::HittableList;
@@ -44,5 +44,7 @@ fn main() {
         },
     );
 
+    let start = Instant::now();
     cam.render(Rc::new(world));
+    println!("Took {:.2?}", start.elapsed());
 }
