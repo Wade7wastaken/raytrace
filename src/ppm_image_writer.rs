@@ -1,16 +1,13 @@
-use std::{fs::File, io::Write, path::Path};
+use std::{fmt::Write as WriteFmt, fs::File, io::Write as WriteIo, path::Path};
 
 use crate::{color::Color, image_writer::ImageWriter};
 
 pub struct PPMImageWriter {
     f: File,
+    buffer: String,
 }
 
 impl PPMImageWriter {
-    pub fn write(&mut self, data: String) {
-        self.f.write_all(data.as_bytes()).unwrap();
-    }
-
     fn linear_to_gamma(linear_component: f64) -> f64 {
         if linear_component > 0.0 {
             linear_component.sqrt()
@@ -26,24 +23,35 @@ impl ImageWriter for PPMImageWriter {
         Self: Sized,
     {
         if let Ok(f) = File::create(path) {
-            return Some(Self { f });
+            return Some(Self {
+                f,
+                buffer: String::new(),
+            });
         }
         None
     }
 
     fn init(&mut self, image_width: u32, image_height: u32) {
-        self.write(format!("P3\n{} {}\n255\n", image_width, image_height));
+        let pixel_expected_value = 4.0;
+        let reserve_length =
+            (image_width as f64 * image_height as f64 * 3.0 * pixel_expected_value).round(); // add 3 for space, space, newline
+
+        println!("Reserving {} bytes", reserve_length);
+        self.buffer.reserve((reserve_length) as usize);
+        writeln!(self.buffer, "P3\n{} {}\n255", image_width, image_height).unwrap();
     }
 
     fn write_pixel(&mut self, pixel_color: Color) {
-        let r = Self::linear_to_gamma(pixel_color.r);
-        let g = Self::linear_to_gamma(pixel_color.g);
-        let b = Self::linear_to_gamma(pixel_color.b);
+        let (r, g, b) = pixel_color
+            .map(Self::linear_to_gamma)
+            .map_any::<u8>(|channel| (channel.clamp(0.0, 1.0) * 255.0) as u8);
 
-        let ir = ((r * 256.0) as i32).clamp(0, 255);
-        let ig = ((g * 256.0) as i32).clamp(0, 255);
-        let ib = ((b * 256.0) as i32).clamp(0, 255);
+        writeln!(self.buffer, "{} {} {}", r, g, b).unwrap();
+    }
 
-        self.write(format!("{} {} {}\n", ir, ig, ib));
+    fn finish(&mut self) {
+        println!("Final buffer capacity: {}", self.buffer.capacity());
+        println!("Final buffer len: {}", self.buffer.len());
+        self.f.write_all(self.buffer.as_bytes()).unwrap();
     }
 }

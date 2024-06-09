@@ -114,7 +114,9 @@ impl Camera {
                     .write_pixel(pixel_color / self.samples_per_pixel as f64);
             }
         }
-        println!("\nDone!");
+        println!();
+        self.image_writer.finish();
+        println!("Done!");
     }
 
     fn get_ray(&self, x: u32, y: u32) -> Ray {

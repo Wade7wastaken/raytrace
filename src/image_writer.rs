@@ -10,4 +10,6 @@ pub trait ImageWriter {
     fn init(&mut self, image_width: u32, image_height: u32);
 
     fn write_pixel(&mut self, pixel_color: Color);
+
+    fn finish(&mut self);
 }

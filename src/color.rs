@@ -44,6 +44,18 @@ impl Color {
             b: rand_range(range.to_owned()),
         }
     }
+
+    pub fn map(&self, pred: fn(f64) -> f64) -> Self {
+        Self {
+            r: pred(self.r),
+            g: pred(self.g),
+            b: pred(self.b),
+        }
+    }
+
+    pub fn map_any<T>(&self, pred: fn(f64) -> T) -> (T, T, T) {
+        (pred(self.r), pred(self.g), pred(self.b))
+    }
 }
 
 impl fmt::Display for Color {
