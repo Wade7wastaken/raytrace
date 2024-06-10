@@ -4,7 +4,7 @@ use camera::{Camera, CameraOptions};
 use color::color;
 use hittable_list::HittableList;
 use image_writer::ImageWriter;
-use material::{Lambertian, Metal};
+use material::{Dielectric, Lambertian, Metal};
 use ppm_image_writer::PPMImageWriter;
 use sphere::sphere;
 use vec3::{point3, vec3};
@@ -37,7 +37,8 @@ fn main() {
 
     let mat_ground = Rc::new(Lambertian::new(color(0.8, 0.8, 0.0)));
     let mat_center = Rc::new(Lambertian::new(color(0.1, 0.2, 0.5)));
-    let mat_left = Rc::new(Metal::new(color(0.8, 0.8, 0.8), 0.3));
+    let mat_left = Rc::new(Dielectric::new(1.50));
+    let mat_bubble = Rc::new(Dielectric::new(1.00 / 1.50));
     let mat_right = Rc::new(Metal::new(color(0.8, 0.6, 0.2), 0.7));
 
     world.add(Rc::new(sphere(
@@ -54,6 +55,11 @@ fn main() {
         point3(-1.0, 0.0, -1.0),
         0.5,
         mat_left.clone(),
+    )));
+    world.add(Rc::new(sphere(
+        point3(-1.0, 0.0, -1.0),
+        0.4,
+        mat_bubble.clone(),
     )));
     world.add(Rc::new(sphere(
         point3(1.0, 0.0, -1.0),
