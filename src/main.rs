@@ -1,4 +1,4 @@
-use std::{rc::Rc, time::Instant};
+use std::{f64::consts::FRAC_PI_4, rc::Rc, time::Instant};
 
 use camera::{Camera, CameraOptions};
 use color::color;
@@ -39,7 +39,7 @@ fn main() {
     let mat_center = Rc::new(Lambertian::new(color(0.1, 0.2, 0.5)));
     let mat_left = Rc::new(Dielectric::new(1.50));
     let mat_bubble = Rc::new(Dielectric::new(1.00 / 1.50));
-    let mat_right = Rc::new(Metal::new(color(0.8, 0.6, 0.2), 0.7));
+    let mat_right = Rc::new(Metal::new(color(0.8, 0.8, 0.8), 0.5));
 
     world.add(Rc::new(sphere(
         point3(0.0, -100.5, -1.0),
@@ -70,9 +70,11 @@ fn main() {
     let mut cam = Camera::new(
         Box::new(PPMImageWriter::new("./output.ppm").unwrap()),
         CameraOptions {
-            // max_depth: 100,
-            // samples_per_pixel: 200,
-            // image_width: 1920,
+            max_depth: 100,
+            samples_per_pixel: 200,
+            image_width: 1920,
+            look_from: point3(-2.0, 2.0, 1.0),
+            v_fov: 20.0,
             ..Default::default()
         },
     );

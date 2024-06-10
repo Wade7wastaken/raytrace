@@ -5,7 +5,7 @@ use crate::{
     interval::interval,
     rand::rand,
     ray::{ray, Ray},
-    vec3::{vec3, Point3, Vec3},
+    vec3::{point3, vec3, Point3, Vec3},
 };
 use std::{
     io::{self, Write},
@@ -15,11 +15,12 @@ use std::{
 pub struct CameraOptions {
     pub aspect_ratio: f64,
     pub image_width: u32,
-    pub focal_length: f64,
+    pub v_fov: f64,
     pub samples_per_pixel: u32,
     pub max_depth: u32,
-    pub viewport_height: f64,
-    pub camera_center: Point3,
+    pub look_from: Point3,
+    pub look_at: Point3,
+    pub vup: Vec3,
 }
 
 impl Default for CameraOptions {
@@ -27,26 +28,27 @@ impl Default for CameraOptions {
         Self {
             aspect_ratio: 16.0 / 9.0,
             image_width: 400,
-            focal_length: 1.0,
+            v_fov: 90.0,
             samples_per_pixel: 10,
             max_depth: 10,
-            viewport_height: 2.0,
-            camera_center: Vec3::empty(),
+            look_from: Point3::empty(),
+            look_at: point3(0.0, 0.0, -1.0),
+            vup: vec3(0.0, 1.0, 0.0),
         }
     }
 }
 
 pub struct Camera {
-    pub image_writer: Box<dyn ImageWriter>,
-    pub aspect_ratio: f64,
+    image_writer: Box<dyn ImageWriter>,
+    // aspect_ratio: f64,
     image_height: u32,
-    pub image_width: u32,
-    pub focal_length: f64,
-    pub samples_per_pixel: u32,
-    pub max_depth: u32,
-    viewport_width: f64,
-    pub viewport_height: f64,
-    pub camera_center: Point3,
+    image_width: u32,
+    // focal_length: f64,
+    samples_per_pixel: u32,
+    max_depth: u32,
+    // viewport_width: f64,
+    // viewport_height: f64,
+    look_from: Point3,
     pixel_00_loc: Point3,
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
@@ -57,11 +59,12 @@ impl Camera {
         let CameraOptions {
             aspect_ratio,
             image_width,
-            focal_length,
+            v_fov,
             samples_per_pixel,
             max_depth,
-            viewport_height,
-            camera_center,
+            look_from,
+            look_at,
+            vup,
         } = options;
         let image_height = (image_width as f64 / aspect_ratio) as u32;
 
@@ -69,30 +72,38 @@ impl Camera {
         assert!(image_width > 0);
         assert!(image_height > 0);
 
+        let focal_length = (look_from - look_at).length();
+        let theta = v_fov.to_radians();
+        let h = (theta/2.0).tan();
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
 
-        let viewport_u = vec3(viewport_width, 0.0, 0.0);
-        let viewport_v = vec3(0.0, -viewport_height, 0.0);
+        let w = (look_from - look_at).unit_vector();
+        let u = vup.cross(w);
+        let v = w.cross(u);
+
+        let viewport_u = viewport_width * u;
+        let viewport_v = viewport_height * -v;
 
         let pixel_delta_u = viewport_u / image_width as f64;
         let pixel_delta_v = viewport_v / image_height as f64;
 
         let viewport_upper_left =
-            camera_center - vec3(0.0, 0.0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
+            look_from - (focal_length * w) - viewport_u / 2.0 - viewport_v / 2.0;
 
         let pixel_00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
         Self {
             image_writer,
-            aspect_ratio,
+            // aspect_ratio,
             image_height,
             image_width,
-            focal_length,
+            // focal_length,
             samples_per_pixel,
             max_depth,
-            viewport_width,
-            viewport_height,
-            camera_center,
+            // viewport_width,
+            // viewport_height,
+            look_from,
             pixel_00_loc,
             pixel_delta_u,
             pixel_delta_v,
@@ -127,7 +138,7 @@ impl Camera {
             + ((x as f64 + offset.x) * self.pixel_delta_u)
             + ((y as f64 + offset.y) * self.pixel_delta_v);
 
-        let ray_origin = self.camera_center;
+        let ray_origin = self.look_from;
         let ray_direction = pixel_sample - ray_origin;
 
         ray(ray_origin, ray_direction)
