@@ -70,11 +70,14 @@ fn main() {
     let mut cam = Camera::new(
         Box::new(PPMImageWriter::new("./output.ppm").unwrap()),
         CameraOptions {
-            max_depth: 100,
-            samples_per_pixel: 200,
-            image_width: 1920,
+            max_depth: 50,
+            samples_per_pixel: 100,
+            // image_width: 1920,
             look_from: point3(-2.0, 2.0, 1.0),
             v_fov: 20.0,
+
+            defocus_angle: 10.0,
+            focus_dist: 3.4,
             ..Default::default()
         },
     );
