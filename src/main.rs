@@ -1,13 +1,14 @@
 use std::{f64::consts::FRAC_PI_4, rc::Rc, time::Instant};
 
 use camera::{Camera, CameraOptions};
-use color::color;
+use color::{color, Color};
 use hittable_list::HittableList;
 use image_writer::ImageWriter;
 use material::{Dielectric, Lambertian, Metal};
 use ppm_image_writer::PPMImageWriter;
+use rand::{rand, rand_range};
 use sphere::sphere;
-use vec3::{point3, vec3};
+use vec3::point3;
 
 mod camera;
 mod color;
@@ -30,9 +31,7 @@ TODO:
 * PNG saving
 */
 
-fn main() {
-    // World
-
+fn scene1() {
     let mut world = HittableList::empty();
 
     let mat_ground = Rc::new(Lambertian::new(color(0.8, 0.8, 0.0)));
@@ -85,4 +84,72 @@ fn main() {
     let start = Instant::now();
     cam.render(Rc::new(world));
     println!("Took {:.2?}", start.elapsed());
+}
+
+fn scene2() {
+    let mut world = HittableList::empty();
+
+    let ground_material = Rc::new(Lambertian::new(color(0.5, 0.5, 0.5)));
+    world.add(Rc::new(sphere(
+        point3(0.0, -1000.0, 0.0),
+        1000.0,
+        ground_material,
+    )));
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = rand();
+            let center = point3(a as f64 + 0.9 * rand(), 0.2, b as f64 + 0.9 * rand());
+
+            if (center - point3(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    // diffuse
+                    let albedo = Color::random() * Color::random();
+                    let mat = Rc::new(Lambertian::new(albedo));
+                    world.add(Rc::new(sphere(center, 0.2, mat)));
+                } else if choose_mat < 0.95 {
+                    // metal
+                    let albedo = Color::random_range(0.5..1.0);
+                    let fuzz = rand_range(0.0..0.5);
+                    let mat = Rc::new(Metal::new(albedo, fuzz));
+                    world.add(Rc::new(sphere(center, 0.2, mat)));
+                } else {
+                    // glass
+                    let mat = Rc::new(Dielectric::new(1.5));
+                    world.add(Rc::new(sphere(center, 0.2, mat)));
+                }
+            }
+        }
+    }
+
+    let material1 = Rc::new(Dielectric::new(1.5));
+    world.add(Rc::new(sphere(point3(0.0, 1.0, 0.0), 1.0, material1)));
+
+    let material2 = Rc::new(Lambertian::new(color(0.4, 0.2, 0.1)));
+    world.add(Rc::new(sphere(point3(-4.0, 1.0, 0.0), 1.0, material2)));
+
+    let material3 = Rc::new(Metal::new(color(0.7, 0.6, 0.5), 0.0));
+    world.add(Rc::new(sphere(point3(4.0, 1.0, 0.0), 1.0, material3)));
+
+    let mut cam = Camera::new(
+        Box::new(PPMImageWriter::new("final.ppm").unwrap()),
+        CameraOptions {
+            image_width: 1920,
+            samples_per_pixel: 500,
+            max_depth: 50,
+            v_fov: 20.0,
+            look_from: point3(13.0, 2.0, 3.0),
+            look_at: point3(0.0, 0.0, 0.0),
+            defocus_angle: 0.6,
+            ..Default::default()
+        },
+    );
+
+    let start = Instant::now();
+    cam.render(Rc::new(world));
+    println!("Took {:.2?}", start.elapsed());
+}
+
+fn main() {
+    scene2()
 }
