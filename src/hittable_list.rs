@@ -21,7 +21,7 @@ impl HittableList {
         self.objects.push(object);
     }
 
-    pub fn add2(&mut self, object: impl Hittable + 'static) {
+    pub fn take(&mut self, object: impl Hittable + 'static) {
         self.objects.push(Rc::new(object));
     }
 }

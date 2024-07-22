@@ -21,13 +21,16 @@ mod ray;
 mod sphere;
 mod vec3;
 
-/*
-TODO:
-* no copy on vec3 and friends
-* timer logging
-* from_str for parsing world objects
-* PNG saving
-*/
+/**
+ * TODO:
+ * rayon
+ * no copy on vec3 and friends
+ * timer logging
+ * from_str for parsing world objects
+ * PNG saving
+ * Default trait for vec3 to replace empty()
+ * Reduce Rc::new boilerplate
+ */
 
 fn scene1() {
     let mut world = HittableList::empty();
@@ -38,31 +41,11 @@ fn scene1() {
     let mat_bubble = Rc::new(Dielectric::new(1.00 / 1.50));
     let mat_right = Rc::new(Metal::new(color(0.8, 0.8, 0.8), 0.5));
 
-    world.add(Rc::new(sphere(
-        point3(0.0, -100.5, -1.0),
-        100.0,
-        mat_ground.clone(),
-    )));
-    world.add(Rc::new(sphere(
-        point3(0.0, 0.0, -1.2),
-        0.5,
-        mat_center.clone(),
-    )));
-    world.add(Rc::new(sphere(
-        point3(-1.0, 0.0, -1.0),
-        0.5,
-        mat_left.clone(),
-    )));
-    world.add(Rc::new(sphere(
-        point3(-1.0, 0.0, -1.0),
-        0.4,
-        mat_bubble.clone(),
-    )));
-    world.add(Rc::new(sphere(
-        point3(1.0, 0.0, -1.0),
-        0.5,
-        mat_right.clone(),
-    )));
+    world.take(sphere(point3(0.0, -100.5, -1.0), 100.0, mat_ground));
+    world.take(sphere(point3(0.0, 0.0, -1.2), 0.5, mat_center));
+    world.take(sphere(point3(-1.0, 0.0, -1.0), 0.5, mat_left));
+    world.take(sphere(point3(-1.0, 0.0, -1.0), 0.4, mat_bubble));
+    world.take(sphere(point3(1.0, 0.0, -1.0), 0.5, mat_right));
 
     let mut cam = Camera::new(CameraOptions {
         max_depth: 50,
@@ -76,8 +59,11 @@ fn scene1() {
         ..Default::default()
     });
 
+    let image_writer =
+        PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
+
     let start = Instant::now();
-    cam.render(PPMImageWriter::new("./output.ppm").unwrap(), Rc::new(world));
+    cam.render(image_writer, Rc::new(world));
     println!("Took {:.2?}", start.elapsed());
 }
 
@@ -85,11 +71,7 @@ fn scene2() {
     let mut world = HittableList::empty();
 
     let ground_material = Rc::new(Lambertian::new(color(0.5, 0.5, 0.5)));
-    world.add(Rc::new(sphere(
-        point3(0.0, -1000.0, 0.0),
-        1000.0,
-        ground_material,
-    )));
+    world.take(sphere(point3(0.0, -1000.0, 0.0), 1000.0, ground_material));
 
     for a in -11..11 {
         for b in -11..11 {
@@ -101,30 +83,30 @@ fn scene2() {
                     // diffuse
                     let albedo = Color::random() * Color::random();
                     let mat = Rc::new(Lambertian::new(albedo));
-                    world.add(Rc::new(sphere(center, 0.2, mat)));
+                    world.take(sphere(center, 0.2, mat));
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random_range(0.5..1.0);
                     let fuzz = rand_range(0.0..0.5);
                     let mat = Rc::new(Metal::new(albedo, fuzz));
-                    world.add(Rc::new(sphere(center, 0.2, mat)));
+                    world.take(sphere(center, 0.2, mat));
                 } else {
                     // glass
                     let mat = Rc::new(Dielectric::new(1.5));
-                    world.add(Rc::new(sphere(center, 0.2, mat)));
+                    world.take(sphere(center, 0.2, mat));
                 }
             }
         }
     }
 
     let material1 = Rc::new(Dielectric::new(1.5));
-    world.add(Rc::new(sphere(point3(0.0, 1.0, 0.0), 1.0, material1)));
+    world.take(sphere(point3(0.0, 1.0, 0.0), 1.0, material1));
 
     let material2 = Rc::new(Lambertian::new(color(0.4, 0.2, 0.1)));
-    world.add(Rc::new(sphere(point3(-4.0, 1.0, 0.0), 1.0, material2)));
+    world.take(sphere(point3(-4.0, 1.0, 0.0), 1.0, material2));
 
     let material3 = Rc::new(Metal::new(color(0.7, 0.6, 0.5), 0.0));
-    world.add(Rc::new(sphere(point3(4.0, 1.0, 0.0), 1.0, material3)));
+    world.take(sphere(point3(4.0, 1.0, 0.0), 1.0, material3));
 
     let mut cam = Camera::new(CameraOptions {
         image_width: 1920,
@@ -137,8 +119,11 @@ fn scene2() {
         ..Default::default()
     });
 
+    let image_writer =
+        PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
+
     let start = Instant::now();
-    cam.render(PPMImageWriter::new("./output.ppm").unwrap(), Rc::new(world));
+    cam.render(image_writer, Rc::new(world));
     println!("Took {:.2?}", start.elapsed());
 }
 
