@@ -9,7 +9,7 @@ use crate::{
 };
 use std::{
     io::{self, Write},
-    {f64::INFINITY, rc::Rc},
+    rc::Rc,
 };
 
 pub struct CameraOptions {
@@ -43,10 +43,9 @@ impl Default for CameraOptions {
 }
 
 pub struct Camera {
-    image_writer: Box<dyn ImageWriter>,
     // aspect_ratio: f64,
-    image_height: u32,
-    image_width: u32,
+    pub image_height: u32, // public so they can be accessed by image writers
+    pub image_width: u32,
     // focal_length: f64,
     samples_per_pixel: u32,
     max_depth: u32,
@@ -62,7 +61,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(image_writer: Box<dyn ImageWriter>, options: CameraOptions) -> Self {
+    pub fn new(options: CameraOptions) -> Self {
         let CameraOptions {
             aspect_ratio,
             image_width,
@@ -106,7 +105,6 @@ impl Camera {
         let defocus_disk_v = v * defocus_radius;
 
         Self {
-            image_writer,
             // aspect_ratio,
             image_height,
             image_width,
@@ -124,8 +122,8 @@ impl Camera {
             defocus_disk_v,
         }
     }
-    pub fn render(&mut self, world: Rc<dyn Hittable>) {
-        self.image_writer.init(self.image_width, self.image_height);
+    pub fn render(&mut self, mut image_writer: impl ImageWriter, world: Rc<dyn Hittable>) {
+        image_writer.init(self);
 
         for y in 0..self.image_height {
             print!("\rScanlines remaining: {:05}", self.image_height - y);
@@ -135,15 +133,14 @@ impl Camera {
                 for _ in 0..self.samples_per_pixel {
                     let r = self.get_ray(x, y);
                     // cloning an rc is cheap
-                    pixel_color += Camera::ray_color(&r, self.max_depth, world.clone());
+                    pixel_color += Camera::ray_color(&r, self.max_depth, world.to_owned());
                 }
 
-                self.image_writer
-                    .write_pixel(pixel_color / self.samples_per_pixel as f64);
+                image_writer.write_pixel(pixel_color / self.samples_per_pixel as f64);
             }
         }
         println!();
-        self.image_writer.finish();
+        image_writer.finish();
         println!("Done!");
     }
 
@@ -178,7 +175,7 @@ impl Camera {
             return Color::empty();
         }
 
-        if let Some(rec) = world.hit(r, interval(0.001, INFINITY)) {
+        if let Some(rec) = world.hit(r, interval(0.001, f64::INFINITY)) {
             if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
                 return attenuation * Self::ray_color(&scattered, depth - 1, world);
             }

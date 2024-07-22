@@ -17,14 +17,12 @@ impl HittableList {
         }
     }
 
-    pub fn new(object: Rc<dyn Hittable>) -> Self {
-        Self {
-            objects: vec![object],
-        }
-    }
-
     pub fn add(&mut self, object: Rc<dyn Hittable>) {
         self.objects.push(object);
+    }
+
+    pub fn add2(&mut self, object: impl Hittable + 'static) {
+        self.objects.push(Rc::new(object));
     }
 }
 

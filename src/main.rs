@@ -1,11 +1,10 @@
-use std::{f64::consts::FRAC_PI_4, rc::Rc, time::Instant};
+use std::{rc::Rc, time::Instant};
 
 use camera::{Camera, CameraOptions};
 use color::{color, Color};
 use hittable_list::HittableList;
-use image_writer::ImageWriter;
+use image_writer::PPMImageWriter;
 use material::{Dielectric, Lambertian, Metal};
-use ppm_image_writer::PPMImageWriter;
 use rand::{rand, rand_range};
 use sphere::sphere;
 use vec3::point3;
@@ -17,7 +16,6 @@ mod hittable_list;
 mod image_writer;
 mod interval;
 mod material;
-mod ppm_image_writer;
 mod rand;
 mod ray;
 mod sphere;
@@ -66,23 +64,20 @@ fn scene1() {
         mat_right.clone(),
     )));
 
-    let mut cam = Camera::new(
-        Box::new(PPMImageWriter::new("./output.ppm").unwrap()),
-        CameraOptions {
-            max_depth: 50,
-            samples_per_pixel: 100,
-            // image_width: 1920,
-            look_from: point3(-2.0, 2.0, 1.0),
-            v_fov: 20.0,
+    let mut cam = Camera::new(CameraOptions {
+        max_depth: 50,
+        samples_per_pixel: 100,
+        // image_width: 1920,
+        look_from: point3(-2.0, 2.0, 1.0),
+        v_fov: 20.0,
 
-            defocus_angle: 10.0,
-            focus_dist: 3.4,
-            ..Default::default()
-        },
-    );
+        defocus_angle: 10.0,
+        focus_dist: 3.4,
+        ..Default::default()
+    });
 
     let start = Instant::now();
-    cam.render(Rc::new(world));
+    cam.render(PPMImageWriter::new("./output.ppm").unwrap(), Rc::new(world));
     println!("Took {:.2?}", start.elapsed());
 }
 
@@ -131,25 +126,22 @@ fn scene2() {
     let material3 = Rc::new(Metal::new(color(0.7, 0.6, 0.5), 0.0));
     world.add(Rc::new(sphere(point3(4.0, 1.0, 0.0), 1.0, material3)));
 
-    let mut cam = Camera::new(
-        Box::new(PPMImageWriter::new("final.ppm").unwrap()),
-        CameraOptions {
-            image_width: 1920,
-            samples_per_pixel: 500,
-            max_depth: 50,
-            v_fov: 20.0,
-            look_from: point3(13.0, 2.0, 3.0),
-            look_at: point3(0.0, 0.0, 0.0),
-            defocus_angle: 0.6,
-            ..Default::default()
-        },
-    );
+    let mut cam = Camera::new(CameraOptions {
+        image_width: 1920,
+        samples_per_pixel: 500,
+        max_depth: 50,
+        v_fov: 20.0,
+        look_from: point3(13.0, 2.0, 3.0),
+        look_at: point3(0.0, 0.0, 0.0),
+        defocus_angle: 0.6,
+        ..Default::default()
+    });
 
     let start = Instant::now();
-    cam.render(Rc::new(world));
+    cam.render(PPMImageWriter::new("./output.ppm").unwrap(), Rc::new(world));
     println!("Took {:.2?}", start.elapsed());
 }
 
 fn main() {
-    scene2()
+    scene1();
 }
