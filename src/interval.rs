@@ -1,4 +1,3 @@
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Interval {
     pub min: f64,
