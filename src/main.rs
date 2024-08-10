@@ -6,8 +6,8 @@ use hittable_list::HittableList;
 use image_writer::PPMImageWriter;
 use material::{Dielectric, Lambertian, Metal};
 use rand::{rand, rand_range};
-use sphere::sphere;
-use vec3::point3;
+use sphere::{sphere, Sphere};
+use vec3::{point3, vec3};
 
 mod camera;
 mod color;
@@ -83,7 +83,12 @@ fn scene2() {
                     // diffuse
                     let albedo = Color::random() * Color::random();
                     let mat = Arc::new(Lambertian::new(albedo));
-                    world.take(sphere(center, 0.2, mat));
+                    world.take(Sphere::new_moving(
+                        center,
+                        vec3(0.0, rand::rand_range(0.0..0.5), 0.0),
+                        0.2,
+                        mat,
+                    ));
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random_range(0.5..1.0);
@@ -109,8 +114,8 @@ fn scene2() {
     world.take(sphere(point3(4.0, 1.0, 0.0), 1.0, material3));
 
     let mut cam = Camera::new(CameraOptions {
-        image_width: 1920,
-        samples_per_pixel: 500,
+        image_width: 400,
+        samples_per_pixel: 100,
         max_depth: 50,
         v_fov: 20.0,
         look_from: point3(13.0, 2.0, 3.0),
