@@ -4,8 +4,8 @@ use crate::{
     vec3::Point3,
 };
 
-#[derive(Debug, Clone)]
-struct AABB {
+#[derive(Debug, Clone, Default)]
+pub struct AABB {
     pub x: Interval,
     pub y: Interval,
     pub z: Interval,
@@ -33,6 +33,13 @@ impl AABB {
             interval(b.z, a.z)
         };
 
+        Self { x, y, z }
+    }
+
+    pub fn from_boxes(a: &Self, b: &Self) -> Self {
+        let x = Interval::from_intervals(a.x, b.x);
+        let y = Interval::from_intervals(a.y, b.y);
+        let z = Interval::from_intervals(a.z, b.z);
         Self { x, y, z }
     }
 

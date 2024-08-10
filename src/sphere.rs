@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
+    aabb::AABB,
     hittable::{HitRecord, Hittable},
     interval::Interval,
     material::Material,
@@ -13,24 +14,33 @@ pub struct Sphere {
     move_dir: Vec3,
     radius: f64,
     mat: Arc<dyn Material>,
+    bbox: AABB,
 }
 
 impl Sphere {
     pub fn new(center: Point3, radius: f64, mat: Arc<dyn Material>) -> Self {
+        let rvec = vec3(radius, radius, radius);
+        let bbox = AABB::from_points(center - rvec, center + rvec);
         Self {
             center,
             move_dir: vec3(0.0, 0.0, 0.0),
             radius,
             mat,
+            bbox,
         }
     }
 
     pub fn new_moving(center: Point3, move_dir: Vec3, radius: f64, mat: Arc<dyn Material>) -> Self {
+        let rvec = vec3(radius, radius, radius);
+        let box1 = AABB::from_points(center - rvec, center + rvec);
+        let box2 = AABB::from_points(center + move_dir - rvec, center + move_dir + rvec);
+        let bbox = AABB::from_boxes(&box1, &box2);
         Self {
             center,
             move_dir,
             radius,
             mat,
+            bbox,
         }
     }
 
@@ -73,6 +83,10 @@ impl Hittable for Sphere {
             r,
             (rec_p - self.center) / self.radius,
         ))
+    }
+
+    fn bounding_box(&self) -> &AABB {
+        &self.bbox
     }
 }
 

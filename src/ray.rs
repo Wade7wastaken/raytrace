@@ -17,7 +17,11 @@ impl Ray {
     }
 
     pub fn new(orig: Point3, dir: Vec3) -> Self {
-        Self { orig, dir, time: 0.0 }
+        Self {
+            orig,
+            dir,
+            time: 0.0,
+        }
     }
 
     pub fn new_tm(orig: Point3, dir: Vec3, time: f64) -> Self {

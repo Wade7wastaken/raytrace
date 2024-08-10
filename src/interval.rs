@@ -23,6 +23,12 @@ impl Interval {
         Self { min, max }
     }
 
+    pub fn from_intervals(a: Interval, b: Interval) -> Self {
+        let min = f64::min(a.min, b.min);
+        let max = f64::max(a.max, b.max);
+        Self { min, max }
+    }
+
     pub fn size(&self) -> f64 {
         // clamp maybe
         self.max - self.min
@@ -42,6 +48,12 @@ impl Interval {
             min: self.min - padding,
             max: self.max + padding,
         }
+    }
+}
+
+impl Default for Interval {
+    fn default() -> Self {
+        Self::empty()
     }
 }
 

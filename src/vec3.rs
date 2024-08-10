@@ -9,6 +9,7 @@ use std::ops::Range;
     Debug,
     Clone,
     Copy,
+    Default,
     PartialEq,
     Add,
     AddAssign,

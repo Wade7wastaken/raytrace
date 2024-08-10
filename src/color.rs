@@ -6,7 +6,19 @@ use std::{
 };
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign,
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Add,
+    AddAssign,
+    Sub,
+    SubAssign,
+    Mul,
+    MulAssign,
+    Div,
+    DivAssign,
 )]
 pub struct Color {
     pub r: f64,
