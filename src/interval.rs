@@ -35,6 +35,14 @@ impl Interval {
     pub fn surrounds(&self, x: f64) -> bool {
         self.min < x && x < self.max
     }
+
+    pub fn expand(&self, delta: f64) -> Self {
+        let padding = delta / 2.0;
+        Self {
+            min: self.min - padding,
+            max: self.max + padding,
+        }
+    }
 }
 
 // helper initializer to make code look pretty

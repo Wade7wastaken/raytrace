@@ -9,6 +9,7 @@ use rand::{rand, rand_range};
 use sphere::{sphere, Sphere};
 use vec3::{point3, vec3};
 
+mod aabb;
 mod camera;
 mod color;
 mod hittable;

@@ -87,6 +87,15 @@ impl Vec3 {
         }
     }
 
+    pub fn axis(&self, index: i32) -> f64 {
+        match index {
+            0 => self.x,
+            1 => self.y,
+            2 => self.z,
+            _ => panic!("Incorrect index passed to axis"),
+        }
+    }
+
     pub fn length_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
