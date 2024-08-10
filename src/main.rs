@@ -1,4 +1,4 @@
-use std::{rc::Rc, time::Instant};
+use std::{sync::Arc, time::Instant};
 
 use camera::{Camera, CameraOptions};
 use color::{color, Color};
@@ -29,17 +29,17 @@ mod vec3;
  * from_str for parsing world objects
  * PNG saving
  * Default trait for vec3 to replace empty()
- * Reduce Rc::new boilerplate
+ * Reduce Arc::new boilerplate
  */
 
 fn scene1() {
     let mut world = HittableList::empty();
 
-    let mat_ground = Rc::new(Lambertian::new(color(0.8, 0.8, 0.0)));
-    let mat_center = Rc::new(Lambertian::new(color(0.1, 0.2, 0.5)));
-    let mat_left = Rc::new(Dielectric::new(1.50));
-    let mat_bubble = Rc::new(Dielectric::new(1.00 / 1.50));
-    let mat_right = Rc::new(Metal::new(color(0.8, 0.8, 0.8), 0.5));
+    let mat_ground = Arc::new(Lambertian::new(color(0.8, 0.8, 0.0)));
+    let mat_center = Arc::new(Lambertian::new(color(0.1, 0.2, 0.5)));
+    let mat_left = Arc::new(Dielectric::new(1.50));
+    let mat_bubble = Arc::new(Dielectric::new(1.00 / 1.50));
+    let mat_right = Arc::new(Metal::new(color(0.8, 0.8, 0.8), 0.5));
 
     world.take(sphere(point3(0.0, -100.5, -1.0), 100.0, mat_ground));
     world.take(sphere(point3(0.0, 0.0, -1.2), 0.5, mat_center));
@@ -48,8 +48,8 @@ fn scene1() {
     world.take(sphere(point3(1.0, 0.0, -1.0), 0.5, mat_right));
 
     let mut cam = Camera::new(CameraOptions {
-        max_depth: 50,
-        samples_per_pixel: 100,
+        max_depth: 20,
+        samples_per_pixel: 50,
         // image_width: 1920,
         look_from: point3(-2.0, 2.0, 1.0),
         v_fov: 20.0,
@@ -63,14 +63,14 @@ fn scene1() {
         PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
-    cam.render(image_writer, Rc::new(world));
+    cam.render(image_writer, Arc::new(world));
     println!("Took {:.2?}", start.elapsed());
 }
 
 fn scene2() {
     let mut world = HittableList::empty();
 
-    let ground_material = Rc::new(Lambertian::new(color(0.5, 0.5, 0.5)));
+    let ground_material = Arc::new(Lambertian::new(color(0.5, 0.5, 0.5)));
     world.take(sphere(point3(0.0, -1000.0, 0.0), 1000.0, ground_material));
 
     for a in -11..11 {
@@ -82,30 +82,30 @@ fn scene2() {
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random() * Color::random();
-                    let mat = Rc::new(Lambertian::new(albedo));
+                    let mat = Arc::new(Lambertian::new(albedo));
                     world.take(sphere(center, 0.2, mat));
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random_range(0.5..1.0);
                     let fuzz = rand_range(0.0..0.5);
-                    let mat = Rc::new(Metal::new(albedo, fuzz));
+                    let mat = Arc::new(Metal::new(albedo, fuzz));
                     world.take(sphere(center, 0.2, mat));
                 } else {
                     // glass
-                    let mat = Rc::new(Dielectric::new(1.5));
+                    let mat = Arc::new(Dielectric::new(1.5));
                     world.take(sphere(center, 0.2, mat));
                 }
             }
         }
     }
 
-    let material1 = Rc::new(Dielectric::new(1.5));
+    let material1 = Arc::new(Dielectric::new(1.5));
     world.take(sphere(point3(0.0, 1.0, 0.0), 1.0, material1));
 
-    let material2 = Rc::new(Lambertian::new(color(0.4, 0.2, 0.1)));
+    let material2 = Arc::new(Lambertian::new(color(0.4, 0.2, 0.1)));
     world.take(sphere(point3(-4.0, 1.0, 0.0), 1.0, material2));
 
-    let material3 = Rc::new(Metal::new(color(0.7, 0.6, 0.5), 0.0));
+    let material3 = Arc::new(Metal::new(color(0.7, 0.6, 0.5), 0.0));
     world.take(sphere(point3(4.0, 1.0, 0.0), 1.0, material3));
 
     let mut cam = Camera::new(CameraOptions {
@@ -123,10 +123,10 @@ fn scene2() {
         PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
-    cam.render(image_writer, Rc::new(world));
+    cam.render(image_writer, Arc::new(world));
     println!("Took {:.2?}", start.elapsed());
 }
 
 fn main() {
-    scene1();
+    scene2();
 }

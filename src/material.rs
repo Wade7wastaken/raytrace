@@ -6,7 +6,7 @@ use crate::{
     vec3::Vec3,
 };
 
-pub trait Material {
+pub trait Material: Send + Sync {
     /// Describes how a ray should be scattered given an input ray and the hit record of that ray
     /// Returns an option of the color attenuation and the output ray. None means the ray was absorbed
     /// Defaults to None

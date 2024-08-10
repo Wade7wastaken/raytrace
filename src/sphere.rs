@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     hittable::{HitRecord, Hittable},
     interval::Interval,
@@ -5,16 +7,15 @@ use crate::{
     ray::Ray,
     vec3::Point3,
 };
-use std::rc::Rc;
 
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    mat: Rc<dyn Material>,
+    mat: Arc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, mat: Rc<dyn Material>) -> Self {
+    pub fn new(center: Point3, radius: f64, mat: Arc<dyn Material>) -> Self {
         Self {
             center,
             radius,
@@ -60,6 +61,6 @@ impl Hittable for Sphere {
 }
 
 // helper initializer to make code look pretty
-pub fn sphere(center: Point3, radius: f64, mat: Rc<dyn Material>) -> Sphere {
+pub fn sphere(center: Point3, radius: f64, mat: Arc<dyn Material>) -> Sphere {
     Sphere::new(center, radius, mat)
 }

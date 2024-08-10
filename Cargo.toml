@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 rand = "0.8"
 derive_more = "0.99.0"
+rayon = "1.10.0"

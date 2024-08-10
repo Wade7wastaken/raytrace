@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::{
     interval::Interval,
@@ -11,14 +11,14 @@ use crate::{
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub mat: Rc<dyn Material>,
+    pub mat: Arc<dyn Material>,
     pub t: f64,
     pub front_face: bool,
 }
 
 impl HitRecord {
     /// outward_normal is assumed to have unit length
-    pub fn new(p: Point3, mat: Rc<dyn Material>, t: f64, r: &Ray, outward_normal: Vec3) -> Self {
+    pub fn new(p: Point3, mat: Arc<dyn Material>, t: f64, r: &Ray, outward_normal: Vec3) -> Self {
         let front_face = r.dir.dot(outward_normal) < 0.0;
         let normal = if front_face {
             outward_normal
@@ -36,6 +36,6 @@ impl HitRecord {
     }
 }
 
-pub trait Hittable {
+pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord>;
 }

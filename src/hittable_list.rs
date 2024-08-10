@@ -1,13 +1,14 @@
+use std::sync::Arc;
+
 use crate::{
     hittable::{HitRecord, Hittable},
     interval::{interval, Interval},
     ray::Ray,
 };
-use std::rc::Rc;
 
 pub struct HittableList {
     // would rather call them hittables
-    pub objects: Vec<Rc<dyn Hittable>>,
+    pub objects: Vec<Arc<dyn Hittable>>,
 }
 
 impl HittableList {
@@ -17,12 +18,12 @@ impl HittableList {
         }
     }
 
-    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+    pub fn add(&mut self, object: Arc<dyn Hittable>) {
         self.objects.push(object);
     }
 
     pub fn take(&mut self, object: impl Hittable + 'static) {
-        self.objects.push(Rc::new(object));
+        self.objects.push(Arc::new(object));
     }
 }
 

@@ -7,10 +7,8 @@ use crate::{
     ray::{ray, Ray},
     vec3::{point3, vec3, Point3, Vec3},
 };
-use std::{
-    io::{self, Write},
-    rc::Rc,
-};
+use rayon::prelude::*;
+use std::sync::Arc;
 
 pub struct CameraOptions {
     pub aspect_ratio: f64,
@@ -122,23 +120,38 @@ impl Camera {
             defocus_disk_v,
         }
     }
-    pub fn render(&mut self, mut image_writer: impl ImageWriter, world: Rc<dyn Hittable>) {
+    pub fn render(&mut self, mut image_writer: impl ImageWriter, world: Arc<dyn Hittable>) {
         image_writer.init(self);
 
-        for y in 0..self.image_height {
-            print!("\rScanlines remaining: {:05}", self.image_height - y);
-            io::stdout().flush().unwrap();
-            for x in 0..self.image_width {
-                let mut pixel_color = Color::empty();
-                for _ in 0..self.samples_per_pixel {
-                    let r = self.get_ray(x, y);
-                    // cloning an rc is cheap
-                    pixel_color += Camera::ray_color(&r, self.max_depth, world.to_owned());
-                }
+        let image = (0..self.image_height)
+            .into_par_iter()
+            .flat_map(|y| {
+                println!("scanline {}", y);
+                (0..self.image_width)
+                    .into_par_iter()
+                    .map(|x| {
+                        // (0..self.samples_per_pixel).map(|sample_i| {
+                        //     let r = self.get_ray(x, y);
+                        //     Camera::ray_color(&r, self.max_depth, world.to_owned())
+                        // }).sum::<Color>() / self.samples_per_pixel as f64
 
-                image_writer.write_pixel(pixel_color / self.samples_per_pixel as f64);
-            }
+                        let mut pixel_color = Color::empty();
+                        for _ in 0..self.samples_per_pixel {
+                            let r = self.get_ray(x, y);
+                            // cloning an arc is cheap
+                            pixel_color += Camera::ray_color(&r, self.max_depth, world.to_owned());
+                        }
+
+                        pixel_color / self.samples_per_pixel as f64
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
+
+        for pixel in image {
+            image_writer.write_pixel(pixel);
         }
+
         println!();
         image_writer.finish();
         println!("Done!");
@@ -169,7 +182,7 @@ impl Camera {
         self.look_from + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v)
     }
 
-    fn ray_color(r: &Ray, depth: u32, world: Rc<dyn Hittable>) -> Color {
+    fn ray_color(r: &Ray, depth: u32, world: Arc<dyn Hittable>) -> Color {
         // if we hit the bounce limit, no more light it gathered
         if depth == 0 {
             return Color::empty();
