@@ -5,22 +5,15 @@ pub struct Interval {
 }
 
 impl Interval {
-    pub fn empty() -> Self {
-        Self {
-            min: f64::INFINITY,
-            max: f64::NEG_INFINITY,
-        }
+    pub fn new(min: f64, max: f64) -> Self {
+        Self { min, max }
     }
 
-    pub fn universe() -> Self {
+    pub fn full() -> Self {
         Self {
             min: f64::NEG_INFINITY,
             max: f64::INFINITY,
         }
-    }
-
-    pub fn new(min: f64, max: f64) -> Self {
-        Self { min, max }
     }
 
     pub fn from_intervals(a: Interval, b: Interval) -> Self {
@@ -30,7 +23,6 @@ impl Interval {
     }
 
     pub fn size(&self) -> f64 {
-        // clamp maybe
         self.max - self.min
     }
 
@@ -53,7 +45,10 @@ impl Interval {
 
 impl Default for Interval {
     fn default() -> Self {
-        Self::empty()
+        Self {
+            min: f64::INFINITY,
+            max: f64::NEG_INFINITY,
+        }
     }
 }
 

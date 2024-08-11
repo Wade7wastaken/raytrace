@@ -31,7 +31,7 @@ impl Material for Lambertian {
             scatter_direction = rec.normal;
         }
 
-        let scattered = Ray::new_tm(rec.p, scatter_direction, r.time);
+        let scattered = ray(rec.p, scatter_direction, r.time);
         let attenuation = self.albedo;
         Some((attenuation, scattered))
     }
@@ -52,7 +52,7 @@ impl Material for Metal {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         let reflected = r.dir.reflect(rec.normal);
         let reflected_fuzzed = reflected.unit_vector() + (self.fuzz * Vec3::random_unit_vector());
-        let scattered = Ray::new_tm(rec.p, reflected_fuzzed, r.time);
+        let scattered = ray(rec.p, reflected_fuzzed, r.time);
         let attenuation = self.albedo;
 
         // if we scatter below the surface, just absorb the ray
@@ -74,8 +74,7 @@ impl Dielectric {
     }
 
     fn reflectance(cosine: f64, refraction_index: f64) -> f64 {
-        let mut r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
-        r0 = r0 * r0;
+        let r0 = ((1.0 - refraction_index) / (1.0 + refraction_index)).powi(2);
         r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
     }
 }
@@ -103,7 +102,7 @@ impl Material for Dielectric {
                 unit_direction.refract(rec.normal, refraction_index)
             };
 
-        let scattered = Ray::new_tm(rec.p, direction, r.time);
+        let scattered = ray(rec.p, direction, r.time);
         Some((attenuation, scattered))
     }
 }

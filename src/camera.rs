@@ -31,7 +31,7 @@ impl Default for CameraOptions {
             samples_per_pixel: 10,
             max_depth: 10,
             v_fov: 90.0,
-            look_from: Point3::empty(),
+            look_from: Point3::default(),
             look_at: point3(0.0, 0.0, -1.0),
             vup: vec3(0.0, 1.0, 0.0),
             defocus_angle: 0.0,
@@ -135,7 +135,7 @@ impl Camera {
                         //     Camera::ray_color(&r, self.max_depth, world.to_owned())
                         // }).sum::<Color>() / self.samples_per_pixel as f64
 
-                        let mut pixel_color = Color::empty();
+                        let mut pixel_color = Color::default();
                         for _ in 0..self.samples_per_pixel {
                             let r = self.get_ray(x, y);
                             // cloning an arc is cheap
@@ -170,7 +170,7 @@ impl Camera {
         };
         let ray_direction = pixel_sample - ray_origin;
 
-        Ray::new_tm(ray_origin, ray_direction, rand())
+        ray(ray_origin, ray_direction, rand())
     }
 
     fn sample_square() -> Vec3 {
@@ -182,21 +182,26 @@ impl Camera {
         self.look_from + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v)
     }
 
+    fn sky(r: &Ray) -> Color {
+        let unit_direction = r.dir.unit_vector();
+        let t = 0.5 * (unit_direction.y + 1.0);
+        (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0)
+    }
+
     fn ray_color(r: &Ray, depth: u32, world: Arc<dyn Hittable>) -> Color {
         // if we hit the bounce limit, no more light it gathered
         if depth == 0 {
-            return Color::empty();
+            return Color::default();
         }
 
         if let Some(rec) = world.hit(r, interval(0.001, f64::INFINITY)) {
             if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
-                return attenuation * Self::ray_color(&scattered, depth - 1, world);
+                attenuation * Self::ray_color(&scattered, depth - 1, world)
+            } else {
+                Color::default()
             }
-            return Color::empty();
+        } else {
+            Self::sky(r)
         }
-
-        let unit_direction = r.dir.unit_vector();
-        let t = 0.5 * (unit_direction.y + 1.0);
-        (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0)
     }
 }

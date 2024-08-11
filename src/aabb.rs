@@ -5,13 +5,13 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Default)]
-pub struct AABB {
+pub struct Aabb {
     pub x: Interval,
     pub y: Interval,
     pub z: Interval,
 }
 
-impl AABB {
+impl Aabb {
     pub fn new(x: Interval, y: Interval, z: Interval) -> Self {
         Self { x, y, z }
     }
@@ -43,11 +43,12 @@ impl AABB {
         Self { x, y, z }
     }
 
-    pub fn axis_interval(&self, n: i32) -> Interval {
-        match n {
+    pub fn axis_interval(&self, index: i32) -> Interval {
+        match index {
+            0 => self.x,
             1 => self.y,
             2 => self.z,
-            _ => self.x,
+            _ => panic!("Incorrect index passed to axis_interval"),
         }
     }
 

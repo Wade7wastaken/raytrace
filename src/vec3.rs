@@ -32,14 +32,6 @@ impl Vec3 {
         Self { x, y, z }
     }
 
-    pub fn empty() -> Self {
-        Self {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        }
-    }
-
     pub fn random() -> Self {
         Self {
             x: rand(),

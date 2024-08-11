@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use std::{sync::Arc, time::Instant};
 
 use camera::{Camera, CameraOptions};
@@ -34,7 +36,7 @@ mod vec3;
  */
 
 fn scene1() {
-    let mut world = HittableList::empty();
+    let mut world = HittableList::default();
 
     let mat_ground = Arc::new(Lambertian::new(color(0.8, 0.8, 0.0)));
     let mat_center = Arc::new(Lambertian::new(color(0.1, 0.2, 0.5)));
@@ -69,7 +71,7 @@ fn scene1() {
 }
 
 fn scene2() {
-    let mut world = HittableList::empty();
+    let mut world = HittableList::default();
 
     let ground_material = Arc::new(Lambertian::new(color(0.5, 0.5, 0.5)));
     world.take(sphere(point3(0.0, -1000.0, 0.0), 1000.0, ground_material));

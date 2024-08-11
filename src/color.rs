@@ -31,14 +31,6 @@ impl Color {
         Self { r, g, b }
     }
 
-    pub fn empty() -> Self {
-        Self {
-            r: 0.0,
-            g: 0.0,
-            b: 0.0,
-        }
-    }
-
     pub fn random() -> Self {
         Self {
             r: rand(),
@@ -63,14 +55,19 @@ impl Color {
         }
     }
 
-    pub fn map_any<T>(&self, pred: fn(f64) -> T) -> (T, T, T) {
-        (pred(self.r), pred(self.g), pred(self.b))
+    pub fn to_rgb(self) -> (u8, u8, u8) {
+        (
+            channel_to_rgb(self.r),
+            channel_to_rgb(self.g),
+            channel_to_rgb(self.b),
+        )
     }
 }
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "rgb({}, {}, {})", self.r, self.g, self.b)
+        let (r, g, b) = self.to_rgb();
+        write!(f, "#{:#04x}{:#04x}{:#04x}", r, g, b)
     }
 }
 
@@ -91,6 +88,10 @@ impl ops::Mul<Color> for Color {
             g: self.g * rhs.g,
         }
     }
+}
+
+fn channel_to_rgb(channel: f64) -> u8 {
+    ((channel * 255.999) as u8).clamp(0, 255)
 }
 
 // helper initializer to make code look pretty
