@@ -26,12 +26,8 @@ mod vec3;
 
 /**
  * TODO:
- * rayon
- * no copy on vec3 and friends
- * timer logging
  * from_str for parsing world objects
  * PNG saving
- * Default trait for vec3 to replace empty()
  * Reduce Arc::new boilerplate
  */
 
