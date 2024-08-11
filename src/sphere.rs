@@ -51,7 +51,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord> {
         let center = self.center(r.time);
         let oc = center - r.orig;
         let a = r.dir.length_squared();

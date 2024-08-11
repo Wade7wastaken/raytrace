@@ -20,18 +20,19 @@ impl HittableList {
     }
 
     pub fn take(&mut self, object: impl Hittable + 'static) {
+        self.bbox = Aabb::from_boxes(&self.bbox, object.bounding_box());
         self.objects.push(Arc::new(object));
     }
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord> {
         let mut closest_so_far = ray_t.max;
 
         let mut rec = None;
 
         for object in &self.objects {
-            if let Some(temp_rec) = object.hit(r, interval(ray_t.min, closest_so_far)) {
+            if let Some(temp_rec) = object.hit(r, &interval(ray_t.min, closest_so_far)) {
                 closest_so_far = temp_rec.t;
                 rec = Some(temp_rec);
             }

@@ -2,6 +2,7 @@
 
 use std::{sync::Arc, time::Instant};
 
+use bvh_node::BvhNode;
 use camera::{Camera, CameraOptions};
 use color::{color, Color};
 use hittable_list::HittableList;
@@ -23,6 +24,7 @@ mod rand;
 mod ray;
 mod sphere;
 mod vec3;
+mod bvh_node;
 
 /**
  * TODO:
@@ -127,7 +129,9 @@ fn scene2() {
         PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
-    cam.render(image_writer, Arc::new(world)).unwrap();
+    // cam.render(image_writer, Arc::new(world)).unwrap();
+    cam.render(image_writer, Arc::new(BvhNode::from_hittable_list(world)))
+        .unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 

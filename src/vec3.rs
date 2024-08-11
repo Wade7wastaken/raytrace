@@ -80,7 +80,7 @@ impl Vec3 {
         }
     }
 
-    pub fn axis(&self, index: i32) -> f64 {
+    pub fn axis(&self, index: u8) -> f64 {
         match index {
             0 => self.x,
             1 => self.y,

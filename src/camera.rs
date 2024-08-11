@@ -189,7 +189,7 @@ fn ray_color(r: &Ray, depth: u32, world: Arc<dyn Hittable>) -> Color {
         return Color::default();
     }
 
-    if let Some(rec) = world.hit(r, interval(0.001, f64::INFINITY)) {
+    if let Some(rec) = world.hit(r, &interval(0.001, f64::INFINITY)) {
         if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
             attenuation * ray_color(&scattered, depth - 1, world)
         } else {

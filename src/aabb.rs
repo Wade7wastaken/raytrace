@@ -43,7 +43,7 @@ impl Aabb {
         Self { x, y, z }
     }
 
-    pub fn axis_interval(&self, index: i32) -> &Interval {
+    pub fn axis_interval(&self, index: u8) -> &Interval {
         match index {
             0 => &self.x,
             1 => &self.y,
@@ -52,7 +52,7 @@ impl Aabb {
         }
     }
 
-    pub fn hit(&self, r: Ray, mut ray_t: Interval) -> bool {
+    pub fn hit(&self, r: &Ray, ray_t: &Interval) -> bool {
         for axis in 0..3 {
             let ax = self.axis_interval(axis);
             let adinv = 1.0 / r.dir.axis(axis);
@@ -60,23 +60,26 @@ impl Aabb {
             let t0 = (ax.min - r.orig.axis(axis)) * adinv;
             let t1 = (ax.max - r.orig.axis(axis)) * adinv;
 
+            let mut min = ray_t.min;
+            let mut max = ray_t.max;
+
             if t0 < t1 {
                 if t0 > ray_t.min {
-                    ray_t.min = t0;
+                    min = t0;
                 }
                 if t1 < ray_t.max {
-                    ray_t.max = t1;
+                    max = t1;
                 }
             } else {
                 if t0 > ray_t.min {
-                    ray_t.min = t1;
+                    min = t1;
                 }
                 if t1 < ray_t.max {
-                    ray_t.max = t0;
+                    max = t0;
                 }
             }
 
-            if ray_t.max <= ray_t.min {
+            if max <= min {
                 return false;
             }
         }
