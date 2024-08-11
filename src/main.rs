@@ -1,4 +1,4 @@
-#![allow(unused)]
+#![allow(dead_code)]
 
 use std::{sync::Arc, time::Instant};
 
@@ -66,7 +66,7 @@ fn scene1() {
         PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
-    cam.render(image_writer, Arc::new(world));
+    cam.render(image_writer, Arc::new(world)).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 
@@ -131,7 +131,7 @@ fn scene2() {
         PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
-    cam.render(image_writer, Arc::new(world));
+    cam.render(image_writer, Arc::new(world)).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 

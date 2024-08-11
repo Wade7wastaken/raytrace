@@ -8,7 +8,7 @@ use crate::{
     vec3::{point3, vec3, Point3, Vec3},
 };
 use rayon::prelude::*;
-use std::sync::Arc;
+use std::{error::Error, sync::Arc};
 
 pub struct CameraOptions {
     pub aspect_ratio: f64,
@@ -120,8 +120,12 @@ impl Camera {
             defocus_disk_v,
         }
     }
-    pub fn render(&mut self, mut image_writer: impl ImageWriter, world: Arc<dyn Hittable>) {
-        image_writer.init(self);
+    pub fn render(
+        &mut self,
+        mut image_writer: impl ImageWriter,
+        world: Arc<dyn Hittable>,
+    ) -> Result<(), Box<dyn Error>> {
+        image_writer.init(self)?;
 
         let image = (0..self.image_height)
             .into_par_iter()
@@ -130,31 +134,27 @@ impl Camera {
                 (0..self.image_width)
                     .into_par_iter()
                     .map(|x| {
-                        // (0..self.samples_per_pixel).map(|sample_i| {
-                        //     let r = self.get_ray(x, y);
-                        //     Camera::ray_color(&r, self.max_depth, world.to_owned())
-                        // }).sum::<Color>() / self.samples_per_pixel as f64
-
-                        let mut pixel_color = Color::default();
-                        for _ in 0..self.samples_per_pixel {
-                            let r = self.get_ray(x, y);
-                            // cloning an arc is cheap
-                            pixel_color += Camera::ray_color(&r, self.max_depth, world.to_owned());
-                        }
-
-                        pixel_color / self.samples_per_pixel as f64
+                        (0..self.samples_per_pixel)
+                            .into_par_iter()
+                            .map(|_| {
+                                ray_color(&self.get_ray(x, y), self.max_depth, world.to_owned())
+                            })
+                            .sum::<Color>()
+                            / self.samples_per_pixel as f64
                     })
                     .collect::<Vec<_>>()
             })
             .collect::<Vec<_>>();
 
         for pixel in image {
-            image_writer.write_pixel(pixel);
+            image_writer.write_pixel(pixel)?;
         }
 
         println!();
-        image_writer.finish();
+        image_writer.finish()?;
         println!("Done!");
+
+        Ok(())
     }
 
     fn get_ray(&self, x: u32, y: u32) -> Ray {
@@ -181,27 +181,27 @@ impl Camera {
         let p = Vec3::random_in_unit_disk();
         self.look_from + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v)
     }
+}
 
-    fn sky(r: &Ray) -> Color {
-        let unit_direction = r.dir.unit_vector();
-        let t = 0.5 * (unit_direction.y + 1.0);
-        (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0)
+fn ray_color(r: &Ray, depth: u32, world: Arc<dyn Hittable>) -> Color {
+    // if we hit the bounce limit, no more light it gathered
+    if depth == 0 {
+        return Color::default();
     }
 
-    fn ray_color(r: &Ray, depth: u32, world: Arc<dyn Hittable>) -> Color {
-        // if we hit the bounce limit, no more light it gathered
-        if depth == 0 {
-            return Color::default();
-        }
-
-        if let Some(rec) = world.hit(r, interval(0.001, f64::INFINITY)) {
-            if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
-                attenuation * Self::ray_color(&scattered, depth - 1, world)
-            } else {
-                Color::default()
-            }
+    if let Some(rec) = world.hit(r, interval(0.001, f64::INFINITY)) {
+        if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
+            attenuation * ray_color(&scattered, depth - 1, world)
         } else {
-            Self::sky(r)
+            Color::default()
         }
+    } else {
+        sky(r)
     }
+}
+
+fn sky(r: &Ray) -> Color {
+    let unit_direction = r.dir.unit_vector();
+    let t = 0.5 * (unit_direction.y + 1.0);
+    (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0)
 }

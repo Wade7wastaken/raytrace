@@ -1,5 +1,5 @@
 use crate::rand::{rand, rand_range};
-use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use derive_more::{derive::Sum, Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use std::{
     fmt,
     ops::{self, Range},
@@ -18,6 +18,7 @@ use std::{
     MulAssign,
     Div,
     DivAssign,
+    Sum,
 )]
 pub struct Color {
     pub r: f64,
