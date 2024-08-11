@@ -9,6 +9,7 @@ use crate::{
     vec3::{vec3, Point3, Vec3},
 };
 
+#[derive(Clone)]
 pub struct Sphere {
     center: Point3,
     move_dir: Vec3,

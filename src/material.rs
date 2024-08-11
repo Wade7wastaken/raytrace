@@ -13,6 +13,7 @@ pub trait Material: Send + Sync {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)>;
 }
 
+#[derive(Clone)]
 pub struct Lambertian {
     albedo: Color,
 }
@@ -32,11 +33,12 @@ impl Material for Lambertian {
         }
 
         let scattered = ray(rec.p, scatter_direction, r.time);
-        let attenuation = self.albedo;
+        let attenuation = self.albedo.to_owned();
         Some((attenuation, scattered))
     }
 }
 
+#[derive(Clone)]
 pub struct Metal {
     albedo: Color,
     fuzz: f64,
@@ -53,7 +55,7 @@ impl Material for Metal {
         let reflected = r.dir.reflect(rec.normal);
         let reflected_fuzzed = reflected.unit_vector() + (self.fuzz * Vec3::random_unit_vector());
         let scattered = ray(rec.p, reflected_fuzzed, r.time);
-        let attenuation = self.albedo;
+        let attenuation = self.albedo.to_owned();
 
         // if we scatter below the surface, just absorb the ray
         if scattered.dir.dot(rec.normal) > 0.0 {
@@ -64,6 +66,7 @@ impl Material for Metal {
     }
 }
 
+#[derive(Clone)]
 pub struct Dielectric {
     refraction_index: f64,
 }

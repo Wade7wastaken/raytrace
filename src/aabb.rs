@@ -37,17 +37,17 @@ impl Aabb {
     }
 
     pub fn from_boxes(a: &Self, b: &Self) -> Self {
-        let x = Interval::from_intervals(a.x, b.x);
-        let y = Interval::from_intervals(a.y, b.y);
-        let z = Interval::from_intervals(a.z, b.z);
+        let x = Interval::from_intervals(&a.x, &b.x);
+        let y = Interval::from_intervals(&a.y, &b.y);
+        let z = Interval::from_intervals(&a.z, &b.z);
         Self { x, y, z }
     }
 
-    pub fn axis_interval(&self, index: i32) -> Interval {
+    pub fn axis_interval(&self, index: i32) -> &Interval {
         match index {
-            0 => self.x,
-            1 => self.y,
-            2 => self.z,
+            0 => &self.x,
+            1 => &self.y,
+            2 => &self.z,
             _ => panic!("Incorrect index passed to axis_interval"),
         }
     }
