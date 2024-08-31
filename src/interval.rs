@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Interval {
     pub min: f64,
@@ -49,6 +51,12 @@ impl Default for Interval {
             min: f64::INFINITY,
             max: f64::NEG_INFINITY,
         }
+    }
+}
+
+impl fmt::Display for Interval {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[{}, {}]", self.min, self.max)
     }
 }
 

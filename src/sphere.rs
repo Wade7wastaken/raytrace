@@ -1,3 +1,4 @@
+use std::fmt;
 use std::sync::Arc;
 
 use crate::{
@@ -88,6 +89,12 @@ impl Hittable for Sphere {
 
     fn bounding_box(&self) -> &Aabb {
         &self.bbox
+    }
+}
+
+impl fmt::Display for Sphere {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "circle({}, {}, {}, {})", self.center, self.radius, self.mat, self.bbox)
     }
 }
 

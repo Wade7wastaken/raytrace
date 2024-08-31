@@ -13,6 +13,7 @@ use sphere::{sphere, Sphere};
 use vec3::{point3, vec3};
 
 mod aabb;
+mod bvh_node;
 mod camera;
 mod color;
 mod hittable;
@@ -24,7 +25,6 @@ mod rand;
 mod ray;
 mod sphere;
 mod vec3;
-mod bvh_node;
 
 /**
  * TODO:
@@ -63,8 +63,10 @@ fn scene1() {
     let image_writer =
         PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
 
+    let world2 = Arc::new(BvhNode::from_hittable_list(world));
+
     let start = Instant::now();
-    cam.render(image_writer, Arc::new(world)).unwrap();
+    cam.render(image_writer, world2).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 

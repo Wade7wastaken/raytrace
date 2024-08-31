@@ -67,7 +67,7 @@ impl Color {
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let (r, g, b) = self.to_rgb();
-        write!(f, "#{:#04x}{:#04x}{:#04x}", r, g, b)
+        write!(f, "#{:02x}{:02x}{:02x}", r, g, b)
     }
 }
 

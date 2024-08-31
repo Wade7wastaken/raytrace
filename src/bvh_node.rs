@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, sync::Arc};
+use std::{cmp::Ordering, fmt, sync::Arc};
 
 use crate::{
     aabb::Aabb,
@@ -18,9 +18,9 @@ pub struct BvhNode {
 impl BvhNode {
     pub fn new(objects: &mut Vec<Arc<dyn Hittable>>, start: usize, end: usize) -> Self {
         let comparator = match rand_range(0..2) {
-            0 => box_x_compare,
-            1 => box_y_compare,
-            2 => box_z_compare,
+            0 => compare(0),
+            1 => compare(1),
+            2 => compare(2),
             _ => unreachable!(),
         };
 
@@ -51,26 +51,12 @@ impl BvhNode {
     }
 }
 
-fn compare(
-    a: &Arc<dyn Hittable + 'static>,
-    b: &Arc<dyn Hittable + 'static>,
-    axis_index: u8,
-) -> Ordering {
-    let a_axis_interval = a.bounding_box().axis_interval(axis_index);
-    let b_axis_interval = b.bounding_box().axis_interval(axis_index);
-    a_axis_interval.min.total_cmp(&b_axis_interval.min)
-}
-
-fn box_x_compare(a: &Arc<dyn Hittable + 'static>, b: &Arc<dyn Hittable + 'static>) -> Ordering {
-    compare(a, b, 0)
-}
-
-fn box_y_compare(a: &Arc<dyn Hittable + 'static>, b: &Arc<dyn Hittable + 'static>) -> Ordering {
-    compare(a, b, 1)
-}
-
-fn box_z_compare(a: &Arc<dyn Hittable + 'static>, b: &Arc<dyn Hittable + 'static>) -> Ordering {
-    compare(a, b, 2)
+fn compare(axis_index: u8) -> impl Fn(&Arc<dyn Hittable>, &Arc<dyn Hittable>) -> Ordering {
+    move |a, b| {
+        let a_axis_interval = a.bounding_box().axis_interval(axis_index);
+        let b_axis_interval = b.bounding_box().axis_interval(axis_index);
+        a_axis_interval.min.total_cmp(&b_axis_interval.min)
+    }
 }
 
 impl Hittable for BvhNode {
@@ -93,5 +79,15 @@ impl Hittable for BvhNode {
 
     fn bounding_box(&self) -> &Aabb {
         &self.bbox
+    }
+}
+
+impl fmt::Display for BvhNode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "bvh(left: {},\r\nright:\r\n{}, bbox:\r\n{})",
+            self.left, self.right, self.bbox
+        )
     }
 }

@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{fmt, sync::Arc};
 
 use crate::{
     aabb::Aabb,
@@ -43,5 +43,19 @@ impl Hittable for HittableList {
 
     fn bounding_box(&self) -> &Aabb {
         &self.bbox
+    }
+}
+
+impl fmt::Display for HittableList {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.objects
+                .iter()
+                .map(|o| o.to_string())
+                .collect::<Vec<_>>()
+                .join("\r\n")
+        )
     }
 }

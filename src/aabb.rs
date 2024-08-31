@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::{
     interval::{interval, Interval},
     ray::Ray,
@@ -85,5 +87,11 @@ impl Aabb {
         }
 
         true
+    }
+}
+
+impl fmt::Display for Aabb {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "(x: {}, y: {}, z: {})", self.x, self.y, self.z)
     }
 }

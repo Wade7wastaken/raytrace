@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::{
     color::{color, Color},
     hittable::HitRecord,
@@ -6,7 +8,7 @@ use crate::{
     vec3::Vec3,
 };
 
-pub trait Material: Send + Sync {
+pub trait Material: Send + Sync + fmt::Display {
     /// Describes how a ray should be scattered given an input ray and the hit record of that ray
     /// Returns an option of the color attenuation and the output ray. None means the ray was absorbed
     /// Defaults to None
@@ -38,6 +40,12 @@ impl Material for Lambertian {
     }
 }
 
+impl fmt::Display for Lambertian {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "lambertian({})", self.albedo)
+    }
+}
+
 #[derive(Clone)]
 pub struct Metal {
     albedo: Color,
@@ -63,6 +71,12 @@ impl Material for Metal {
         } else {
             None
         }
+    }
+}
+
+impl fmt::Display for Metal {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "metal({}, {})", self.albedo, self.fuzz)
     }
 }
 
@@ -107,5 +121,11 @@ impl Material for Dielectric {
 
         let scattered = ray(rec.p, direction, r.time);
         Some((attenuation, scattered))
+    }
+}
+
+impl fmt::Display for Dielectric {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "dielectric({})", self.refraction_index)
     }
 }
