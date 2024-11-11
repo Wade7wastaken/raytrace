@@ -88,15 +88,15 @@ impl Camera {
         let u = vup.cross(w);
         let v = w.cross(u);
 
-        let viewport_u = viewport_width * u;
-        let viewport_v = viewport_height * -v;
+        let viewport_u = u * viewport_width;
+        let viewport_v = -v * viewport_height;
 
         let pixel_delta_u = viewport_u / image_width as f64;
         let pixel_delta_v = viewport_v / image_height as f64;
 
         let viewport_upper_left =
-            look_from - (focus_dist * w) - viewport_u / 2.0 - viewport_v / 2.0;
-        let pixel_00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+            look_from - (w * focus_dist) - viewport_u / 2.0 - viewport_v / 2.0;
+        let pixel_00_loc = viewport_upper_left + (pixel_delta_u + pixel_delta_v) * 0.5;
 
         let defocus_radius = focus_dist * (defocus_angle / 2.0).to_radians().tan();
         let defocus_disk_u = u * defocus_radius;
@@ -160,8 +160,8 @@ impl Camera {
     fn get_ray(&self, x: u32, y: u32) -> Ray {
         let offset = Camera::sample_square();
         let pixel_sample = self.pixel_00_loc
-            + ((x as f64 + offset.x) * self.pixel_delta_u)
-            + ((y as f64 + offset.y) * self.pixel_delta_v);
+            + (self.pixel_delta_u * (x as f64 + offset.x))
+            + (self.pixel_delta_v * (y as f64 + offset.y));
 
         let ray_origin = if self.defocus_angle <= 0.0 {
             self.look_from
@@ -179,7 +179,7 @@ impl Camera {
 
     fn defocus_disk_sample(&self) -> Point3 {
         let p = Vec3::random_in_unit_disk();
-        self.look_from + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v)
+        self.look_from + (self.defocus_disk_u * p.x) + (self.defocus_disk_v * p.y)
     }
 }
 

@@ -2,7 +2,6 @@ use crate::rand::rand;
 use crate::rand::rand_range;
 use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::fmt;
-use std::ops;
 use std::ops::Range;
 
 #[derive(
@@ -12,14 +11,14 @@ use std::ops::Range;
     Default,
     PartialEq,
     Add,
-    AddAssign,
     Sub,
-    SubAssign,
     Mul,
-    MulAssign,
     Div,
-    DivAssign,
     Neg,
+    AddAssign,
+    SubAssign,
+    MulAssign,
+    DivAssign,
 )]
 pub struct Vec3 {
     pub x: f64,
@@ -110,13 +109,13 @@ impl Vec3 {
     }
 
     pub fn reflect(&self, n: Vec3) -> Vec3 {
-        *self - 2.0 * self.dot(n) * n
+        *self - n * self.dot(n) * 2.0
     }
 
     pub fn refract(&self, n: Vec3, eta_i_over_eta_t: f64) -> Vec3 {
         let cos_theta = (-*self).dot(n).min(1.0);
-        let r_out_perp = eta_i_over_eta_t * (*self + cos_theta * n);
-        let r_out_parallel = -((1.0 - r_out_perp.length_squared()).abs()).sqrt() * n;
+        let r_out_perp = (*self + n * cos_theta) * eta_i_over_eta_t;
+        let r_out_parallel = n * -((1.0 - r_out_perp.length_squared()).abs()).sqrt();
         r_out_parallel + r_out_parallel
     }
 
@@ -133,13 +132,6 @@ impl Vec3 {
 impl fmt::Display for Vec3 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {}, {})", self.x, self.y, self.z)
-    }
-}
-
-impl ops::Mul<Vec3> for f64 {
-    type Output = Vec3;
-    fn mul(self, rhs: Vec3) -> Self::Output {
-        rhs * self
     }
 }
 

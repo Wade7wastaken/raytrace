@@ -132,5 +132,5 @@ fn scene2() {
 }
 
 fn main() {
-    scene2();
+    scene1();
 }
