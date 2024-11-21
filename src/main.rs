@@ -62,7 +62,7 @@ fn scene1() {
         .expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
-    cam.render_and_save(Arc::new(world), image_writer).unwrap();
+    cam.render_and_save(&world, image_writer).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 
@@ -127,7 +127,7 @@ fn scene2() {
         .expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
-    cam.render_and_save(Arc::new(world), image_writer).unwrap();
+    cam.render_and_save(&world, image_writer).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 

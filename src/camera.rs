@@ -8,7 +8,7 @@ use crate::{
     vec3::{point3, vec3, Point3, Vec3},
 };
 use rayon::prelude::*;
-use std::{error::Error, sync::Arc};
+use std::error::Error;
 
 pub struct CameraOptions {
     pub aspect_ratio: f64,
@@ -120,8 +120,8 @@ impl Camera {
             defocus_disk_v,
         }
     }
-    pub fn render(&self, world: Arc<dyn Hittable>) -> Vec<Vec<Color>> {
-        let image = (0..self.image_height)
+    pub fn render(&self, world: &dyn Hittable) -> Vec<Vec<Color>> {
+        (0..self.image_height)
             .into_par_iter()
             .map(|y| {
                 println!("scanline {}", y);
@@ -130,28 +130,26 @@ impl Camera {
                     .map(|x| {
                         (0..self.samples_per_pixel)
                             .into_par_iter()
-                            .map(|_| {
-                                ray_color(&self.get_ray(x, y), self.max_depth, world.to_owned())
-                            })
+                            .map(|_| ray_color(&self.get_ray(x, y), self.max_depth, world))
                             .sum::<Color>()
                             / self.samples_per_pixel as f64
                     })
                     .collect()
             })
-            .collect();
-
-        println!("Done!");
-
-        image
+            .collect()
     }
 
     pub fn render_and_save(
         &self,
-        world: Arc<dyn Hittable>,
+        world: &dyn Hittable,
         mut image_writer: impl ImageWriter,
     ) -> Result<(), Box<dyn Error>> {
         let pixels = self.render(world);
-        image_writer.write(pixels)
+        println!("Done rendering");
+
+        image_writer.write(pixels)?;
+        println!("Done Saving");
+        Ok(())
     }
 
     fn get_ray(&self, x: u32, y: u32) -> Ray {
@@ -180,7 +178,7 @@ impl Camera {
     }
 }
 
-fn ray_color(r: &Ray, depth: u32, world: Arc<dyn Hittable>) -> Color {
+fn ray_color(r: &Ray, depth: u32, world: &dyn Hittable) -> Color {
     // if we hit the bounce limit, no more light it gathered
     if depth == 0 {
         return Color::default();
