@@ -5,7 +5,7 @@ use std::{sync::Arc, time::Instant};
 use camera::{Camera, CameraOptions};
 use color::{color, Color};
 use hittable_list::HittableList;
-use image_writer::PPMImageWriter;
+use image_writer::{PNGImageWriter, PPMImageWriter};
 use material::{Dielectric, Lambertian, Metal};
 use rand::{rand, rand_range};
 use sphere::{sphere, Sphere};
@@ -58,7 +58,7 @@ fn scene1() {
         ..Default::default()
     });
 
-    let image_writer = PPMImageWriter::new("./output.ppm", cam.image_width, cam.image_height)
+    let image_writer = PNGImageWriter::new("./output.png")
         .expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();

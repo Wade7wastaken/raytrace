@@ -1,4 +1,10 @@
-use std::{error::Error, fmt::Write as FmtWrite, fs::File, io::Write as IOWrite, path::Path};
+use std::{
+    error::Error,
+    fmt::Write as FmtWrite,
+    fs::File,
+    io::Write as IOWrite,
+    path::Path,
+};
 
 use crate::color::Color;
 
@@ -45,6 +51,44 @@ impl ImageWriter for PPMImageWriter {
         println!("Final buffer capacity: {}", self.buffer.capacity());
         println!("Final buffer len: {}", self.buffer.len());
         self.f.write_all(self.buffer.as_bytes())?;
+
+        Ok(())
+    }
+}
+
+pub struct PNGImageWriter {
+    f: File,
+}
+
+impl PNGImageWriter {
+    pub fn new(path: impl AsRef<Path>) -> Result<Self, Box<dyn Error>> {
+        Ok(Self {
+            f: File::create(path)?,
+        })
+    }
+}
+
+impl ImageWriter for PNGImageWriter {
+    fn write(&mut self, pixels: Vec<Vec<Color>>) -> Result<(), Box<dyn Error>> {
+        let height = pixels.len();
+        let width = pixels.first().map(|row| row.len()).unwrap_or(0);
+
+        let mut encoder = png::Encoder::new(&self.f, width.try_into()?, height.try_into()?);
+        encoder.set_color(png::ColorType::Rgb);
+        encoder.set_depth(png::BitDepth::Eight);
+        encoder.set_source_gamma(png::ScaledFloat::new(1.0 / 2.0));
+        let mut writer = encoder.write_header()?;
+
+        let data: Vec<u8> = pixels
+            .into_iter()
+            .flat_map(|row| {
+                row.into_iter().flat_map(|pixel| {
+                    let (r, g, b) = pixel.map(linear_to_gamma).to_rgb();
+                    [r, g, b]
+                })
+            })
+            .collect();
+        writer.write_image_data(data.as_slice())?;
 
         Ok(())
     }
