@@ -120,16 +120,10 @@ impl Camera {
             defocus_disk_v,
         }
     }
-    pub fn render(
-        &mut self,
-        mut image_writer: impl ImageWriter,
-        world: Arc<dyn Hittable>,
-    ) -> Result<(), Box<dyn Error>> {
-        image_writer.init(self)?;
-
+    pub fn render(&self, world: Arc<dyn Hittable>) -> Vec<Vec<Color>> {
         let image = (0..self.image_height)
             .into_par_iter()
-            .flat_map(|y| {
+            .map(|y| {
                 println!("scanline {}", y);
                 (0..self.image_width)
                     .into_par_iter()
@@ -142,19 +136,22 @@ impl Camera {
                             .sum::<Color>()
                             / self.samples_per_pixel as f64
                     })
-                    .collect::<Vec<_>>()
+                    .collect()
             })
-            .collect::<Vec<_>>();
+            .collect();
 
-        for pixel in image {
-            image_writer.write_pixel(pixel)?;
-        }
-
-        println!();
-        image_writer.finish()?;
         println!("Done!");
 
-        Ok(())
+        image
+    }
+
+    pub fn render_and_save(
+        &self,
+        world: Arc<dyn Hittable>,
+        mut image_writer: impl ImageWriter,
+    ) -> Result<(), Box<dyn Error>> {
+        let pixels = self.render(world);
+        image_writer.write(pixels)
     }
 
     fn get_ray(&self, x: u32, y: u32) -> Ray {
