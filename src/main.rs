@@ -10,7 +10,7 @@ use image_writer::PNGImageWriter;
 use material::{Dielectric, Lambertian, Metal};
 use rand::{rand, rand_range};
 use sphere::{sphere, Sphere};
-use texture::{CheckerTexture, ImageTexture};
+use texture::{CheckerTexture, ImageTexture, NoiseTexture};
 use vec3::{point3, vec3};
 
 mod aabb;
@@ -22,6 +22,7 @@ mod hittable_list;
 mod image_writer;
 mod interval;
 mod material;
+mod perlin;
 mod rand;
 mod ray;
 mod rtw_image;
@@ -136,8 +137,8 @@ fn bouncing_spheres() {
 
     let world_bvh = BvhNode::from_hittable_list(world);
 
-    let image_writer =
-        PNGImageWriter::new("./output/bouncing_spheres.png").expect("failed to initialize PPMImageWriter");
+    let image_writer = PNGImageWriter::new("./output/bouncing_spheres.png")
+        .expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
     cam.render_and_save(&world_bvh, image_writer).unwrap();
@@ -176,7 +177,10 @@ fn checkered_spheres() {
 }
 
 fn earth() {
-    let earth_texture = Arc::new(ImageTexture::from_bytes(include_bytes!("../textures/earthmap.png")).expect("couldn't load texture"));
+    let earth_texture = Arc::new(
+        ImageTexture::from_bytes(include_bytes!("../textures/earthmap.png"))
+            .expect("couldn't load texture"),
+    );
     let earth_mat = Arc::new(Lambertian::new(earth_texture));
     let globe = sphere(point3(0.0, 0.0, 0.0), 2.0, earth_mat);
 
@@ -192,17 +196,41 @@ fn earth() {
         ..Default::default()
     });
 
-    let image_writer = PNGImageWriter::new("./output/earth.png")
-        .expect("failed to initialize PPMImageWriter");
+    let image_writer =
+        PNGImageWriter::new("./output/earth.png").expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
     cam.render_and_save(&globe, image_writer).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 
+fn perlin_spheres() {
+    let mut world = HittableList::default();
+
+    let perlin = Arc::new(Lambertian::new(Arc::new(NoiseTexture::new())));
+
+    world.take(sphere(point3(0.0, -1000.0, 0.0), 1000.0, perlin.clone()));
+    world.take(sphere(point3(0.0, 2.0, 0.0), 2.0, perlin));
+
+    let cam = Camera::new(CameraOptions {
+        image_width: 400,
+        samples_per_pixel: 100,
+        max_depth: 50,
+        v_fov: 20.0,
+        look_from: point3(13.0, 2.0, 3.0),
+        look_at: point3(0.0, 0.0, 0.0),
+        defocus_angle: 0.0,
+        ..Default::default()
+    });
+
+    let image_writer = PNGImageWriter::new("./output/perlin_spheres.png")
+        .expect("failed to initialize PPMImageWriter");
+
+    let start = Instant::now();
+    cam.render_and_save(&world, image_writer).unwrap();
+    println!("Took {:.2?}", start.elapsed());
+}
+
 fn main() {
-    simple();
-    bouncing_spheres();
-    checkered_spheres();
-    earth();
+    perlin_spheres();
 }

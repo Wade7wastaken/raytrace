@@ -1,6 +1,6 @@
 use std::{error::Error, sync::Arc};
 
-use crate::{color::Color, rtw_image::RtwImage, vec3::Point3};
+use crate::{color::{color, Color}, perlin::Perlin, rtw_image::RtwImage, vec3::Point3};
 
 pub trait Texture: Sync + Send {
     fn value(&self, u: f64, v: f64, p: &Point3) -> Color;
@@ -86,5 +86,23 @@ impl Texture for ImageTexture {
         let j = (v * self.image.height as f64) as u32;
 
         self.image.pixel_data(i, j)
+    }
+}
+
+pub struct NoiseTexture {
+    noise: Perlin,
+}
+
+impl NoiseTexture {
+    pub fn new() -> Self {
+        Self {
+            noise: Perlin::new(),
+        }
+    }
+}
+
+impl Texture for NoiseTexture {
+    fn value(&self, _u: f64, _v: f64, p: &Point3) -> Color {
+        color(1.0, 1.0, 1.0) * self.noise.noise(p)
     }
 }
