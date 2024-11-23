@@ -88,6 +88,15 @@ impl Aabb {
 
         true
     }
+
+    pub fn longest_axis(&self) -> u8 {
+        [&self.x, &self.y, &self.z]
+            .into_iter()
+            .enumerate()
+            .max_by(|a, b| a.1.size().partial_cmp(&b.1.size()).unwrap())
+            .unwrap()
+            .0 as u8
+    }
 }
 
 impl fmt::Display for Aabb {

@@ -6,7 +6,7 @@ use bvh_node::BvhNode;
 use camera::{Camera, CameraOptions};
 use color::{color, Color};
 use hittable_list::HittableList;
-use image_writer::{PNGImageWriter, PPMImageWriter};
+use image_writer::PNGImageWriter;
 use material::{Dielectric, Lambertian, Metal};
 use rand::{rand, rand_range};
 use sphere::{sphere, Sphere};
@@ -50,8 +50,8 @@ fn scene1() {
 
     let cam = Camera::new(CameraOptions {
         max_depth: 20,
-        samples_per_pixel: 50,
-        // image_width: 1920,
+        samples_per_pixel: 100,
+        image_width: 1920,
         look_from: point3(-2.0, 2.0, 1.0),
         v_fov: 20.0,
 
@@ -60,13 +60,13 @@ fn scene1() {
         ..Default::default()
     });
 
-    let image_writer = PNGImageWriter::new("./output.png")
-        .expect("failed to initialize PPMImageWriter");
+    let image_writer =
+        PNGImageWriter::new("./output.png").expect("failed to initialize PPMImageWriter");
 
-    // let world2 = Arc::new(BvhNode::from_hittable_list(world));
+    let world_bvh = BvhNode::from_hittable_list(world);
 
     let start = Instant::now();
-    cam.render_and_save(&world, image_writer).unwrap();
+    cam.render_and_save(&world_bvh, image_writer).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 
@@ -127,14 +127,16 @@ fn scene2() {
         ..Default::default()
     });
 
-    let image_writer = PPMImageWriter::new("./output.ppm", cam.image_width, cam.image_height)
-        .expect("failed to initialize PPMImageWriter");
+    let world_bvh = BvhNode::from_hittable_list(world);
+
+    let image_writer =
+        PNGImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
-    cam.render_and_save(&world, image_writer).unwrap();
+    cam.render_and_save(&world_bvh, image_writer).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 
 fn main() {
-    scene1();
+    scene2();
 }

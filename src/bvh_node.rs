@@ -5,7 +5,6 @@ use crate::{
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
     interval::{interval, Interval},
-    rand::rand_range,
     ray::Ray,
 };
 
@@ -17,7 +16,12 @@ pub struct BvhNode {
 
 impl BvhNode {
     pub fn new(objects: &mut Vec<Arc<dyn Hittable>>, start: usize, end: usize) -> Self {
-        let comparator = match rand_range(0..2) {
+        let mut bbox = Aabb::default();
+        for object in &objects[start..end] {
+            bbox = Aabb::from_boxes(&bbox, object.bounding_box());
+        }
+
+        let comparator = match bbox.longest_axis() {
             0 => compare(0),
             1 => compare(1),
             2 => compare(2),
@@ -39,8 +43,6 @@ impl BvhNode {
                 )
             }
         };
-
-        let bbox = Aabb::from_boxes(left.bounding_box(), right.bounding_box());
 
         Self { left, right, bbox }
     }
