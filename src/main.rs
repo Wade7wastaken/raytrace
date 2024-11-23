@@ -10,6 +10,7 @@ use image_writer::PNGImageWriter;
 use material::{Dielectric, Lambertian, Metal};
 use rand::{rand, rand_range};
 use sphere::{sphere, Sphere};
+use texture::CheckerTexture;
 use vec3::{point3, vec3};
 
 mod aabb;
@@ -24,6 +25,7 @@ mod material;
 mod rand;
 mod ray;
 mod sphere;
+mod texture;
 mod vec3;
 
 /**
@@ -36,8 +38,8 @@ mod vec3;
 fn scene1() {
     let mut world = HittableList::default();
 
-    let mat_ground = Arc::new(Lambertian::new(color(0.8, 0.8, 0.0)));
-    let mat_center = Arc::new(Lambertian::new(color(0.1, 0.2, 0.5)));
+    let mat_ground = Arc::new(Lambertian::from_color(color(0.8, 0.8, 0.0)));
+    let mat_center = Arc::new(Lambertian::from_color(color(0.1, 0.2, 0.5)));
     let mat_left = Arc::new(Dielectric::new(1.50));
     let mat_bubble = Arc::new(Dielectric::new(1.00 / 1.50));
     let mat_right = Arc::new(Metal::new(color(0.8, 0.8, 0.8), 0.5));
@@ -73,7 +75,11 @@ fn scene1() {
 fn scene2() {
     let mut world = HittableList::default();
 
-    let ground_material = Arc::new(Lambertian::new(color(0.5, 0.5, 0.5)));
+    let ground_material = Arc::new(Lambertian::new(Arc::new(CheckerTexture::from_colors(
+        0.32,
+        color(0.2, 0.3, 0.1),
+        color(0.9, 0.9, 0.9),
+    ))));
     world.take(sphere(point3(0.0, -1000.0, 0.0), 1000.0, ground_material));
 
     for a in -11..11 {
@@ -85,7 +91,7 @@ fn scene2() {
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random() * Color::random();
-                    let mat = Arc::new(Lambertian::new(albedo));
+                    let mat = Arc::new(Lambertian::from_color(albedo));
                     world.take(Sphere::new_moving(
                         center,
                         vec3(0.0, rand::rand_range(0.0..0.5), 0.0),
@@ -110,7 +116,7 @@ fn scene2() {
     let material1 = Arc::new(Dielectric::new(1.5));
     world.take(sphere(point3(0.0, 1.0, 0.0), 1.0, material1));
 
-    let material2 = Arc::new(Lambertian::new(color(0.4, 0.2, 0.1)));
+    let material2 = Arc::new(Lambertian::from_color(color(0.4, 0.2, 0.1)));
     world.take(sphere(point3(-4.0, 1.0, 0.0), 1.0, material2));
 
     let material3 = Arc::new(Metal::new(color(0.7, 0.6, 0.5), 0.0));
@@ -130,7 +136,7 @@ fn scene2() {
     let world_bvh = BvhNode::from_hittable_list(world);
 
     let image_writer =
-        PNGImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
+        PNGImageWriter::new("./output.png").expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
     cam.render_and_save(&world_bvh, image_writer).unwrap();

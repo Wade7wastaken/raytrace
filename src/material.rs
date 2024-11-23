@@ -1,10 +1,11 @@
-use std::fmt;
+use std::{fmt, sync::Arc};
 
 use crate::{
     color::{color, Color},
     hittable::HitRecord,
     rand::rand,
     ray::{ray, Ray},
+    texture::{SolidColor, Texture},
     vec3::Vec3,
 };
 
@@ -17,12 +18,17 @@ pub trait Material: Send + Sync + fmt::Display {
 
 #[derive(Clone)]
 pub struct Lambertian {
-    albedo: Color,
+    tex: Arc<dyn Texture>,
 }
 
 impl Lambertian {
-    pub fn new(albedo: Color) -> Self {
-        Self { albedo }
+    pub fn new(tex: Arc<dyn Texture>) -> Self {
+        Self { tex }
+    }
+    pub fn from_color(albedo: Color) -> Self {
+        Self {
+            tex: Arc::new(SolidColor::new(albedo)),
+        }
     }
 }
 
@@ -35,14 +41,15 @@ impl Material for Lambertian {
         }
 
         let scattered = ray(rec.p, scatter_direction, r.time);
-        let attenuation = self.albedo.to_owned();
+        let attenuation = self.tex.value(rec.u, rec.v, &rec.p);
         Some((attenuation, scattered))
     }
 }
 
 impl fmt::Display for Lambertian {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "lambertian({})", self.albedo)
+        // write!(f, "lambertian({})", self.albedo)
+        write!(f, "lambertian")
     }
 }
 

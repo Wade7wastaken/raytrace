@@ -9,6 +9,7 @@ use std::{
     Debug,
     Default,
     Clone,
+    Copy,
     PartialEq,
     Add,
     AddAssign,
@@ -55,7 +56,7 @@ impl Color {
         }
     }
 
-    pub fn to_rgb(&self) -> (u8, u8, u8) {
+    pub fn to_rgb(self) -> (u8, u8, u8) {
         (
             channel_to_rgb(self.r),
             channel_to_rgb(self.g),
