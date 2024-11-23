@@ -35,7 +35,7 @@ mod vec3;
  * Reduce Arc::new boilerplate
  */
 
-fn scene1() {
+fn simple() {
     let mut world = HittableList::default();
 
     let mat_ground = Arc::new(Lambertian::from_color(color(0.8, 0.8, 0.0)));
@@ -63,7 +63,7 @@ fn scene1() {
     });
 
     let image_writer =
-        PNGImageWriter::new("./output.png").expect("failed to initialize PPMImageWriter");
+        PNGImageWriter::new("./simple.png").expect("failed to initialize PPMImageWriter");
 
     let world_bvh = BvhNode::from_hittable_list(world);
 
@@ -72,7 +72,7 @@ fn scene1() {
     println!("Took {:.2?}", start.elapsed());
 }
 
-fn scene2() {
+fn bouncing_spheres() {
     let mut world = HittableList::default();
 
     let ground_material = Arc::new(Lambertian::new(Arc::new(CheckerTexture::from_colors(
@@ -136,13 +136,44 @@ fn scene2() {
     let world_bvh = BvhNode::from_hittable_list(world);
 
     let image_writer =
-        PNGImageWriter::new("./output.png").expect("failed to initialize PPMImageWriter");
+        PNGImageWriter::new("./bouncing_spheres.png").expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
     cam.render_and_save(&world_bvh, image_writer).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 
+fn checkered_spheres() {
+    let mut world = HittableList::default();
+
+    let checker = Arc::new(Lambertian::new(Arc::new(CheckerTexture::from_colors(
+        0.32,
+        color(0.2, 0.3, 0.1),
+        color(0.9, 0.9, 0.9),
+    ))));
+
+    world.take(sphere(point3(0.0, -10.0, 0.0), 10.0, checker.clone()));
+    world.take(sphere(point3(0.0, 10.0, 0.0), 10.0, checker));
+
+    let cam = Camera::new(CameraOptions {
+        image_width: 400,
+        samples_per_pixel: 100,
+        max_depth: 50,
+        v_fov: 20.0,
+        look_from: point3(13.0, 2.0, 3.0),
+        look_at: point3(0.0, 0.0, 0.0),
+        defocus_angle: 0.0,
+        ..Default::default()
+    });
+
+    let image_writer =
+        PNGImageWriter::new("./checkered_spheres.png").expect("failed to initialize PPMImageWriter");
+
+    let start = Instant::now();
+    cam.render_and_save(&world, image_writer).unwrap();
+    println!("Took {:.2?}", start.elapsed());
+}
+
 fn main() {
-    scene2();
+    checkered_spheres();
 }
