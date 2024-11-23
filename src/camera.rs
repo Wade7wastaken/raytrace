@@ -8,7 +8,7 @@ use crate::{
     vec3::{point3, vec3, Point3, Vec3},
 };
 use rayon::prelude::*;
-use std::{error::Error, sync::Arc};
+use std::error::Error;
 
 pub struct CameraOptions {
     pub aspect_ratio: f64,
@@ -88,15 +88,15 @@ impl Camera {
         let u = vup.cross(w);
         let v = w.cross(u);
 
-        let viewport_u = viewport_width * u;
-        let viewport_v = viewport_height * -v;
+        let viewport_u = u * viewport_width;
+        let viewport_v = -v * viewport_height;
 
         let pixel_delta_u = viewport_u / image_width as f64;
         let pixel_delta_v = viewport_v / image_height as f64;
 
         let viewport_upper_left =
-            look_from - (focus_dist * w) - viewport_u / 2.0 - viewport_v / 2.0;
-        let pixel_00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+            look_from - (w * focus_dist) - viewport_u / 2.0 - viewport_v / 2.0;
+        let pixel_00_loc = viewport_upper_left + (pixel_delta_u + pixel_delta_v) * 0.5;
 
         let defocus_radius = focus_dist * (defocus_angle / 2.0).to_radians().tan();
         let defocus_disk_u = u * defocus_radius;
@@ -120,48 +120,43 @@ impl Camera {
             defocus_disk_v,
         }
     }
-    pub fn render(
-        &mut self,
-        mut image_writer: impl ImageWriter,
-        world: Arc<dyn Hittable>,
-    ) -> Result<(), Box<dyn Error>> {
-        image_writer.init(self)?;
-
-        let image = (0..self.image_height)
+    pub fn render(&self, world: &dyn Hittable) -> Vec<Vec<Color>> {
+        (0..self.image_height)
             .into_par_iter()
-            .flat_map(|y| {
+            .map(|y| {
                 println!("scanline {}", y);
                 (0..self.image_width)
                     .into_par_iter()
                     .map(|x| {
                         (0..self.samples_per_pixel)
                             .into_par_iter()
-                            .map(|_| {
-                                ray_color(&self.get_ray(x, y), self.max_depth, world.to_owned())
-                            })
+                            .map(|_| ray_color(&self.get_ray(x, y), self.max_depth, world))
                             .sum::<Color>()
                             / self.samples_per_pixel as f64
                     })
-                    .collect::<Vec<_>>()
+                    .collect()
             })
-            .collect::<Vec<_>>();
+            .collect()
+    }
 
-        for pixel in image {
-            image_writer.write_pixel(pixel)?;
-        }
+    pub fn render_and_save(
+        &self,
+        world: &dyn Hittable,
+        mut image_writer: impl ImageWriter,
+    ) -> Result<(), Box<dyn Error>> {
+        let pixels = self.render(world);
+        println!("Done rendering");
 
-        println!();
-        image_writer.finish()?;
-        println!("Done!");
-
+        image_writer.write(pixels)?;
+        println!("Done Saving");
         Ok(())
     }
 
     fn get_ray(&self, x: u32, y: u32) -> Ray {
         let offset = Camera::sample_square();
         let pixel_sample = self.pixel_00_loc
-            + ((x as f64 + offset.x) * self.pixel_delta_u)
-            + ((y as f64 + offset.y) * self.pixel_delta_v);
+            + (self.pixel_delta_u * (x as f64 + offset.x))
+            + (self.pixel_delta_v * (y as f64 + offset.y));
 
         let ray_origin = if self.defocus_angle <= 0.0 {
             self.look_from
@@ -179,11 +174,11 @@ impl Camera {
 
     fn defocus_disk_sample(&self) -> Point3 {
         let p = Vec3::random_in_unit_disk();
-        self.look_from + (p.x * self.defocus_disk_u) + (p.y * self.defocus_disk_v)
+        self.look_from + (self.defocus_disk_u * p.x) + (self.defocus_disk_v * p.y)
     }
 }
 
-fn ray_color(r: &Ray, depth: u32, world: Arc<dyn Hittable>) -> Color {
+fn ray_color(r: &Ray, depth: u32, world: &dyn Hittable) -> Color {
     // if we hit the bounce limit, no more light it gathered
     if depth == 0 {
         return Color::default();

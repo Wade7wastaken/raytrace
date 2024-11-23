@@ -6,7 +6,7 @@ use bvh_node::BvhNode;
 use camera::{Camera, CameraOptions};
 use color::{color, Color};
 use hittable_list::HittableList;
-use image_writer::PPMImageWriter;
+use image_writer::{PNGImageWriter, PPMImageWriter};
 use material::{Dielectric, Lambertian, Metal};
 use rand::{rand, rand_range};
 use sphere::{sphere, Sphere};
@@ -48,7 +48,7 @@ fn scene1() {
     world.take(sphere(point3(-1.0, 0.0, -1.0), 0.4, mat_bubble));
     world.take(sphere(point3(1.0, 0.0, -1.0), 0.5, mat_right));
 
-    let mut cam = Camera::new(CameraOptions {
+    let cam = Camera::new(CameraOptions {
         max_depth: 20,
         samples_per_pixel: 50,
         // image_width: 1920,
@@ -60,13 +60,13 @@ fn scene1() {
         ..Default::default()
     });
 
-    let image_writer =
-        PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
+    let image_writer = PNGImageWriter::new("./output.png")
+        .expect("failed to initialize PPMImageWriter");
 
-    let world2 = Arc::new(BvhNode::from_hittable_list(world));
+    // let world2 = Arc::new(BvhNode::from_hittable_list(world));
 
     let start = Instant::now();
-    cam.render(image_writer, world2).unwrap();
+    cam.render_and_save(&world, image_writer).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 
@@ -116,7 +116,7 @@ fn scene2() {
     let material3 = Arc::new(Metal::new(color(0.7, 0.6, 0.5), 0.0));
     world.take(sphere(point3(4.0, 1.0, 0.0), 1.0, material3));
 
-    let mut cam = Camera::new(CameraOptions {
+    let cam = Camera::new(CameraOptions {
         image_width: 400,
         samples_per_pixel: 100,
         max_depth: 50,
@@ -127,16 +127,14 @@ fn scene2() {
         ..Default::default()
     });
 
-    let image_writer =
-        PPMImageWriter::new("./output.ppm").expect("failed to initialize PPMImageWriter");
+    let image_writer = PPMImageWriter::new("./output.ppm", cam.image_width, cam.image_height)
+        .expect("failed to initialize PPMImageWriter");
 
     let start = Instant::now();
-    // cam.render(image_writer, Arc::new(world)).unwrap();
-    cam.render(image_writer, Arc::new(BvhNode::from_hittable_list(world)))
-        .unwrap();
+    cam.render_and_save(&world, image_writer).unwrap();
     println!("Took {:.2?}", start.elapsed());
 }
 
 fn main() {
-    scene2();
+    scene1();
 }

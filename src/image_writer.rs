@@ -1,14 +1,15 @@
-use std::{fmt::Write as FmtWrite, fs::File, io::Write as IOWrite, path::Path};
+use std::{
+    error::Error,
+    fmt::Write as FmtWrite,
+    fs::File,
+    io::Write as IOWrite,
+    path::Path,
+};
 
-use crate::{camera::Camera, color::Color};
+use crate::color::Color;
 
 pub trait ImageWriter {
-    // should change this to a result some day
-    fn init(&mut self, cam: &Camera) -> Result<(), std::fmt::Error>;
-
-    fn write_pixel(&mut self, pixel_color: Color) -> Result<(), std::fmt::Error>;
-
-    fn finish(&mut self) -> Result<(), std::io::Error>;
+    fn write(&mut self, pixels: Vec<Vec<Color>>) -> Result<(), Box<dyn Error>>;
 }
 
 pub struct PPMImageWriter {
@@ -17,39 +18,79 @@ pub struct PPMImageWriter {
 }
 
 impl PPMImageWriter {
-    pub fn new(path: impl AsRef<Path>) -> Result<Self, std::io::Error> {
-        File::create(path).map(|f| Self {
-            f,
-            buffer: String::new(),
-        })
+    pub fn new(
+        path: impl AsRef<Path>,
+        image_width: u32,
+        image_height: u32,
+    ) -> Result<Self, Box<dyn Error>> {
+        let f = File::create(path)?;
+        let mut buffer = String::new();
+
+        let pixel_expected_value = 4.0;
+        let reserve_length =
+            (image_width as f64 * image_height as f64 * 3.0 * pixel_expected_value).round(); // add 3 for space, space, newline
+
+        println!("Reserving {} bytes", reserve_length);
+        buffer.reserve((reserve_length) as usize);
+        writeln!(buffer, "P3\n{} {}\n255", image_width, image_height)?;
+
+        Ok(Self { f, buffer })
     }
 }
 
 impl ImageWriter for PPMImageWriter {
-    fn init(&mut self, cam: &Camera) -> Result<(), std::fmt::Error> {
-        let pixel_expected_value = 4.0;
-        let reserve_length =
-            (cam.image_width as f64 * cam.image_height as f64 * 3.0 * pixel_expected_value).round(); // add 3 for space, space, newline
+    fn write(&mut self, pixels: Vec<Vec<Color>>) -> Result<(), Box<dyn Error>> {
+        for row in pixels {
+            for pixel in row {
+                let (r, g, b) = pixel.map(linear_to_gamma).to_rgb();
 
-        println!("Reserving {} bytes", reserve_length);
-        self.buffer.reserve((reserve_length) as usize);
-        writeln!(
-            self.buffer,
-            "P3\n{} {}\n255",
-            cam.image_width, cam.image_height
-        )
-    }
+                writeln!(self.buffer, "{} {} {}", r, g, b)?;
+            }
+        }
 
-    fn write_pixel(&mut self, pixel_color: Color) -> Result<(), std::fmt::Error> {
-        let (r, g, b) = pixel_color.map(linear_to_gamma).to_rgb();
-
-        writeln!(self.buffer, "{} {} {}", r, g, b)
-    }
-
-    fn finish(&mut self) -> Result<(), std::io::Error> {
         println!("Final buffer capacity: {}", self.buffer.capacity());
         println!("Final buffer len: {}", self.buffer.len());
-        self.f.write_all(self.buffer.as_bytes())
+        self.f.write_all(self.buffer.as_bytes())?;
+
+        Ok(())
+    }
+}
+
+pub struct PNGImageWriter {
+    f: File,
+}
+
+impl PNGImageWriter {
+    pub fn new(path: impl AsRef<Path>) -> Result<Self, Box<dyn Error>> {
+        Ok(Self {
+            f: File::create(path)?,
+        })
+    }
+}
+
+impl ImageWriter for PNGImageWriter {
+    fn write(&mut self, pixels: Vec<Vec<Color>>) -> Result<(), Box<dyn Error>> {
+        let height = pixels.len();
+        let width = pixels.first().map(|row| row.len()).unwrap_or(0);
+
+        let mut encoder = png::Encoder::new(&self.f, width.try_into()?, height.try_into()?);
+        encoder.set_color(png::ColorType::Rgb);
+        encoder.set_depth(png::BitDepth::Eight);
+        encoder.set_source_gamma(png::ScaledFloat::new(1.0 / 2.0));
+        let mut writer = encoder.write_header()?;
+
+        let data: Vec<u8> = pixels
+            .into_iter()
+            .flat_map(|row| {
+                row.into_iter().flat_map(|pixel| {
+                    let (r, g, b) = pixel.map(linear_to_gamma).to_rgb();
+                    [r, g, b]
+                })
+            })
+            .collect();
+        writer.write_image_data(data.as_slice())?;
+
+        Ok(())
     }
 }
 
