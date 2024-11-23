@@ -76,7 +76,7 @@ impl ImageWriter for PNGImageWriter {
         let mut encoder = png::Encoder::new(&self.f, width.try_into()?, height.try_into()?);
         encoder.set_color(png::ColorType::Rgb);
         encoder.set_depth(png::BitDepth::Eight);
-        encoder.set_source_gamma(png::ScaledFloat::new(1.0 / 2.0));
+        encoder.set_source_gamma(png::ScaledFloat::new(1.0 / 2.2));
         let mut writer = encoder.write_header()?;
 
         let data: Vec<u8> = pixels
@@ -96,7 +96,8 @@ impl ImageWriter for PNGImageWriter {
 
 fn linear_to_gamma(linear_component: f64) -> f64 {
     if linear_component > 0.0 {
-        linear_component.sqrt()
+        linear_component.powf(1.0 / 2.2)
+        // linear_component.sqrt()
     } else {
         0.0
     }

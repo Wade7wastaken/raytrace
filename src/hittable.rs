@@ -21,7 +21,15 @@ pub struct HitRecord {
 
 impl HitRecord {
     /// outward_normal is assumed to have unit length
-    pub fn new(p: Point3, mat: Arc<dyn Material>, t: f64, r: &Ray, outward_normal: Vec3) -> Self {
+    pub fn new(
+        p: Point3,
+        mat: Arc<dyn Material>,
+        t: f64,
+        u: f64,
+        v: f64,
+        r: &Ray,
+        outward_normal: Vec3,
+    ) -> Self {
         let front_face = r.dir.dot(outward_normal) < 0.0;
         let normal = if front_face {
             outward_normal
@@ -34,8 +42,8 @@ impl HitRecord {
             normal,
             mat,
             t,
-            u: 0.0,
-            v: 0.0,
+            u,
+            v,
             front_face,
         }
     }

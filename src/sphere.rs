@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{f64::consts::PI, fmt};
 use std::sync::Arc;
 
 use crate::{
@@ -49,6 +49,15 @@ impl Sphere {
     fn center(&self, time: f64) -> Point3 {
         self.center + self.move_dir * time
     }
+
+    fn get_sphere_uv(p: Point3) -> (f64, f64) {
+        let theta = (-p.y).acos();
+        let phi = f64::atan2(-p.z, p.x) + PI;
+        let u = phi/(2.0 * PI);
+        let v = theta / PI;
+
+        (u, v)
+    }
 }
 
 impl Hittable for Sphere {
@@ -78,10 +87,16 @@ impl Hittable for Sphere {
 
         let rec_p = r.at(root);
 
+        let outward_normal = (rec_p - self.center) / self.radius;
+
+        let (u, v) = Sphere::get_sphere_uv(outward_normal);
+
         Some(HitRecord::new(
             rec_p,
             self.mat.to_owned(),
             root,
+            u,
+            v,
             r,
             (rec_p - self.center) / self.radius,
         ))
