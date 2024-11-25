@@ -1,10 +1,6 @@
 use std::fmt;
 
-use crate::{
-    interval::{interval, Interval},
-    ray::Ray,
-    vec3::Point3,
-};
+use super::{interval, Interval, Point3, Ray};
 
 #[derive(Debug, Clone)]
 pub struct Aabb {

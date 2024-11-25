@@ -1,6 +1,6 @@
 use png::DecodingError;
 
-use crate::color::{color, Color};
+use crate::primitives::{color, Color};
 
 #[derive(Debug)]
 pub struct RtwImage {

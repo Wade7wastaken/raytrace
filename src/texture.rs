@@ -1,10 +1,9 @@
 use std::{error::Error, sync::Arc};
 
 use crate::{
-    color::{color, Color},
     perlin::Perlin,
+    primitives::{color, Color, Point3},
     rtw_image::RtwImage,
-    vec3::Point3,
 };
 
 pub trait Texture: Sync + Send {

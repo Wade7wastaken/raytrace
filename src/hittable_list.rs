@@ -1,10 +1,8 @@
 use std::{fmt, sync::Arc};
 
 use crate::{
-    aabb::Aabb,
     hittable::{HitRecord, Hittable},
-    interval::{interval, Interval},
-    ray::Ray,
+    primitives::{interval, Aabb, Interval, Ray},
 };
 
 #[derive(Clone, Default)]

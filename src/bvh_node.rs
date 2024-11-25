@@ -1,11 +1,9 @@
 use std::{cmp::Ordering, fmt, sync::Arc};
 
 use crate::{
-    aabb::Aabb,
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
-    interval::{interval, Interval},
-    ray::Ray,
+    primitives::{interval, Aabb, Interval, Ray},
 };
 
 pub struct BvhNode {

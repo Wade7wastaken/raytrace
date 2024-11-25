@@ -1,12 +1,6 @@
-use std::{
-    error::Error,
-    fmt::Write as FmtWrite,
-    fs::File,
-    io::Write as IOWrite,
-    path::Path,
-};
+use std::{error::Error, fmt::Write as FmtWrite, fs::File, io::Write as IOWrite, path::Path};
 
-use crate::color::Color;
+use crate::primitives::Color;
 
 pub trait ImageWriter {
     fn write(&mut self, pixels: Vec<Vec<Color>>) -> Result<(), Box<dyn Error>>;

@@ -1,4 +1,4 @@
-use crate::vec3::{Point3, Vec3};
+use super::{Point3, Vec3};
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Ray {
@@ -17,7 +17,6 @@ impl Ray {
     }
 }
 
-// helper initializer to make code look pretty
 pub fn ray(orig: Point3, dir: Vec3, time: f64) -> Ray {
     Ray::new(orig, dir, time)
 }

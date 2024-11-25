@@ -1,14 +1,12 @@
-use crate::{
-    color::{color, Color},
-    hittable::Hittable,
-    image_writer::ImageWriter,
-    interval::interval,
-    rand::rand,
-    ray::{ray, Ray},
-    vec3::{point3, vec3, Point3, Vec3},
-};
 use rayon::prelude::*;
 use std::error::Error;
+
+use crate::{
+    hittable::Hittable,
+    image_writer::ImageWriter,
+    primitives::{color, interval, point3, ray, vec3, Color, Point3, Ray, Vec3},
+    rand,
+};
 
 pub struct CameraOptions {
     pub aspect_ratio: f64,

@@ -1,11 +1,8 @@
 use std::{fmt, sync::Arc};
 
 use crate::{
-    aabb::Aabb,
-    interval::Interval,
     material::Material,
-    ray::Ray,
-    vec3::{Point3, Vec3},
+    primitives::{Aabb, Interval, Point3, Ray, Vec3},
 };
 
 #[derive(Clone)]

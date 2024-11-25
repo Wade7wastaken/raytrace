@@ -95,7 +95,6 @@ fn channel_to_rgb(channel: f64) -> u8 {
     ((channel * 255.999) as u8).clamp(0, 255)
 }
 
-// helper initializer to make code look pretty
 pub fn color(r: f64, g: f64, b: f64) -> Color {
     Color::new(r, g, b)
 }

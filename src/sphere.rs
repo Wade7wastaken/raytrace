@@ -1,13 +1,10 @@
-use std::{f64::consts::PI, fmt};
 use std::sync::Arc;
+use std::{f64::consts::PI, fmt};
 
 use crate::{
-    aabb::Aabb,
     hittable::{HitRecord, Hittable},
-    interval::Interval,
     material::Material,
-    ray::Ray,
-    vec3::{vec3, Point3, Vec3},
+    primitives::{vec3, Aabb, Interval, Point3, Ray, Vec3},
 };
 
 #[derive(Clone)]
@@ -53,7 +50,7 @@ impl Sphere {
     fn get_sphere_uv(p: Point3) -> (f64, f64) {
         let theta = (-p.y).acos();
         let phi = f64::atan2(-p.z, p.x) + PI;
-        let u = phi/(2.0 * PI);
+        let u = phi / (2.0 * PI);
         let v = theta / PI;
 
         (u, v)
@@ -109,7 +106,11 @@ impl Hittable for Sphere {
 
 impl fmt::Display for Sphere {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "circle({}, {}, {}, {})", self.center, self.radius, self.mat, self.bbox)
+        write!(
+            f,
+            "circle({}, {}, {}, {})",
+            self.center, self.radius, self.mat, self.bbox
+        )
     }
 }
 

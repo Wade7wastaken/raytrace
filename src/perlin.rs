@@ -1,6 +1,6 @@
 use rand::seq::SliceRandom;
 
-use crate::vec3::{vec3, Point3, Vec3};
+use crate::primitives::{vec3, Point3, Vec3};
 
 const POINT_COUNT: usize = 256;
 

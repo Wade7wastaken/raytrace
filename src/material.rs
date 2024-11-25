@@ -1,12 +1,10 @@
 use std::{fmt, sync::Arc};
 
 use crate::{
-    color::{color, Color},
     hittable::HitRecord,
+    primitives::{color, ray, Color, Ray, Vec3},
     rand::rand,
-    ray::{ray, Ray},
     texture::{SolidColor, Texture},
-    vec3::Vec3,
 };
 
 pub trait Material: Send + Sync + fmt::Display {
