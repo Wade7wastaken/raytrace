@@ -207,7 +207,7 @@ fn earth() {
 fn perlin_spheres() {
     let mut world = HittableList::default();
 
-    let perlin = Arc::new(Lambertian::new(Arc::new(NoiseTexture::new())));
+    let perlin = Arc::new(Lambertian::new(Arc::new(NoiseTexture::new(4.0))));
 
     world.take(sphere(point3(0.0, -1000.0, 0.0), 1000.0, perlin.clone()));
     world.take(sphere(point3(0.0, 2.0, 0.0), 2.0, perlin));

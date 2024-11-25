@@ -41,7 +41,7 @@ impl Material for Lambertian {
         }
 
         let scattered = ray(rec.p, scatter_direction, r.time);
-        let attenuation = self.tex.value(rec.u, rec.v, &rec.p);
+        let attenuation = self.tex.value(rec.u, rec.v, rec.p);
         Some((attenuation, scattered))
     }
 }
