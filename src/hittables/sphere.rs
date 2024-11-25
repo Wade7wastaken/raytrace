@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::{f64::consts::PI, fmt};
 
 use crate::{
-    material::Material,
+    materials::Material,
     primitives::{vec3, Aabb, Interval, Point3, Ray, Vec3},
 };
 

@@ -1,7 +1,7 @@
 use std::{fmt::Display, sync::Arc};
 
 use crate::{
-    material::Material,
+    materials::Material,
     primitives::{Aabb, Interval, Point3, Ray, Vec3},
 };
 
