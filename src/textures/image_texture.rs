@@ -1,11 +1,8 @@
 use std::error::Error;
 
-use crate::{
-    primitives::{Color, Point3},
-    rtw_image::RtwImage,
-};
+use crate::primitives::{Color, Point3};
 
-use super::Texture;
+use super::{RtwImage, Texture};
 
 pub struct ImageTexture {
     image: RtwImage,

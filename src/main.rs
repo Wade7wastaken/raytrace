@@ -14,10 +14,8 @@ mod camera;
 mod hittables;
 mod image_writer;
 mod materials;
-mod perlin;
 mod primitives;
 mod rand;
-mod rtw_image;
 mod textures;
 
 /**

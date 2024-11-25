@@ -1,9 +1,6 @@
-use crate::{
-    perlin::Perlin,
-    primitives::{color, Color, Point3},
-};
+use crate::primitives::{color, Color, Point3};
 
-use super::Texture;
+use super::{Perlin, Texture};
 
 pub struct NoiseTexture {
     noise: Perlin,
