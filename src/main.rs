@@ -8,7 +8,7 @@ use image_writer::PNGImageWriter;
 use material::{Dielectric, Lambertian, Metal};
 use primitives::{color, point3, vec3, Color};
 use rand::{rand, rand_range};
-use texture::{CheckerTexture, ImageTexture, NoiseTexture};
+use textures::{CheckerTexture, ImageTexture, NoiseTexture};
 
 mod camera;
 mod hittables;
@@ -18,7 +18,7 @@ mod perlin;
 mod primitives;
 mod rand;
 mod rtw_image;
-mod texture;
+mod textures;
 
 /**
  * TODO:

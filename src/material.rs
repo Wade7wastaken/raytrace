@@ -4,7 +4,7 @@ use crate::{
     hittables::HitRecord,
     primitives::{color, ray, Color, Ray, Vec3},
     rand::rand,
-    texture::{SolidColor, Texture},
+    textures::{SolidColor, Texture},
 };
 
 pub trait Material: Send + Sync + fmt::Display {
