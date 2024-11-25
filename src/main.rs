@@ -8,6 +8,7 @@ use color::{color, Color};
 use hittable_list::HittableList;
 use image_writer::PNGImageWriter;
 use material::{Dielectric, Lambertian, Metal};
+use quad::quad;
 use rand::{rand, rand_range};
 use sphere::{sphere, Sphere};
 use texture::{CheckerTexture, ImageTexture, NoiseTexture};
@@ -23,6 +24,7 @@ mod image_writer;
 mod interval;
 mod material;
 mod perlin;
+mod quad;
 mod rand;
 mod ray;
 mod rtw_image;
@@ -231,6 +233,67 @@ fn perlin_spheres() {
     println!("Took {:.2?}", start.elapsed());
 }
 
+fn quads() {
+    let mut world = HittableList::default();
+
+    let left = Arc::new(Lambertian::from_color(color(1.0, 0.2, 0.2)));
+    let back = Arc::new(Lambertian::from_color(color(0.2, 1.0, 0.2)));
+    let right = Arc::new(Lambertian::from_color(color(0.2, 0.2, 1.0)));
+    let upper = Arc::new(Lambertian::from_color(color(1.0, 0.5, 0.0)));
+    let lower = Arc::new(Lambertian::from_color(color(0.2, 0.8, 0.8)));
+
+    world.take(quad(
+        point3(-3.0, -2.0, 5.0),
+        vec3(0.0, 0.0, -4.0),
+        vec3(0.0, 4.0, 0.0),
+        left,
+    ));
+    world.take(quad(
+        point3(-2.0, -2.0, 0.0),
+        vec3(4.0, 0.0, 0.0),
+        vec3(0.0, 4.0, 0.0),
+        back,
+    ));
+    world.take(quad(
+        point3(3.0, -2.0, 1.0),
+        vec3(0.0, 0.0, 4.0),
+        vec3(0.0, 4.0, 0.0),
+        right,
+    ));
+    world.take(quad(
+        point3(-2.0, 3.0, 1.0),
+        vec3(4.0, 0.0, 0.0),
+        vec3(0.0, 0.0, 4.0),
+        upper,
+    ));
+    world.take(quad(
+        point3(-2.0, -3.0, 5.0),
+        vec3(4.0, 0.0, 0.0),
+        vec3(0.0, 0.0, -4.0),
+        lower,
+    ));
+
+    let cam = Camera::new(CameraOptions {
+        aspect_ratio: 1.0,
+        image_width: 400,
+        samples_per_pixel: 100,
+        max_depth: 50,
+        v_fov: 80.0,
+        look_from: point3(0.0, 0.0, 9.0),
+        look_at: point3(0.0, 0.0, 0.0),
+        vup: vec3(0.0, 1.0, 0.0),
+        defocus_angle: 0.0,
+        ..Default::default()
+    });
+
+    let image_writer =
+        PNGImageWriter::new("./output/quads.png").expect("failed to initialize PPMImageWriter");
+
+    let start = Instant::now();
+    cam.render_and_save(&world, image_writer).unwrap();
+    println!("Took {:.2?}", start.elapsed());
+}
+
 fn main() {
-    perlin_spheres();
+    quads();
 }

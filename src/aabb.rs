@@ -6,7 +6,7 @@ use crate::{
     vec3::Point3,
 };
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct Aabb {
     pub x: Interval,
     pub y: Interval,
@@ -15,7 +15,7 @@ pub struct Aabb {
 
 impl Aabb {
     pub fn new(x: Interval, y: Interval, z: Interval) -> Self {
-        Self { x, y, z }
+        Self { x, y, z }.pad_to_minimums()
     }
 
     pub fn from_points(a: Point3, b: Point3) -> Self {
@@ -96,6 +96,32 @@ impl Aabb {
             .max_by(|a, b| a.1.size().partial_cmp(&b.1.size()).unwrap())
             .unwrap()
             .0 as u8
+    }
+
+    const DELTA: f64 = 0.0001;
+
+    fn pad_to_minimums(mut self) -> Self {
+        if self.x.size() < Self::DELTA {
+            self.x = self.x.expand(Self::DELTA)
+        }
+        if self.y.size() < Self::DELTA {
+            self.y = self.y.expand(Self::DELTA)
+        }
+        if self.z.size() < Self::DELTA {
+            self.y = self.z.expand(Self::DELTA)
+        }
+
+        self
+    }
+}
+
+impl Default for Aabb {
+    fn default() -> Self {
+        Self::new(
+            Interval::default(),
+            Interval::default(),
+            Interval::default(),
+        )
     }
 }
 
