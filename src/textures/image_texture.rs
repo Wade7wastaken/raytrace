@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, sync::Arc};
 
 use crate::primitives::{Color, Point3};
 
@@ -30,4 +30,12 @@ impl Texture for ImageTexture {
 
         self.image.pixel_data(i, j)
     }
+}
+
+pub fn image_texture(image: RtwImage) -> Arc<ImageTexture> {
+    Arc::new(ImageTexture::new(image))
+}
+
+pub fn image_texture_from_bytes(bytes: &[u8]) -> Result<Arc<ImageTexture>, Box<dyn Error>> {
+    Ok(Arc::new(ImageTexture::from_bytes(bytes)?))
 }

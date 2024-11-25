@@ -44,3 +44,11 @@ impl fmt::Display for Lambertian {
         write!(f, "lambertian")
     }
 }
+
+pub fn lambertian(tex: Arc<dyn Texture>) -> Arc<Lambertian> {
+    Arc::new(Lambertian::new(tex))
+}
+
+pub fn lambertian_from_color(albedo: Color) -> Arc<Lambertian> {
+    Arc::new(Lambertian::from_color(albedo))
+}

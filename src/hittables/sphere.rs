@@ -115,7 +115,10 @@ impl fmt::Display for Sphere {
     }
 }
 
-// helper initializer to make code look pretty
-pub fn sphere(center: Point3, radius: f64, mat: Arc<dyn Material>) -> Sphere {
-    Sphere::new(center, radius, mat)
+pub fn sphere(center: Point3, radius: f64, mat: Arc<dyn Material>) -> Arc<Sphere> {
+    Arc::new(Sphere::new(center, radius, mat))
+}
+
+pub fn sphere_moving(center: Point3, move_dir: Vec3, radius: f64, mat: Arc<dyn Material>) -> Arc<Sphere> {
+    Arc::new(Sphere::new_moving(center, move_dir, radius, mat))
 }

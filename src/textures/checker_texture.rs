@@ -42,3 +42,15 @@ impl Texture for CheckerTexture {
         }
     }
 }
+
+pub fn checker_texture(
+    scale: f64,
+    even: Arc<dyn Texture>,
+    odd: Arc<dyn Texture>,
+) -> Arc<CheckerTexture> {
+    Arc::new(CheckerTexture::new(scale, even, odd))
+}
+
+pub fn checker_texture_from_colors(scale: f64, c1: Color, c2: Color) -> Arc<CheckerTexture> {
+    Arc::new(CheckerTexture::from_colors(scale, c1, c2))
+}

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::primitives::{color, Color, Point3};
 
 use super::{Perlin, Texture};
@@ -21,4 +23,8 @@ impl Texture for NoiseTexture {
         color(0.5, 0.5, 0.5) * (1.0 + (self.scale * p.z + 10.0 * self.noise.turb(p, 7)).sin())
         // color(1.0, 1.0, 1.0) * self.noise.turb(p, 7)
     }
+}
+
+pub fn noise_texture(scale: f64) -> Arc<NoiseTexture> {
+    Arc::new(NoiseTexture::new(scale))
 }

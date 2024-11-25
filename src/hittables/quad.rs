@@ -89,6 +89,6 @@ impl Display for Quad {
     }
 }
 
-pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Arc<dyn Material>) -> Quad {
-    Quad::new(q, u, v, mat)
+pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Arc<dyn Material>) -> Arc<Quad> {
+    Arc::new(Quad::new(q, u, v, mat))
 }

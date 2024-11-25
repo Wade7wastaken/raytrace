@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, sync::Arc};
 
 use crate::{
     hittables::HitRecord,
@@ -39,4 +39,8 @@ impl fmt::Display for Metal {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "metal({}, {})", self.albedo, self.fuzz)
     }
+}
+
+pub fn metal(albedo: Color, fuzz: f64) -> Arc<Metal> {
+    Arc::new(Metal::new(albedo, fuzz))
 }

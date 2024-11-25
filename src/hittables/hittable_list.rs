@@ -15,11 +15,6 @@ impl HittableList {
         self.bbox = Aabb::from_boxes(&self.bbox, object.bounding_box());
         self.objects.push(object);
     }
-
-    pub fn take(&mut self, object: impl Hittable + 'static) {
-        self.bbox = Aabb::from_boxes(&self.bbox, object.bounding_box());
-        self.objects.push(Arc::new(object));
-    }
 }
 
 impl Hittable for HittableList {

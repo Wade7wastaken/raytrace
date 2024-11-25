@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, sync::Arc};
 
 use crate::{
     hittables::HitRecord,
@@ -56,4 +56,8 @@ impl fmt::Display for Dielectric {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "dielectric({})", self.refraction_index)
     }
+}
+
+pub fn dielectric(refraction_index: f64) -> Arc<Dielectric> {
+    Arc::new(Dielectric::new(refraction_index))
 }
