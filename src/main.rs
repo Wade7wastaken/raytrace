@@ -39,12 +39,8 @@ fn simple() {
     world.add(sphere(point3(1.0, 0.0, -1.0), 0.5, mat_right));
 
     let cam = Camera::new(CameraOptions {
-        max_depth: 20,
-        samples_per_pixel: 100,
-        image_width: 400,
         look_from: point3(-2.0, 2.0, 1.0),
         v_fov: 20.0,
-
         defocus_angle: 10.0,
         focus_dist: 3.4,
         ..Default::default()
@@ -112,9 +108,6 @@ fn bouncing_spheres() {
     world.add(sphere(point3(4.0, 1.0, 0.0), 1.0, material3));
 
     let cam = Camera::new(CameraOptions {
-        image_width: 400,
-        samples_per_pixel: 100,
-        max_depth: 50,
         v_fov: 20.0,
         look_from: point3(13.0, 2.0, 3.0),
         look_at: point3(0.0, 0.0, 0.0),
@@ -147,13 +140,9 @@ fn checkered_spheres() {
     world.add(sphere(point3(0.0, 10.0, 0.0), 10.0, checker));
 
     let cam = Camera::new(CameraOptions {
-        image_width: 400,
-        samples_per_pixel: 100,
-        max_depth: 50,
         v_fov: 20.0,
         look_from: point3(13.0, 2.0, 3.0),
         look_at: point3(0.0, 0.0, 0.0),
-        defocus_angle: 0.0,
         ..Default::default()
     });
 
@@ -175,14 +164,10 @@ fn earth() {
     let globe = sphere(point3(0.0, 0.0, 0.0), 2.0, earth_mat);
 
     let cam = Camera::new(CameraOptions {
-        image_width: 400,
-        samples_per_pixel: 100,
-        max_depth: 50,
         v_fov: 20.0,
         look_from: point3(0.0, 0.0, 12.0),
         look_at: point3(0.0, 0.0, 0.0),
         vup: vec3(0.0, 1.0, 0.0),
-        defocus_angle: 0.0,
         ..Default::default()
     });
 
@@ -205,13 +190,9 @@ fn perlin_spheres() {
     world.add(sphere(point3(0.0, 2.0, 0.0), 2.0, perlin));
 
     let cam = Camera::new(CameraOptions {
-        image_width: 400,
-        samples_per_pixel: 100,
-        max_depth: 50,
         v_fov: 20.0,
         look_from: point3(13.0, 2.0, 3.0),
         look_at: point3(0.0, 0.0, 0.0),
-        defocus_angle: 0.0,
         ..Default::default()
     });
 
@@ -267,14 +248,9 @@ fn quads() {
 
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,
-        image_width: 400,
-        samples_per_pixel: 100,
-        max_depth: 50,
         v_fov: 80.0,
         look_from: point3(0.0, 0.0, 9.0),
         look_at: point3(0.0, 0.0, 0.0),
-        vup: vec3(0.0, 1.0, 0.0),
-        defocus_angle: 0.0,
         ..Default::default()
     });
 
