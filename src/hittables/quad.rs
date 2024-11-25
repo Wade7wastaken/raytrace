@@ -1,10 +1,11 @@
 use std::{fmt::Display, sync::Arc};
 
 use crate::{
-    hittable::{HitRecord, Hittable},
     material::Material,
     primitives::{Aabb, Interval, Point3, Ray, Vec3},
 };
+
+use super::{HitRecord, Hittable};
 
 pub struct Quad {
     q: Point3,

@@ -1,10 +1,8 @@
 use std::{cmp::Ordering, fmt, sync::Arc};
 
-use crate::{
-    hittable::{HitRecord, Hittable},
-    hittable_list::HittableList,
-    primitives::{interval, Aabb, Interval, Ray},
-};
+use crate::primitives::{interval, Aabb, Interval, Ray};
+
+use super::{HitRecord, Hittable, HittableList};
 
 pub struct BvhNode {
     left: Arc<dyn Hittable>,

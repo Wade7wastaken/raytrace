@@ -2,29 +2,22 @@
 
 use std::{sync::Arc, time::Instant};
 
-use bvh_node::BvhNode;
 use camera::{Camera, CameraOptions};
-use hittable_list::HittableList;
+use hittables::{quad, sphere, BvhNode, HittableList, Sphere};
 use image_writer::PNGImageWriter;
 use material::{Dielectric, Lambertian, Metal};
 use primitives::{color, point3, vec3, Color};
-use quad::quad;
 use rand::{rand, rand_range};
-use sphere::{sphere, Sphere};
 use texture::{CheckerTexture, ImageTexture, NoiseTexture};
 
-mod bvh_node;
 mod camera;
-mod hittable;
-mod hittable_list;
+mod hittables;
 mod image_writer;
 mod material;
 mod perlin;
 mod primitives;
-mod quad;
 mod rand;
 mod rtw_image;
-mod sphere;
 mod texture;
 
 /**

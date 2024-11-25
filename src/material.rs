@@ -1,7 +1,7 @@
 use std::{fmt, sync::Arc};
 
 use crate::{
-    hittable::HitRecord,
+    hittables::HitRecord,
     primitives::{color, ray, Color, Ray, Vec3},
     rand::rand,
     texture::{SolidColor, Texture},

@@ -2,10 +2,11 @@ use std::sync::Arc;
 use std::{f64::consts::PI, fmt};
 
 use crate::{
-    hittable::{HitRecord, Hittable},
     material::Material,
     primitives::{vec3, Aabb, Interval, Point3, Ray, Vec3},
 };
+
+use super::{HitRecord, Hittable};
 
 #[derive(Clone)]
 pub struct Sphere {

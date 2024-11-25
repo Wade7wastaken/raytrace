@@ -1,9 +1,8 @@
 use std::{fmt, sync::Arc};
 
-use crate::{
-    hittable::{HitRecord, Hittable},
-    primitives::{interval, Aabb, Interval, Ray},
-};
+use crate::primitives::{interval, Aabb, Interval, Ray};
+
+use super::{HitRecord, Hittable};
 
 #[derive(Clone, Default)]
 pub struct HittableList {

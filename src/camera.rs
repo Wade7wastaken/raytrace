@@ -2,7 +2,7 @@ use rayon::prelude::*;
 use std::error::Error;
 
 use crate::{
-    hittable::Hittable,
+    hittables::Hittable,
     image_writer::ImageWriter,
     primitives::{color, interval, point3, ray, vec3, Color, Point3, Ray, Vec3},
     rand,
