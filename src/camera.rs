@@ -10,7 +10,7 @@ use crate::{
 
 pub struct CameraOptions {
     pub aspect_ratio: f64,
-    pub image_width: u32,
+    pub image_width: usize,
     pub samples_per_pixel: u32,
     pub max_depth: u32,
     pub v_fov: f64,
@@ -40,8 +40,8 @@ impl Default for CameraOptions {
 
 pub struct Camera {
     // aspect_ratio: f64,
-    pub image_height: u32, // public so they can be accessed by image writers
-    pub image_width: u32,
+    pub image_height: usize, // public so they can be accessed by image writers
+    pub image_width: usize,
     // focal_length: f64,
     samples_per_pixel: u32,
     max_depth: u32,
@@ -70,7 +70,7 @@ impl Camera {
             defocus_angle,
             focus_dist,
         } = options;
-        let image_height = (image_width as f64 / aspect_ratio) as u32;
+        let image_height = (image_width as f64 / aspect_ratio) as usize;
 
         // ensure dimensions are more than 0
         assert!(image_width > 0);
@@ -122,7 +122,7 @@ impl Camera {
         (0..self.image_height)
             .into_par_iter()
             .map(|y| {
-                println!("scanline {}", y);
+                // println!("scanline {}", y);
                 (0..self.image_width)
                     .into_par_iter()
                     .map(|x| {
@@ -150,7 +150,7 @@ impl Camera {
         Ok(())
     }
 
-    fn get_ray(&self, x: u32, y: u32) -> Ray {
+    fn get_ray(&self, x: usize, y: usize) -> Ray {
         let offset = Camera::sample_square();
         let pixel_sample = self.pixel_00_loc
             + (self.pixel_delta_u * (x as f64 + offset.x))
