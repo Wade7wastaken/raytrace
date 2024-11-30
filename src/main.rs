@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use camera::{Camera, CameraOptions};
-use hittables::{quad, sphere, sphere_moving, BvhNode, HittableList};
+use hittables::{cube, quad, sphere, sphere_moving, BvhNode, HittableList};
 use image_writer::PNGImageWriter;
 use materials::{dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal};
 use primitives::{color, point3, vec3, Color};
@@ -302,6 +302,84 @@ fn simple_light() {
     println!("Took {:.2?}", end);
 }
 
+fn cornell_box() {
+    let mut world = HittableList::default();
+
+    let red = lambertian_from_color(color(0.65, 0.05, 0.05));
+    let white = lambertian_from_color(color(0.73, 0.73, 0.73));
+    let green = lambertian_from_color(color(0.12, 0.45, 0.15));
+
+    let light = diffuse_light_from_color(color(15.0, 15.0, 15.0));
+
+    world.add(quad(
+        point3(555.0, 0.0, 0.0),
+        point3(0.0, 555.0, 0.0),
+        vec3(0.0, 0.0, 555.0),
+        green,
+    ));
+    world.add(quad(
+        point3(0.0, 0.0, 0.0),
+        point3(0.0, 555.0, 0.0),
+        vec3(0.0, 0.0, 555.0),
+        red,
+    ));
+    world.add(quad(
+        point3(343.0, 554.0, 332.0),
+        point3(-130.0, 0.0, 0.0),
+        vec3(0.0, 0.0, -105.0),
+        light,
+    ));
+    world.add(quad(
+        point3(0.0, 0.0, 0.0),
+        point3(555.0, 0.0, 0.0),
+        vec3(0.0, 0.0, 555.0),
+        white.clone(),
+    ));
+    world.add(quad(
+        point3(555.0, 555.0, 555.0),
+        point3(-555.0, 0.0, 0.0),
+        vec3(0.0, 0.0, -555.0),
+        white.clone(),
+    ));
+    world.add(quad(
+        point3(0.0, 0.0, 555.0),
+        point3(555.0, 0.0, 0.0),
+        vec3(0.0, 555.0, 0.0),
+        white.clone(),
+    ));
+
+    world.add(cube(
+        point3(130.0, 0.0, 65.0),
+        point3(295.0, 165.0, 230.0),
+        white.clone(),
+    ));
+    world.add(cube(
+        point3(265.0, 0.0, 295.0),
+        point3(430.0, 330.0, 460.0),
+        white.clone(),
+    ));
+
+    let cam = Camera::new(CameraOptions {
+        aspect_ratio: 1.0,
+        image_width: 600,
+        v_fov: 40.0,
+        samples_per_pixel: 200,
+        look_from: point3(278.0, 278.0, -800.0),
+        look_at: point3(278.0, 278.0, 0.0),
+        background: color(0.0, 0.0, 0.0),
+        ..Default::default()
+    });
+
+    let image_writer =
+        PNGImageWriter::new("./output/cornel_box.png").expect("failed to initialize image writer");
+
+    let start = Instant::now();
+    cam.render_and_save(&world, image_writer)
+        .expect("failed to save image");
+    let end = start.elapsed();
+    println!("Took {:.2?}", end);
+}
+
 fn main() {
     // simple();
     // bouncing_spheres();
@@ -309,5 +387,6 @@ fn main() {
     // earth();
     // perlin_spheres();
     // quads();
-    simple_light();
+    // simple_light();
+    cornell_box();
 }
