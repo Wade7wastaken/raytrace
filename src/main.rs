@@ -265,10 +265,5 @@ fn quads() {
 }
 
 fn main() {
-    simple();
-    bouncing_spheres();
-    checkered_spheres();
-    earth();
-    perlin_spheres();
     quads();
 }

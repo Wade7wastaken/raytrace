@@ -122,7 +122,7 @@ impl Camera {
         (0..self.image_height)
             .into_par_iter()
             .map(|y| {
-                // println!("scanline {}", y);
+                println!("scanline {}", y);
                 (0..self.image_width)
                     .into_par_iter()
                     .map(|x| {
