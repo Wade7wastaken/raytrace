@@ -1,11 +1,9 @@
-#![allow(dead_code)]
-
 use std::time::Instant;
 
 use camera::{Camera, CameraOptions};
 use hittables::{quad, sphere, sphere_moving, BvhNode, HittableList};
 use image_writer::PNGImageWriter;
-use materials::{dielectric, lambertian, lambertian_from_color, metal};
+use materials::{dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal};
 use primitives::{color, point3, vec3, Color};
 use rand::{rand, rand_range};
 use textures::{checker_texture_from_colors, image_texture_from_bytes, noise_texture};
@@ -43,6 +41,7 @@ fn simple() {
         v_fov: 20.0,
         defocus_angle: 10.0,
         focus_dist: 3.4,
+        background: color(0.7, 0.8, 1.0),
         ..Default::default()
     });
 
@@ -112,6 +111,7 @@ fn bouncing_spheres() {
         look_from: point3(13.0, 2.0, 3.0),
         look_at: point3(0.0, 0.0, 0.0),
         defocus_angle: 0.6,
+        background: color(0.7, 0.8, 1.0),
         ..Default::default()
     });
 
@@ -143,6 +143,7 @@ fn checkered_spheres() {
         v_fov: 20.0,
         look_from: point3(13.0, 2.0, 3.0),
         look_at: point3(0.0, 0.0, 0.0),
+        background: color(0.7, 0.8, 1.0),
         ..Default::default()
     });
 
@@ -168,6 +169,7 @@ fn earth() {
         look_from: point3(0.0, 0.0, 12.0),
         look_at: point3(0.0, 0.0, 0.0),
         vup: vec3(0.0, 1.0, 0.0),
+        background: color(0.7, 0.8, 1.0),
         ..Default::default()
     });
 
@@ -193,6 +195,7 @@ fn perlin_spheres() {
         v_fov: 20.0,
         look_from: point3(13.0, 2.0, 3.0),
         look_at: point3(0.0, 0.0, 0.0),
+        background: color(0.7, 0.8, 1.0),
         ..Default::default()
     });
 
@@ -251,6 +254,7 @@ fn quads() {
         v_fov: 80.0,
         look_from: point3(0.0, 0.0, 9.0),
         look_at: point3(0.0, 0.0, 0.0),
+        background: color(0.7, 0.8, 1.0),
         ..Default::default()
     });
 
@@ -264,6 +268,46 @@ fn quads() {
     println!("Took {:.2?}", end);
 }
 
+fn simple_light() {
+    let mut world = HittableList::default();
+
+    let noise = lambertian(noise_texture(4.0));
+    world.add(sphere(point3(0.0, -1000.0, 0.0), 1000.0, noise.clone()));
+    world.add(sphere(point3(0.0, 2.0, 0.0), 2.0, noise));
+
+    let light = diffuse_light_from_color(color(4.0, 4.0, 4.0));
+    world.add(sphere(point3(0.0, 7.0, 0.0), 2.0, light.clone()));
+    world.add(quad(
+        point3(3.0, 1.0, -2.0),
+        vec3(2.0, 0.0, 0.0),
+        vec3(0.0, 2.0, 0.0),
+        light,
+    ));
+
+    let cam = Camera::new(CameraOptions {
+        v_fov: 20.0,
+        look_from: point3(26.0, 3.0, 6.0),
+        look_at: point3(0.0, 2.0, 0.0),
+        background: color(0.0, 0.0, 0.0),
+        ..Default::default()
+    });
+
+    let image_writer = PNGImageWriter::new("./output/simple_light.png")
+        .expect("failed to initialize image writer");
+
+    let start = Instant::now();
+    cam.render_and_save(&world, image_writer)
+        .expect("failed to save image");
+    let end = start.elapsed();
+    println!("Took {:.2?}", end);
+}
+
 fn main() {
-    quads();
+    // simple();
+    // bouncing_spheres();
+    // checkered_spheres();
+    // earth();
+    // perlin_spheres();
+    // quads();
+    simple_light();
 }

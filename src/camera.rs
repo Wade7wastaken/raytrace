@@ -19,6 +19,7 @@ pub struct CameraOptions {
     pub vup: Vec3,
     pub defocus_angle: f64,
     pub focus_dist: f64,
+    pub background: Color,
 }
 
 impl Default for CameraOptions {
@@ -34,6 +35,7 @@ impl Default for CameraOptions {
             vup: vec3(0.0, 1.0, 0.0),
             defocus_angle: 0.0,
             focus_dist: 10.0,
+            background: color(0.0, 0.0, 0.0),
         }
     }
 }
@@ -54,6 +56,7 @@ pub struct Camera {
     defocus_angle: f64,
     defocus_disk_u: Vec3,
     defocus_disk_v: Vec3,
+    background: Color,
 }
 
 impl Camera {
@@ -69,6 +72,7 @@ impl Camera {
             vup,
             defocus_angle,
             focus_dist,
+            background,
         } = options;
         let image_height = (image_width as f64 / aspect_ratio) as usize;
 
@@ -116,6 +120,7 @@ impl Camera {
             defocus_angle,
             defocus_disk_u,
             defocus_disk_v,
+            background,
         }
     }
     pub fn render(&self, world: &dyn Hittable) -> Vec<Vec<Color>> {
@@ -128,7 +133,7 @@ impl Camera {
                     .map(|x| {
                         (0..self.samples_per_pixel)
                             .into_par_iter()
-                            .map(|_| ray_color(&self.get_ray(x, y), self.max_depth, world))
+                            .map(|_| self.ray_color(&self.get_ray(x, y), self.max_depth, world))
                             .sum::<Color>()
                             / self.samples_per_pixel as f64
                     })
@@ -150,8 +155,27 @@ impl Camera {
         Ok(())
     }
 
+    fn ray_color(&self, r: &Ray, depth: u32, world: &dyn Hittable) -> Color {
+        // if we hit the bounce limit, no more light it gathered
+        if depth == 0 {
+            return color(0.0, 0.0, 0.0);
+        }
+
+        if let Some(rec) = world.hit(r, &interval(0.001, f64::INFINITY)) {
+            let color_from_emission = rec.mat.emitted(rec.u, rec.v, rec.p);
+            if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
+                let color_from_scatter = attenuation * self.ray_color(&scattered, depth - 1, world);
+                color_from_scatter + color_from_emission
+            } else {
+                color_from_emission
+            }
+        } else {
+            self.background
+        }
+    }
+
     fn get_ray(&self, x: usize, y: usize) -> Ray {
-        let offset = Camera::sample_square();
+        let offset = sample_square();
         let pixel_sample = self.pixel_00_loc
             + (self.pixel_delta_u * (x as f64 + offset.x))
             + (self.pixel_delta_v * (y as f64 + offset.y));
@@ -166,35 +190,12 @@ impl Camera {
         ray(ray_origin, ray_direction, rand())
     }
 
-    fn sample_square() -> Vec3 {
-        vec3(rand() - 0.5, rand() - 0.5, 0.0)
-    }
-
     fn defocus_disk_sample(&self) -> Point3 {
         let p = Vec3::random_in_unit_disk();
         self.look_from + (self.defocus_disk_u * p.x) + (self.defocus_disk_v * p.y)
     }
 }
 
-fn ray_color(r: &Ray, depth: u32, world: &dyn Hittable) -> Color {
-    // if we hit the bounce limit, no more light it gathered
-    if depth == 0 {
-        return Color::default();
-    }
-
-    if let Some(rec) = world.hit(r, &interval(0.001, f64::INFINITY)) {
-        if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
-            attenuation * ray_color(&scattered, depth - 1, world)
-        } else {
-            Color::default()
-        }
-    } else {
-        sky(r)
-    }
-}
-
-fn sky(r: &Ray) -> Color {
-    let unit_direction = r.dir.unit_vector();
-    let t = 0.5 * (unit_direction.y + 1.0);
-    (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0)
+fn sample_square() -> Vec3 {
+    vec3(rand() - 0.5, rand() - 0.5, 0.0)
 }
