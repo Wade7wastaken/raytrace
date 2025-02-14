@@ -3,7 +3,7 @@ use std::{fmt, sync::Arc};
 use crate::{
     hittables::HitRecord,
     primitives::{color, ray, Color, Ray},
-    rand,
+    rand::rand,
 };
 
 use super::Material;

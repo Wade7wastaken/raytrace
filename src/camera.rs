@@ -5,7 +5,7 @@ use crate::{
     hittables::Hittable,
     image_writer::ImageWriter,
     primitives::{color, interval, point3, ray, vec3, Color, Point3, Ray, Vec3},
-    rand,
+    rand::rand,
 };
 
 pub struct CameraOptions {
@@ -127,7 +127,7 @@ impl Camera {
         (0..self.image_height)
             .into_par_iter()
             .map(|y| {
-                println!("scanline {}", y);
+                // println!("scanline {}", y);
                 (0..self.image_width)
                     .into_par_iter()
                     .map(|x| {
@@ -162,13 +162,13 @@ impl Camera {
         }
 
         if let Some(rec) = world.hit(r, &interval(0.001, f64::INFINITY)) {
-            let color_from_emission = rec.mat.emitted(rec.u, rec.v, rec.p);
+            let mut color = rec.mat.emitted(rec.u, rec.v, rec.p);
+
             if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
                 let color_from_scatter = attenuation * self.ray_color(&scattered, depth - 1, world);
-                color_from_scatter + color_from_emission
-            } else {
-                color_from_emission
+                color += color_from_scatter
             }
+            color
         } else {
             self.background
         }
