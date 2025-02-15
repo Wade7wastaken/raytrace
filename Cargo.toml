@@ -10,3 +10,4 @@ rand = "0.8"
 derive_more = { version = "1.0.0", features = ["full"] }
 rayon = "1.10.0"
 png = "0.17.14"
+gltf = "1.4.1"
