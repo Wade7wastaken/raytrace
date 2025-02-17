@@ -363,8 +363,8 @@ pub fn room() -> (BvhNode, Camera) {
             0.20000000298023224,
         )),
         lambertian_from_color(color(0.7, 0.7, 0.7)),
-        lambertian(image_texture_from_bytes(include_bytes!("../Wood_Floor_Light.png")).unwrap()),
-        lambertian(image_texture_from_bytes(include_bytes!("../Wood_Floor.png")).unwrap()),
+        lambertian(image_texture_from_bytes(include_bytes!("./res/Wood_Floor_Light.png")).unwrap()),
+        lambertian(image_texture_from_bytes(include_bytes!("./res/Wood_Floor.png")).unwrap()),
         diffuse_light_from_color(color(
             0.3921569883823395,
             0.5843139886856079,
