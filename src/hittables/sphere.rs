@@ -96,7 +96,7 @@ impl Hittable for Sphere {
             u,
             v,
             r,
-            (rec_p - self.center) / self.radius,
+            outward_normal
         ))
     }
 
