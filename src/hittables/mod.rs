@@ -3,6 +3,7 @@ mod hittable;
 mod hittable_list;
 mod quad;
 mod sphere;
+mod triangle;
 
 use std::sync::Arc;
 
@@ -11,6 +12,7 @@ pub use hittable::*;
 pub use hittable_list::*;
 pub use quad::*;
 pub use sphere::*;
+pub use triangle::*;
 
 use crate::{
     materials::Material,

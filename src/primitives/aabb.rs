@@ -31,14 +31,14 @@ impl Aabb {
             interval(b.z, a.z)
         };
 
-        Self { x, y, z }
+        Self { x, y, z }.pad_to_minimums()
     }
 
     pub fn from_boxes(a: &Self, b: &Self) -> Self {
         let x = Interval::from_intervals(&a.x, &b.x);
         let y = Interval::from_intervals(&a.y, &b.y);
         let z = Interval::from_intervals(&a.z, &b.z);
-        Self { x, y, z }
+        Self { x, y, z }.pad_to_minimums()
     }
 
     pub fn axis_interval(&self, index: u8) -> &Interval {
@@ -104,7 +104,7 @@ impl Aabb {
             self.y = self.y.expand(Self::DELTA)
         }
         if self.z.size() < Self::DELTA {
-            self.y = self.z.expand(Self::DELTA)
+            self.z = self.z.expand(Self::DELTA)
         }
 
         self
@@ -118,6 +118,7 @@ impl Default for Aabb {
             Interval::default(),
             Interval::default(),
         )
+        .pad_to_minimums()
     }
 }
 

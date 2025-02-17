@@ -1,6 +1,6 @@
 use crate::{
     camera::{Camera, CameraOptions},
-    hittables::{cube, quad, sphere, sphere_moving, BvhNode, HittableList},
+    hittables::{cube, quad, sphere, sphere_moving, triangle, BvhNode, HittableList},
     materials::{dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal},
     primitives::{color, point3, vec3, Color},
     rand::{self, rand},
@@ -307,6 +307,32 @@ pub fn cornell_box() -> (HittableList, Camera) {
         look_from: point3(278.0, 278.0, -800.0),
         look_at: point3(278.0, 278.0, 0.0),
         background: color(0.0, 0.0, 0.0),
+        ..Default::default()
+    });
+
+    (world, cam)
+}
+
+pub fn triangles() -> (HittableList, Camera) {
+    let mut world = HittableList::default();
+
+    let red = lambertian_from_color(color(0.65, 0.05, 0.05));
+
+    world.add(triangle(
+        point3(0.0, 0.0, 0.0),
+        point3(1.0, 1.0, 0.0),
+        point3(1.0, 0.0, 0.0),
+        red.clone(),
+    ));
+
+    let cam = Camera::new(CameraOptions {
+        aspect_ratio: 1.0,
+        image_width: 400,
+        v_fov: 40.0,
+        samples_per_pixel: 10,
+        look_from: point3(1.0, 0.0, -5.0),
+        look_at: point3(0.0, 0.0, 0.0),
+        background: color(1.0, 1.0, 1.0),
         ..Default::default()
     });
 

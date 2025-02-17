@@ -127,10 +127,11 @@ impl Camera {
         (0..self.image_height)
             .into_par_iter()
             .map(|y| {
-                // println!("scanline {}", y);
+                println!("scanline {}", y);
                 (0..self.image_width)
                     .into_par_iter()
                     .map(|x| {
+                        // println!("pixel {}", x);
                         (0..self.samples_per_pixel)
                             .into_par_iter()
                             .map(|_| self.ray_color(&self.get_ray(x, y), self.max_depth, world))
