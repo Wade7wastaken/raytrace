@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     camera::{Camera, CameraOptions},
-    hittables::{cube, quad, rotate_y, sphere, sphere_moving, translate, triangle, BvhNode, Hittable, HittableList},
+    hittables::{constant_medium_from_color, cube, quad, rotate_y, sphere, sphere_moving, translate, triangle, BvhNode, Hittable, HittableList},
     materials::{dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal, Material},
     primitives::{color, point3, vec3, Color, Point3},
     rand::{self, rand},
@@ -251,7 +251,7 @@ pub fn cornell_box() -> (HittableList, Camera) {
     let white = lambertian_from_color(color(0.73, 0.73, 0.73));
     let green = lambertian_from_color(color(0.12, 0.45, 0.15));
 
-    let light = diffuse_light_from_color(color(15.0, 15.0, 15.0));
+    let light = diffuse_light_from_color(color(7.0, 7.0, 7.0));
 
     world.add(quad(
         point3(555.0, 0.0, 0.0),
@@ -266,21 +266,21 @@ pub fn cornell_box() -> (HittableList, Camera) {
         red,
     ));
     world.add(quad(
-        point3(343.0, 554.0, 332.0),
-        point3(-130.0, 0.0, 0.0),
-        vec3(0.0, 0.0, -105.0),
+        point3(113.0, 554.0, 127.0),
+        point3(330.0, 0.0, 0.0),
+        vec3(0.0, 0.0, 305.0),
         light,
     ));
     world.add(quad(
-        point3(0.0, 0.0, 0.0),
+        point3(0.0, 555.0, 0.0),
         point3(555.0, 0.0, 0.0),
         vec3(0.0, 0.0, 555.0),
         white.clone(),
     ));
     world.add(quad(
-        point3(555.0, 555.0, 555.0),
-        point3(-555.0, 0.0, 0.0),
-        vec3(0.0, 0.0, -555.0),
+        point3(0.0, 0.0, 0.0),
+        point3(555.0, 0.0, 0.0),
+        vec3(0.0, 0.0, 555.0),
         white.clone(),
     ));
     world.add(quad(
@@ -297,15 +297,18 @@ pub fn cornell_box() -> (HittableList, Camera) {
     );
     box1 = rotate_y(box1, 15.0);
     box1 = translate(box1, vec3(265.0, 0.0, 295.0));
-    world.add(box1);
-    let mut box1: Arc<dyn Hittable> = cube(
+    // world.add(box1);
+    let mut box2: Arc<dyn Hittable> = cube(
         point3(0.0, 0.0, 0.0),
         point3(165.0, 165.0, 165.0),
         white.clone(),
     );
-    box1 = rotate_y(box1, -18.0);
-    box1 = translate(box1, vec3(130.0, 0.0, 65.0));
-    world.add(box1);
+    box2 = rotate_y(box2, -18.0);
+    box2 = translate(box2, vec3(130.0, 0.0, 65.0));
+    // world.add(box2);
+
+    world.add(constant_medium_from_color(box1, 0.01, color(0.0, 0.0, 0.0)));
+    world.add(constant_medium_from_color(box2, 0.01, color(1.0, 1.0, 1.0)));
 
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,

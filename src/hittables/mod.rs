@@ -1,4 +1,5 @@
 mod bvh_node;
+mod constant_medium;
 mod hittable;
 mod hittable_list;
 mod quad;
@@ -7,9 +8,8 @@ mod sphere;
 mod translate;
 mod triangle;
 
-use std::sync::Arc;
-
 pub use bvh_node::*;
+pub use constant_medium::*;
 pub use hittable::*;
 pub use hittable_list::*;
 pub use quad::*;
@@ -17,6 +17,8 @@ pub use rotate_y::*;
 pub use sphere::*;
 pub use translate::*;
 pub use triangle::*;
+
+use std::sync::Arc;
 
 use crate::{
     materials::Material,
