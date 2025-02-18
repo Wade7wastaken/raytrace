@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     camera::{Camera, CameraOptions},
-    hittables::{cube, quad, sphere, sphere_moving, triangle, BvhNode, HittableList},
+    hittables::{cube, quad, rotate_y, sphere, sphere_moving, translate, triangle, BvhNode, Hittable, HittableList},
     materials::{dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal, Material},
     primitives::{color, point3, vec3, Color, Point3},
     rand::{self, rand},
@@ -290,16 +290,22 @@ pub fn cornell_box() -> (HittableList, Camera) {
         white.clone(),
     ));
 
-    world.add(cube(
-        point3(130.0, 0.0, 65.0),
-        point3(295.0, 165.0, 230.0),
+    let mut box1: Arc<dyn Hittable> = cube(
+        point3(0.0, 0.0, 0.0),
+        point3(165.0, 330.0, 165.0),
         white.clone(),
-    ));
-    world.add(cube(
-        point3(265.0, 0.0, 295.0),
-        point3(430.0, 330.0, 460.0),
+    );
+    box1 = rotate_y(box1, 15.0);
+    box1 = translate(box1, vec3(265.0, 0.0, 295.0));
+    world.add(box1);
+    let mut box1: Arc<dyn Hittable> = cube(
+        point3(0.0, 0.0, 0.0),
+        point3(165.0, 165.0, 165.0),
         white.clone(),
-    ));
+    );
+    box1 = rotate_y(box1, -18.0);
+    box1 = translate(box1, vec3(130.0, 0.0, 65.0));
+    world.add(box1);
 
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,

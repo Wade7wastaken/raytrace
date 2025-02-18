@@ -1,6 +1,6 @@
-use std::fmt;
+use std::{fmt, ops::Add};
 
-use super::{interval, Interval, Point3, Ray};
+use super::{interval, Interval, Point3, Ray, Vec3};
 
 #[derive(Debug, Clone)]
 pub struct Aabb {
@@ -108,6 +108,13 @@ impl Aabb {
         }
 
         self
+    }
+}
+
+impl Add<Vec3> for &Aabb {
+    type Output = Aabb;
+    fn add(self, rhs: Vec3) -> Self::Output {
+        Aabb::new(self.x.clone() + rhs.x, self.y.clone() + rhs.y, self.z.clone() + rhs.z)
     }
 }
 

@@ -2,7 +2,9 @@ mod bvh_node;
 mod hittable;
 mod hittable_list;
 mod quad;
+mod rotate_y;
 mod sphere;
+mod translate;
 mod triangle;
 
 use std::sync::Arc;
@@ -11,7 +13,9 @@ pub use bvh_node::*;
 pub use hittable::*;
 pub use hittable_list::*;
 pub use quad::*;
+pub use rotate_y::*;
 pub use sphere::*;
+pub use translate::*;
 pub use triangle::*;
 
 use crate::{
@@ -32,9 +36,9 @@ pub fn cube(a: Point3, b: Point3, mat: Arc<dyn Material>) -> Arc<HittableList> {
     sides.add(quad(point3(min.x, min.y, max.z), dx, dy, mat.clone())); // front
     sides.add(quad(point3(max.x, min.y, max.z), -dz, dy, mat.clone())); // right
     sides.add(quad(point3(max.x, min.y, min.z), -dx, dy, mat.clone())); // back
-    sides.add(quad(point3(min.x, min.y, min.z), dx, dy, mat.clone())); // left
+    sides.add(quad(point3(min.x, min.y, min.z), dz, dy, mat.clone())); // left
     sides.add(quad(point3(min.x, max.y, max.z), dx, -dz, mat.clone())); // top
-    sides.add(quad(point3(min.x, min.y, min.z), dx, dz, mat)); // botton
+    sides.add(quad(point3(min.x, min.y, min.z), dx, dz, mat)); // bottom
 
     Arc::new(sides)
 }

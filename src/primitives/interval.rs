@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, ops::Add};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Interval {
@@ -42,6 +42,13 @@ impl Interval {
             min: self.min - padding,
             max: self.max + padding,
         }
+    }
+}
+
+impl Add<f64> for Interval {
+    type Output = Interval;
+    fn add(self, rhs: f64) -> Self::Output {
+        Interval::new(self.min + rhs, self.max + rhs)
     }
 }
 
