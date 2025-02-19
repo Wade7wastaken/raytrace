@@ -82,10 +82,6 @@ impl Hittable for BvhNode {
 
 impl fmt::Display for BvhNode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "bvh(left: {},\r\nright:\r\n{}, bbox:\r\n{})",
-            self.left, self.right, self.bbox
-        )
+        write!(f, "bvh({}, {})", self.left, self.right)
     }
 }

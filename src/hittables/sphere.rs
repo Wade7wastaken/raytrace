@@ -1,5 +1,6 @@
+use std::f64::consts::PI;
+use std::fmt::{self, Display};
 use std::sync::Arc;
-use std::{f64::consts::PI, fmt};
 
 use crate::{
     materials::Material,
@@ -96,7 +97,7 @@ impl Hittable for Sphere {
             u,
             v,
             r,
-            outward_normal
+            outward_normal,
         ))
     }
 
@@ -105,12 +106,12 @@ impl Hittable for Sphere {
     }
 }
 
-impl fmt::Display for Sphere {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for Sphere {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "circle({}, {}, {}, {})",
-            self.center, self.radius, self.mat, self.bbox
+            "circle({}, {}, {})",
+            self.center, self.radius, self.mat
         )
     }
 }
@@ -119,6 +120,11 @@ pub fn sphere(center: Point3, radius: f64, mat: Arc<dyn Material>) -> Arc<Sphere
     Arc::new(Sphere::new(center, radius, mat))
 }
 
-pub fn sphere_moving(center: Point3, move_dir: Vec3, radius: f64, mat: Arc<dyn Material>) -> Arc<Sphere> {
+pub fn sphere_moving(
+    center: Point3,
+    move_dir: Vec3,
+    radius: f64,
+    mat: Arc<dyn Material>,
+) -> Arc<Sphere> {
     Arc::new(Sphere::new_moving(center, move_dir, radius, mat))
 }

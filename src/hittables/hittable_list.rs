@@ -42,12 +42,12 @@ impl fmt::Display for HittableList {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "{}",
+            "hittable_list({})",
             self.objects
                 .iter()
                 .map(|o| o.to_string())
                 .collect::<Vec<_>>()
-                .join("\r\n")
+                .join(" ")
         )
     }
 }

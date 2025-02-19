@@ -95,7 +95,7 @@ impl Hittable for Quad {
 
 impl Display for Quad {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "todo")
+        write!(f, "quad({}, {}, {}, {})", self.q, self.u, self.v, self.mat)
     }
 }
 

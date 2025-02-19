@@ -1,4 +1,8 @@
-use std::{error::Error, sync::Arc};
+use std::{
+    error::Error,
+    fmt::{self, Display},
+    sync::Arc,
+};
 
 use crate::primitives::{Color, Point3};
 
@@ -29,6 +33,12 @@ impl Texture for ImageTexture {
         let j = (v * self.image.height as f64) as u32;
 
         self.image.pixel_data(i, j)
+    }
+}
+
+impl Display for ImageTexture {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "image_texture")
     }
 }
 

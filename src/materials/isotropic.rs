@@ -1,7 +1,11 @@
-use std::{fmt::Display, sync::Arc};
+use std::{
+    fmt::{self, Display},
+    sync::Arc,
+};
 
 use crate::{
-    primitives::{ray, Color, Vec3},
+    hittables::HitRecord,
+    primitives::{ray, Color, Ray, Vec3},
     textures::{solid_color, Texture},
 };
 
@@ -24,11 +28,7 @@ impl Isotropic {
 }
 
 impl Material for Isotropic {
-    fn scatter(
-        &self,
-        r: &crate::primitives::Ray,
-        rec: &crate::hittables::HitRecord,
-    ) -> Option<(Color, crate::primitives::Ray)> {
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         let scattered = ray(rec.p, Vec3::random_unit_vector(), r.time);
         let attenuation = self.tex.value(rec.u, rec.v, rec.p);
         Some((attenuation, scattered))
@@ -36,7 +36,7 @@ impl Material for Isotropic {
 }
 
 impl Display for Isotropic {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Isotropic")
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Isotropic({})", self.tex)
     }
 }

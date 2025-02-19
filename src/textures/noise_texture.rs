@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{fmt::Display, sync::Arc};
 
 use crate::primitives::{color, Color, Point3};
 
@@ -22,6 +22,12 @@ impl Texture for NoiseTexture {
     fn value(&self, _u: f64, _v: f64, p: Point3) -> Color {
         color(0.5, 0.5, 0.5) * (1.0 + (self.scale * p.z + 10.0 * self.noise.turb(p, 7)).sin())
         // color(1.0, 1.0, 1.0) * self.noise.turb(p, 7)
+    }
+}
+
+impl Display for NoiseTexture {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "noise_texture({})", self.scale)
     }
 }
 

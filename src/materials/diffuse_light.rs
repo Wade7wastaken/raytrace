@@ -39,7 +39,7 @@ impl Material for DiffuseLight {
 
 impl Display for DiffuseLight {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "diffuse light")
+        write!(f, "diffuse light({})", self.tex)
     }
 }
 

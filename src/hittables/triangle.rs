@@ -1,4 +1,4 @@
-use std::{fmt::Display, sync::Arc};
+use std::{fmt::{self, Display}, sync::Arc};
 
 use crate::{
     materials::Material,
@@ -96,8 +96,8 @@ impl Hittable for Triangle {
 }
 
 impl Display for Triangle {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Triangle {} {} {}", self.a, self.b, self.c)
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "triangle({}, {}, {})", self.a, self.b, self.c)
     }
 }
 

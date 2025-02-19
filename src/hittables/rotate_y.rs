@@ -1,5 +1,8 @@
 use core::f64;
-use std::{fmt::Display, sync::Arc};
+use std::{
+    fmt::{self, Display},
+    sync::Arc,
+};
 
 use crate::primitives::{point3, ray, vec3, Aabb, Interval, Ray};
 
@@ -7,6 +10,7 @@ use super::{HitRecord, Hittable};
 
 pub struct RotateY {
     object: Arc<dyn Hittable>,
+    angle: f64,
     sin_theta: f64,
     cos_theta: f64,
     bbox: Aabb,
@@ -46,6 +50,7 @@ impl RotateY {
 
         Self {
             object,
+            angle,
             sin_theta,
             cos_theta,
             bbox: Aabb::from_points(min, max),
@@ -72,19 +77,19 @@ impl Hittable for RotateY {
 
         // check collision
 
-        self.object.hit(&rotated_ray, ray_t).map(|mut rec| {
-            rec.p = point3(
-                self.cos_theta * rec.p.x + self.sin_theta * rec.p.z,
-                rec.p.y,
-                -self.sin_theta * rec.p.x + self.cos_theta * rec.p.z,
-            );
-            rec.normal = point3(
-                self.cos_theta * rec.normal.x + self.sin_theta * rec.normal.z,
-                rec.normal.y,
-                -self.sin_theta * rec.normal.x + self.cos_theta * rec.normal.z,
-            );
-            rec
-        })
+        let mut rec = self.object.hit(&rotated_ray, ray_t)?;
+
+        rec.p = point3(
+            self.cos_theta * rec.p.x + self.sin_theta * rec.p.z,
+            rec.p.y,
+            -self.sin_theta * rec.p.x + self.cos_theta * rec.p.z,
+        );
+        rec.normal = point3(
+            self.cos_theta * rec.normal.x + self.sin_theta * rec.normal.z,
+            rec.normal.y,
+            -self.sin_theta * rec.normal.x + self.cos_theta * rec.normal.z,
+        );
+        Some(rec)
     }
 
     fn bounding_box(&self) -> &crate::primitives::Aabb {
@@ -93,8 +98,8 @@ impl Hittable for RotateY {
 }
 
 impl Display for RotateY {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Rotate-Y {}", self.object)
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "rotate_y({}, {})", self.object, self.angle)
     }
 }
 

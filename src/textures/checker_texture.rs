@@ -1,4 +1,7 @@
-use std::sync::Arc;
+use std::{
+    fmt::{self, Display},
+    sync::Arc,
+};
 
 use crate::primitives::{Color, Point3};
 
@@ -40,6 +43,18 @@ impl Texture for CheckerTexture {
         } else {
             self.odd.value(u, v, p)
         }
+    }
+}
+
+impl Display for CheckerTexture {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "checker_texture({}, {}, {})",
+            1.0 / self.inv_scale,
+            self.even,
+            self.odd
+        )
     }
 }
 

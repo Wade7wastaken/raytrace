@@ -131,6 +131,6 @@ impl Default for Aabb {
 
 impl fmt::Display for Aabb {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "(x: {}, y: {}, z: {})", self.x, self.y, self.z)
+        write!(f, "aabb({}, {}, {})", self.x, self.y, self.z)
     }
 }

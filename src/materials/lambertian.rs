@@ -40,8 +40,7 @@ impl Material for Lambertian {
 
 impl fmt::Display for Lambertian {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // write!(f, "lambertian({})", self.albedo)
-        write!(f, "lambertian")
+        write!(f, "lambertian{}", self.tex)
     }
 }
 

@@ -1,4 +1,7 @@
-use std::{fmt::Display, sync::Arc};
+use std::{
+    fmt::{self, Display},
+    sync::Arc,
+};
 
 use crate::primitives::{Aabb, Interval, Ray, Vec3};
 
@@ -27,10 +30,10 @@ impl Hittable for Translate {
         let offset_ray = Ray::new(r.orig - self.offset, r.dir, r.time);
 
         // check for a hit and move the hit position forward if there was a hit
-        self.object.hit(&offset_ray, ray_t).map(|mut rec| {
-            rec.p += self.offset;
-            rec
-        })
+        let mut rec = self.object.hit(&offset_ray, ray_t)?;
+        rec.p += self.offset;
+
+        Some(rec)
     }
 
     fn bounding_box(&self) -> &Aabb {
@@ -39,8 +42,8 @@ impl Hittable for Translate {
 }
 
 impl Display for Translate {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Translate {} by {}", self.object, self.offset)
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "translate({}, {})", self.object, self.offset)
     }
 }
 

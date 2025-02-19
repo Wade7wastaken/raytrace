@@ -2,7 +2,7 @@ use std::{fmt::Display, sync::Arc};
 
 use crate::{
     materials::{Isotropic, Material},
-    primitives::{interval, vec3, Color, Interval},
+    primitives::{interval, vec3, Color, Interval, Ray},
     rand::rand,
     textures::Texture,
 };
@@ -33,11 +33,7 @@ impl ConstantMedium {
 }
 
 impl Hittable for ConstantMedium {
-    fn hit(
-        &self,
-        r: &crate::primitives::Ray,
-        ray_t: &crate::primitives::Interval,
-    ) -> Option<super::HitRecord> {
+    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord> {
         // if we never hit the boundary, return
         let mut rec1 = self.boundary.hit(r, &Interval::full())?;
 
@@ -89,8 +85,10 @@ impl Display for ConstantMedium {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Constant Medium {} {} {}",
-            self.boundary, self.neg_inv_density, self.phase_function
+            "constant_medium({}, {}, {})",
+            self.boundary,
+            -1.0 / self.neg_inv_density,
+            self.phase_function
         )
     }
 }
