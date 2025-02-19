@@ -114,7 +114,11 @@ impl Aabb {
 impl Add<Vec3> for &Aabb {
     type Output = Aabb;
     fn add(self, rhs: Vec3) -> Self::Output {
-        Aabb::new(self.x.clone() + rhs.x, self.y.clone() + rhs.y, self.z.clone() + rhs.z)
+        Aabb::new(
+            self.x.clone() + rhs.x,
+            self.y.clone() + rhs.y,
+            self.z.clone() + rhs.z,
+        )
     }
 }
 

@@ -108,11 +108,7 @@ impl Hittable for Sphere {
 
 impl Display for Sphere {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "circle({}, {}, {})",
-            self.center, self.radius, self.mat
-        )
+        write!(f, "circle({}, {}, {})", self.center, self.radius, self.mat)
     }
 }
 

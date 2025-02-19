@@ -1,4 +1,7 @@
-use std::{fmt::{self, Display}, sync::Arc};
+use std::{
+    fmt::{self, Display},
+    sync::Arc,
+};
 
 use crate::{
     materials::Material,

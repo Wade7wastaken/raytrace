@@ -2,8 +2,13 @@ use std::sync::Arc;
 
 use crate::{
     camera::{Camera, CameraOptions},
-    hittables::{constant_medium_from_color, cube, quad, rotate_y, sphere, sphere_moving, translate, triangle, BvhNode, Hittable, HittableList},
-    materials::{dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal, Material},
+    hittables::{
+        constant_medium_from_color, cube, quad, rotate_y, sphere, sphere_moving, translate,
+        triangle, BvhNode, Hittable, HittableList,
+    },
+    materials::{
+        dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal, Material,
+    },
     primitives::{color, point3, vec3, Color, Point3},
     rand::{self, rand, rand_range},
     textures::{checker_texture_from_colors, image_texture_from_bytes, noise_texture},
@@ -374,11 +379,9 @@ pub fn room() -> (BvhNode, Camera) {
         lambertian_from_color(color(0.7, 0.7, 0.7)),
         lambertian(image_texture_from_bytes(include_bytes!("./res/Wood_Floor_Light.png")).unwrap()),
         lambertian(image_texture_from_bytes(include_bytes!("./res/Wood_Floor.png")).unwrap()),
-        diffuse_light_from_color(color(
-            0.3921569883823395,
-            0.5843139886856079,
-            0.9294120073318481,
-        ) * 15.0),
+        diffuse_light_from_color(
+            color(0.3921569883823395, 0.5843139886856079, 0.9294120073318481) * 15.0,
+        ),
         lambertian_from_color(color(
             0.11764699965715408,
             0.11764699965715408,
@@ -438,18 +441,17 @@ pub fn book_2_final() -> (HittableList, Camera) {
     const BOXES_PER_SIDE: u8 = 20;
 
     for i in (0..BOXES_PER_SIDE).map(f64::from) {
+        for j in (0..BOXES_PER_SIDE).map(f64::from) {
+            let w = 100.0;
+            let x0 = -1000.0 + i * w;
+            let z0 = -1000.0 + j * w;
+            let y0 = 0.0;
+            let x1 = x0 + w;
+            let y1 = rand_range(1.0..101.0);
+            let z1 = z0 + w;
 
-    for j in (0..BOXES_PER_SIDE).map(f64::from) {
-        let w = 100.0;
-        let x0 = -1000.0 + i * w;
-        let z0 = -1000.0 + j * w;
-        let y0 = 0.0;
-        let x1 = x0 + w;
-        let y1 = rand_range(1.0..101.0);
-        let z1 = z0 + w;
-
-        boxes1.add(cube(point3(x0, y0, z0), point3(x1, y1, z1), ground.clone()));
-    }
+            boxes1.add(cube(point3(x0, y0, z0), point3(x1, y1, z1), ground.clone()));
+        }
     }
 
     let mut world = HittableList::default();
@@ -457,34 +459,71 @@ pub fn book_2_final() -> (HittableList, Camera) {
     world.add(Arc::new(BvhNode::from_hittable_list(boxes1)));
 
     let light = diffuse_light_from_color(color(7.0, 7.0, 7.0));
-    world.add(quad(point3(123.0, 554.0, 147.0), vec3(300.0, 0.0, 0.0), point3(0.0, 0.0, 265.0), light));
+    world.add(quad(
+        point3(123.0, 554.0, 147.0),
+        vec3(300.0, 0.0, 0.0),
+        point3(0.0, 0.0, 265.0),
+        light,
+    ));
 
     let center1 = point3(400.0, 400.0, 200.0);
     let sphere_mat = lambertian_from_color(color(0.7, 0.3, 0.1));
-    world.add(sphere_moving(center1, point3(30.0, 0.0, 0.0), 50.0, sphere_mat));
+    world.add(sphere_moving(
+        center1,
+        point3(30.0, 0.0, 0.0),
+        50.0,
+        sphere_mat,
+    ));
 
     world.add(sphere(point3(260.0, 150.0, 45.0), 50.0, dielectric(1.5)));
-    world.add(sphere(point3(0.0, 150.0, 145.0), 50.0, metal(color(0.8, 0.8, 0.9), 1.0)));
+    world.add(sphere(
+        point3(0.0, 150.0, 145.0),
+        50.0,
+        metal(color(0.8, 0.8, 0.9), 1.0),
+    ));
 
     let boundary = sphere(point3(360.0, 150.0, 145.0), 70.0, dielectric(1.5));
     world.add(boundary.clone());
-    world.add(constant_medium_from_color(boundary, 0.2, color(0.2, 0.4, 0.9)));
+    world.add(constant_medium_from_color(
+        boundary,
+        0.2,
+        color(0.2, 0.4, 0.9),
+    ));
     let boundary = sphere(point3(0.0, 0.0, 0.0), 5000.0, dielectric(1.5));
-    world.add(constant_medium_from_color(boundary, 0.0001, color(1.0, 1.0, 1.0)));
+    world.add(constant_medium_from_color(
+        boundary,
+        0.0001,
+        color(1.0, 1.0, 1.0),
+    ));
 
     let earth = image_texture_from_bytes(include_bytes!("../textures/earthmap.png")).unwrap();
-    world.add(sphere(point3(400.0, 200.0, 400.0), 100.0, lambertian(earth)));
+    world.add(sphere(
+        point3(400.0, 200.0, 400.0),
+        100.0,
+        lambertian(earth),
+    ));
     let pertex = noise_texture(0.2);
-    world.add(sphere(point3(220.0, 280.0, 300.0), 80.0, lambertian(pertex)));
+    world.add(sphere(
+        point3(220.0, 280.0, 300.0),
+        80.0,
+        lambertian(pertex),
+    ));
 
     let mut boxes2 = HittableList::default();
 
     let white = lambertian_from_color(color(0.73, 0.73, 0.73));
     for _ in 0..1000 {
-        boxes2.add(sphere(Point3::random_range(0.0..165.0), 10.0, white.clone()));
+        boxes2.add(sphere(
+            Point3::random_range(0.0..165.0),
+            10.0,
+            white.clone(),
+        ));
     }
 
-    world.add(translate(rotate_y(Arc::new(BvhNode::from_hittable_list(boxes2)), 15.0), vec3(-100.0, 270.0, 395.0)));
+    world.add(translate(
+        rotate_y(Arc::new(BvhNode::from_hittable_list(boxes2)), 15.0),
+        vec3(-100.0, 270.0, 395.0),
+    ));
 
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,
