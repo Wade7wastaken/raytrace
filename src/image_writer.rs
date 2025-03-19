@@ -1,4 +1,4 @@
-use std::{error::Error, fmt::Write as FmtWrite, fs::File, io::Write as IOWrite, path::Path};
+use std::{error::Error, fmt::Write as _, fs::File, io::Write as _, path::Path};
 
 use crate::primitives::Color;
 
