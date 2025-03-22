@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     materials::Material,
-    primitives::{point3, vec3, Aabb, Interval, Point3, Ray, Vec3},
+    primitives::{Aabb, Interval, Point3, Ray, Vec3, point3, vec3},
 };
 
 use super::{HitRecord, Hittable, HittableList};
@@ -82,7 +82,7 @@ impl Hittable for Quad {
 
         Some(HitRecord::new(
             intersection,
-            self.mat.to_owned(),
+            self.mat.clone(),
             t,
             alpha,
             beta,
@@ -106,7 +106,7 @@ pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Arc<dyn Material>) -> Arc<Quad> {
     Arc::new(Quad::new(q, u, v, mat))
 }
 
-pub fn cube(a: Point3, b: Point3, mat: Arc<dyn Material>) -> Arc<HittableList> {
+pub fn cube(a: Point3, b: Point3, material: Arc<dyn Material>) -> Arc<HittableList> {
     let mut sides = HittableList::default();
 
     let min = point3(a.x.min(b.x), a.y.min(b.y), a.z.min(b.z));
@@ -116,12 +116,12 @@ pub fn cube(a: Point3, b: Point3, mat: Arc<dyn Material>) -> Arc<HittableList> {
     let dy = vec3(0.0, max.y - min.y, 0.0);
     let dz = vec3(0.0, 0.0, max.z - min.z);
 
-    sides.add(quad(point3(min.x, min.y, max.z), dx, dy, mat.clone())); // front
-    sides.add(quad(point3(max.x, min.y, max.z), -dz, dy, mat.clone())); // right
-    sides.add(quad(point3(max.x, min.y, min.z), -dx, dy, mat.clone())); // back
-    sides.add(quad(point3(min.x, min.y, min.z), dz, dy, mat.clone())); // left
-    sides.add(quad(point3(min.x, max.y, max.z), dx, -dz, mat.clone())); // top
-    sides.add(quad(point3(min.x, min.y, min.z), dx, dz, mat)); // bottom
+    sides.add(quad(point3(min.x, min.y, max.z), dx, dy, material.clone())); // front
+    sides.add(quad(point3(max.x, min.y, max.z), -dz, dy, material.clone())); // right
+    sides.add(quad(point3(max.x, min.y, min.z), -dx, dy, material.clone())); // back
+    sides.add(quad(point3(min.x, min.y, min.z), dz, dy, material.clone())); // left
+    sides.add(quad(point3(min.x, max.y, max.z), dx, -dz, material.clone())); // top
+    sides.add(quad(point3(min.x, min.y, min.z), dx, dz, material)); // bottom
 
     Arc::new(sides)
 }

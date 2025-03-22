@@ -6,7 +6,7 @@ use std::{
 use crate::{
     hittables::HitRecord,
     primitives::{Color, Point3, Ray},
-    textures::{solid_color, Texture},
+    textures::{Texture, solid_color},
 };
 
 use super::Material;
@@ -47,6 +47,7 @@ pub fn diffuse_light(tex: Arc<dyn Texture>) -> Arc<DiffuseLight> {
     Arc::new(DiffuseLight::new(tex))
 }
 
+#[must_use]
 pub fn diffuse_light_from_color(color: Color) -> Arc<DiffuseLight> {
     Arc::new(DiffuseLight::new_from_color(color))
 }

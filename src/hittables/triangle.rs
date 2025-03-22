@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     materials::Material,
-    primitives::{point3, Aabb, Interval, Point3, Ray, Vec3},
+    primitives::{Aabb, Interval, Point3, Ray, Vec3, point3},
 };
 
 use super::{HitRecord, Hittable};
@@ -23,7 +23,7 @@ pub struct Triangle {
 }
 
 impl Triangle {
-    pub fn new(a: Point3, b: Point3, c: Point3, mat: Arc<dyn Material>) -> Self {
+    pub fn new(a: Point3, b: Point3, c: Point3, material: Arc<dyn Material>) -> Self {
         let edge1 = b - a;
         let edge2 = c - a;
         let outward_normal = edge1.cross(edge2).unit_vector();
@@ -47,7 +47,7 @@ impl Triangle {
             edge1,
             edge2,
             outward_normal,
-            mat,
+            mat: material,
             bbox,
         }
     }
@@ -84,7 +84,7 @@ impl Hittable for Triangle {
 
         Some(HitRecord::new(
             p,
-            self.mat.to_owned(),
+            self.mat.clone(),
             t,
             u,
             v,

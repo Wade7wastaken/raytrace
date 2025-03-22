@@ -24,6 +24,7 @@ impl CheckerTexture {
             odd,
         }
     }
+    #[must_use]
     pub fn from_colors(scale: f64, c1: Color, c2: Color) -> Self {
         Self {
             inv_scale: 1.0 / scale,
@@ -65,6 +66,7 @@ pub fn checker_texture(
     Arc::new(CheckerTexture::new(scale, even, odd))
 }
 
+#[must_use]
 pub fn checker_texture_from_colors(scale: f64, c1: Color, c2: Color) -> Arc<CheckerTexture> {
     Arc::new(CheckerTexture::from_colors(scale, c1, c2))
 }

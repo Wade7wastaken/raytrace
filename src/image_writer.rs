@@ -22,11 +22,11 @@ impl PPMImageWriter {
 
         let pixel_expected_value = 4.0;
         let reserve_length =
-            (image_width as f64 * image_height as f64 * 3.0 * pixel_expected_value).round(); // add 3 for space, space, newline
+            (f64::from(image_width) * f64::from(image_height) * 3.0 * pixel_expected_value).round(); // add 3 for space, space, newline
 
-        println!("Reserving {} bytes", reserve_length);
+        println!("Reserving {reserve_length} bytes");
         buffer.reserve((reserve_length) as usize);
-        writeln!(buffer, "P3\n{} {}\n255", image_width, image_height)?;
+        writeln!(buffer, "P3\n{image_width} {image_height}\n255")?;
 
         Ok(Self { f, buffer })
     }
@@ -38,7 +38,7 @@ impl ImageWriter for PPMImageWriter {
             for pixel in row {
                 let (r, g, b) = pixel.map(linear_to_gamma).to_rgb();
 
-                writeln!(self.buffer, "{} {} {}", r, g, b)?;
+                writeln!(self.buffer, "{r} {g} {b}")?;
             }
         }
 
@@ -65,7 +65,7 @@ impl PNGImageWriter {
 impl ImageWriter for PNGImageWriter {
     fn write(&mut self, pixels: Vec<Vec<Color>>) -> Result<(), Box<dyn Error>> {
         let height = pixels.len();
-        let width = pixels.first().map(|row| row.len()).unwrap_or(0);
+        let width = pixels.first().map_or(0, Vec::len);
 
         let mut encoder = png::Encoder::new(&self.f, width.try_into()?, height.try_into()?);
         encoder.set_color(png::ColorType::Rgb);

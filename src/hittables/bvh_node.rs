@@ -40,6 +40,7 @@ impl BvhNode {
         Self { left, right, bbox }
     }
 
+    #[must_use]
     pub fn from_hittable_list(mut list: HittableList) -> Self {
         Self::new(&mut list.objects)
     }
@@ -61,7 +62,7 @@ impl Hittable for BvhNode {
 
         let hit_right = self.right.as_ref().and_then(|right| right.hit(r, ray_t));
 
-        let max = hit_right.as_ref().map(|rec| rec.t).unwrap_or(ray_t.max);
+        let max = hit_right.as_ref().map_or(ray_t.max, |rec| rec.t);
 
         let hit_left = self.left.hit(r, &interval(ray_t.min, max));
 

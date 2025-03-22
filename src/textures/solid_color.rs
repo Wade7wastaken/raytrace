@@ -12,6 +12,7 @@ pub struct SolidColor {
 }
 
 impl SolidColor {
+    #[must_use]
     pub fn new(color: Color) -> Self {
         Self { albedo: color }
     }
@@ -29,6 +30,7 @@ impl Display for SolidColor {
     }
 }
 
+#[must_use]
 pub fn solid_color(color: Color) -> Arc<SolidColor> {
     Arc::new(SolidColor::new(color))
 }

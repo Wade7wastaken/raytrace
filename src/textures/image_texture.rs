@@ -6,13 +6,14 @@ use std::{
 
 use crate::primitives::{Color, Point3};
 
-use super::{RtwImage, Texture};
+use super::{Texture, rtw_image::RtwImage};
 
 pub struct ImageTexture {
     image: RtwImage,
 }
 
 impl ImageTexture {
+    #[must_use]
     pub fn new(image: RtwImage) -> Self {
         Self { image }
     }
@@ -29,8 +30,8 @@ impl Texture for ImageTexture {
         let u = u.clamp(0.0, 1.0);
         let v = 1.0 - v.clamp(0.0, 1.0);
 
-        let i = (u * self.image.width as f64) as u32;
-        let j = (v * self.image.height as f64) as u32;
+        let i = (u * f64::from(self.image.width)) as u32;
+        let j = (v * f64::from(self.image.height)) as u32;
 
         self.image.pixel_data(i, j)
     }
@@ -42,6 +43,7 @@ impl Display for ImageTexture {
     }
 }
 
+#[must_use]
 pub fn image_texture(image: RtwImage) -> Arc<ImageTexture> {
     Arc::new(ImageTexture::new(image))
 }

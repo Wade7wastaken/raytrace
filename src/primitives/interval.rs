@@ -7,10 +7,12 @@ pub struct Interval {
 }
 
 impl Interval {
+    #[must_use]
     pub fn new(min: f64, max: f64) -> Self {
         Self { min, max }
     }
 
+    #[must_use]
     pub fn full() -> Self {
         Self {
             min: f64::NEG_INFINITY,
@@ -18,24 +20,29 @@ impl Interval {
         }
     }
 
+    #[must_use]
     pub fn from_intervals(a: &Interval, b: &Interval) -> Self {
         let min = f64::min(a.min, b.min);
         let max = f64::max(a.max, b.max);
         Self { min, max }
     }
 
+    #[must_use]
     pub fn size(&self) -> f64 {
         self.max - self.min
     }
 
+    #[must_use]
     pub fn contains(&self, x: f64) -> bool {
         self.min <= x && x <= self.max
     }
 
+    #[must_use]
     pub fn surrounds(&self, x: f64) -> bool {
         self.min < x && x < self.max
     }
 
+    #[must_use]
     pub fn expand(&self, delta: f64) -> Self {
         let padding = delta / 2.0;
         Self {
@@ -68,6 +75,7 @@ impl fmt::Display for Interval {
 }
 
 // helper initializer to make code look pretty
+#[must_use]
 pub fn interval(min: f64, max: f64) -> Interval {
     Interval::new(min, max)
 }

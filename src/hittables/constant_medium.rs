@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     materials::{Isotropic, Material},
-    primitives::{interval, vec3, Color, Interval, Ray},
+    primitives::{Color, Interval, Ray, interval, vec3},
     rand::rand,
     textures::Texture,
 };

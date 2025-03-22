@@ -2,7 +2,7 @@ use std::{fmt, sync::Arc};
 
 use crate::{
     hittables::HitRecord,
-    primitives::{ray, Color, Ray, Vec3},
+    primitives::{Color, Ray, Vec3, ray},
     textures::{SolidColor, Texture},
 };
 
@@ -17,6 +17,7 @@ impl Lambertian {
     pub fn new(tex: Arc<dyn Texture>) -> Self {
         Self { tex }
     }
+    #[must_use]
     pub fn from_color(albedo: Color) -> Self {
         Self {
             tex: Arc::new(SolidColor::new(albedo)),
@@ -48,6 +49,7 @@ pub fn lambertian(tex: Arc<dyn Texture>) -> Arc<Lambertian> {
     Arc::new(Lambertian::new(tex))
 }
 
+#[must_use]
 pub fn lambertian_from_color(albedo: Color) -> Arc<Lambertian> {
     Arc::new(Lambertian::from_color(albedo))
 }

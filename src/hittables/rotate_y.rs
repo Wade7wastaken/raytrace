@@ -4,7 +4,7 @@ use std::{
     sync::Arc,
 };
 
-use crate::primitives::{point3, ray, vec3, Aabb, Interval, Ray};
+use crate::primitives::{Aabb, Interval, Ray, point3, ray, vec3};
 
 use super::{HitRecord, Hittable};
 

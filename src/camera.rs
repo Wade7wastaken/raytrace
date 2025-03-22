@@ -4,10 +4,11 @@ use std::error::Error;
 use crate::{
     hittables::Hittable,
     image_writer::ImageWriter,
-    primitives::{color, interval, point3, ray, vec3, Color, Point3, Ray, Vec3},
+    primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
     rand::rand,
 };
 
+#[derive(Debug, Clone, Copy)]
 pub struct CameraOptions {
     pub aspect_ratio: f64,
     pub image_width: usize,
@@ -56,6 +57,7 @@ pub struct Camera {
 }
 
 impl Camera {
+    #[must_use]
     pub fn new(options: CameraOptions) -> Self {
         let CameraOptions {
             aspect_ratio,
@@ -118,16 +120,16 @@ impl Camera {
         (0..self.image_height)
             .into_par_iter()
             .map(|y| {
-                println!("scanline {}", y);
+                println!("scanline {y}");
                 (0..self.image_width)
                     .into_par_iter()
                     .map(|x| {
-                        // println!("pixel {}", x);
+                        // println!("pixel {x}");
                         (0..self.samples_per_pixel)
                             .into_par_iter()
                             .map(|_| self.ray_color(&self.get_ray(x, y), self.max_depth, world))
                             .sum::<Color>()
-                            / self.samples_per_pixel as f64
+                            / f64::from(self.samples_per_pixel)
                     })
                     .collect()
             })
@@ -158,7 +160,7 @@ impl Camera {
 
             if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
                 let color_from_scatter = attenuation * self.ray_color(&scattered, depth - 1, world);
-                color += color_from_scatter
+                color += color_from_scatter;
             }
             color
         } else {

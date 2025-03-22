@@ -5,8 +5,8 @@ use std::{
 
 use crate::{
     hittables::HitRecord,
-    primitives::{ray, Color, Ray, Vec3},
-    textures::{solid_color, Texture},
+    primitives::{Color, Ray, Vec3, ray},
+    textures::{Texture, solid_color},
 };
 
 use super::Material;
@@ -20,6 +20,7 @@ impl Isotropic {
         Self { tex }
     }
 
+    #[must_use]
     pub fn from_color(albedo: Color) -> Self {
         Self {
             tex: solid_color(albedo),

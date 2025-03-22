@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use crate::{
     materials::Material,
-    primitives::{vec3, Aabb, Interval, Point3, Ray, Vec3},
+    primitives::{Aabb, Interval, Point3, Ray, Vec3, vec3},
 };
 
 use super::{HitRecord, Hittable};
@@ -92,7 +92,7 @@ impl Hittable for Sphere {
 
         Some(HitRecord::new(
             rec_p,
-            self.mat.to_owned(),
+            self.mat.clone(),
             root,
             u,
             v,

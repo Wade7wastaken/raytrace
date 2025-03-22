@@ -20,7 +20,7 @@ impl HittableList {
 impl Hittable for HittableList {
     fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord> {
         self.objects.iter().fold(None, |rec, object| {
-            let max = rec.as_ref().map(|r| r.t).unwrap_or(ray_t.max);
+            let max = rec.as_ref().map_or(ray_t.max, |r| r.t);
             object.hit(r, &interval(ray_t.min, max)).or(rec)
         })
     }
@@ -37,7 +37,7 @@ impl fmt::Display for HittableList {
             "hittable_list({})",
             self.objects
                 .iter()
-                .map(|o| o.to_string())
+                .map(std::string::ToString::to_string)
                 .collect::<Vec<_>>()
                 .join(" ")
         )

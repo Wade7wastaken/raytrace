@@ -1,6 +1,6 @@
 use rand::seq::SliceRandom;
 
-use crate::primitives::{vec3, Point3, Vec3};
+use crate::primitives::{Point3, Vec3, vec3};
 
 const POINT_COUNT: usize = 256;
 
@@ -44,11 +44,9 @@ impl Perlin {
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    c[di][dj][dk] = self.rand_vec[
-                        self.perm_x[((i + di as i32) & 255) as usize]
+                    c[di][dj][dk] = self.rand_vec[self.perm_x[((i + di as i32) & 255) as usize]
                         ^ self.perm_y[((j + dj as i32) & 255) as usize]
-                        ^ self.perm_z[((k + dk as i32) & 255) as usize]
-                    ]
+                        ^ self.perm_z[((k + dk as i32) & 255) as usize]];
                 }
             }
         }
@@ -81,7 +79,7 @@ impl Perlin {
                     acc += (i as f64 * uu + (1.0 - i as f64) * (1.0 - uu))
                         * (j as f64 * vv + (1.0 - j as f64) * (1.0 - vv))
                         * (k as f64 * ww + (1.0 - k as f64) * (1.0 - ww))
-                        * c[i][j][k].dot(weight_v)
+                        * c[i][j][k].dot(weight_v);
                 }
             }
         }

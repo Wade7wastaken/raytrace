@@ -1,5 +1,5 @@
 use crate::rand::{rand, rand_range};
-use derive_more::{derive::Sum, Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, derive::Sum};
 use std::{
     fmt,
     ops::{self, Range},
@@ -28,10 +28,12 @@ pub struct Color {
 }
 
 impl Color {
+    #[must_use]
     pub fn new(r: f64, g: f64, b: f64) -> Self {
         Self { r, g, b }
     }
 
+    #[must_use]
     pub fn random() -> Self {
         Self {
             r: rand(),
@@ -40,14 +42,16 @@ impl Color {
         }
     }
 
+    #[must_use]
     pub fn random_range(range: Range<f64>) -> Self {
         Self {
-            r: rand_range(range.to_owned()),
-            g: rand_range(range.to_owned()),
-            b: rand_range(range.to_owned()),
+            r: rand_range(range.clone()),
+            g: rand_range(range.clone()),
+            b: rand_range(range.clone()),
         }
     }
 
+    #[must_use]
     pub fn map(&self, pred: fn(f64) -> f64) -> Self {
         Self {
             r: pred(self.r),
@@ -56,6 +60,7 @@ impl Color {
         }
     }
 
+    #[must_use]
     pub fn to_rgb(self) -> (u8, u8, u8) {
         (
             channel_to_rgb(self.r),
@@ -68,7 +73,7 @@ impl Color {
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let (r, g, b) = self.to_rgb();
-        write!(f, "#{:02x}{:02x}{:02x}", r, g, b)
+        write!(f, "#{r:02x}{g:02x}{b:02x}")
     }
 }
 
@@ -95,6 +100,7 @@ fn channel_to_rgb(channel: f64) -> u8 {
     ((channel * 255.999) as u8).clamp(0, 255)
 }
 
+#[must_use]
 pub fn color(r: f64, g: f64, b: f64) -> Color {
     Color::new(r, g, b)
 }

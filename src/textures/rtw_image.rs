@@ -1,6 +1,6 @@
 use png::DecodingError;
 
-use crate::primitives::{color, Color};
+use crate::primitives::{Color, color};
 
 #[derive(Debug)]
 pub struct RtwImage {
@@ -47,6 +47,10 @@ impl RtwImage {
             // return color(1.0, 0.0, 1.0); // return magenta
         };
         let scale = 1.0 / 255.0;
-        color(*r as f64 * scale, *g as f64 * scale, *b as f64 * scale)
+        color(
+            f64::from(*r) * scale,
+            f64::from(*g) * scale,
+            f64::from(*b) * scale,
+        )
     }
 }

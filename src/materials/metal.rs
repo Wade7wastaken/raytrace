@@ -2,7 +2,7 @@ use std::{fmt, sync::Arc};
 
 use crate::{
     hittables::HitRecord,
-    primitives::{ray, Color, Ray, Vec3},
+    primitives::{Color, Ray, Vec3, ray},
 };
 
 use super::Material;
@@ -14,6 +14,7 @@ pub struct Metal {
 }
 
 impl Metal {
+    #[must_use]
     pub fn new(albedo: Color, fuzz: f64) -> Self {
         Self { albedo, fuzz }
     }
@@ -24,7 +25,7 @@ impl Material for Metal {
         let reflected = r.dir.reflect(rec.normal);
         let reflected_fuzzed = reflected.unit_vector() + (Vec3::random_unit_vector() * self.fuzz);
         let scattered = ray(rec.p, reflected_fuzzed, r.time);
-        let attenuation = self.albedo.to_owned();
+        let attenuation = self.albedo;
 
         // if we scatter below the surface, just absorb the ray
         if scattered.dir.dot(rec.normal) > 0.0 {
@@ -41,6 +42,7 @@ impl fmt::Display for Metal {
     }
 }
 
+#[must_use]
 pub fn metal(albedo: Color, fuzz: f64) -> Arc<Metal> {
     Arc::new(Metal::new(albedo, fuzz))
 }

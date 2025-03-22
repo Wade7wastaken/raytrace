@@ -17,7 +17,7 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
-    /// outward_normal is assumed to have unit length
+    /// `outward_normal` is assumed to have unit length
     pub fn new(
         p: Point3,
         mat: Arc<dyn Material>,

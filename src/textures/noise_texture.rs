@@ -3,9 +3,9 @@ use std::{
     sync::Arc,
 };
 
-use crate::primitives::{color, Color, Point3};
+use crate::primitives::{Color, Point3, color};
 
-use super::{Perlin, Texture};
+use super::{Texture, perlin::Perlin};
 
 pub struct NoiseTexture {
     noise: Perlin,
@@ -13,6 +13,7 @@ pub struct NoiseTexture {
 }
 
 impl NoiseTexture {
+    #[must_use]
     pub fn new(scale: f64) -> Self {
         Self {
             noise: Perlin::new(),
@@ -34,6 +35,7 @@ impl Display for NoiseTexture {
     }
 }
 
+#[must_use]
 pub fn noise_texture(scale: f64) -> Arc<NoiseTexture> {
     Arc::new(NoiseTexture::new(scale))
 }

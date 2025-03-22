@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::{
     hittables::HitRecord,
-    primitives::{color, Color, Point3, Ray},
+    primitives::{Color, Point3, Ray, color},
 };
 
 pub trait Material: Send + Sync + fmt::Display {

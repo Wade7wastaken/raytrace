@@ -2,7 +2,7 @@ use std::{fmt, sync::Arc};
 
 use crate::{
     hittables::HitRecord,
-    primitives::{color, ray, Color, Ray},
+    primitives::{Color, Ray, color, ray},
     rand::rand,
 };
 
@@ -14,6 +14,7 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
+    #[must_use]
     pub fn new(refraction_index: f64) -> Self {
         Self { refraction_index }
     }
@@ -58,6 +59,7 @@ impl fmt::Display for Dielectric {
     }
 }
 
+#[must_use]
 pub fn dielectric(refraction_index: f64) -> Arc<Dielectric> {
     Arc::new(Dielectric::new(refraction_index))
 }

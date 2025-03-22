@@ -8,6 +8,7 @@ where
     rand::random_range(range)
 }
 
+#[must_use]
 pub fn rand() -> f64 {
     rand_range(0.0..1.0)
 }

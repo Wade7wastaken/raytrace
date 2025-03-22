@@ -12,10 +12,12 @@ pub struct Aabb {
 }
 
 impl Aabb {
+    #[must_use]
     pub fn new(x: Interval, y: Interval, z: Interval) -> Self {
         Self { x, y, z }.pad_to_minimums()
     }
 
+    #[must_use]
     pub fn from_points(a: Point3, b: Point3) -> Self {
         let x = interval(a.x.min(b.x), a.x.max(b.x));
         let y = interval(a.y.min(b.y), a.y.max(b.y));
@@ -24,6 +26,7 @@ impl Aabb {
         Self::new(x, y, z)
     }
 
+    #[must_use]
     pub fn from_boxes(a: &Self, b: &Self) -> Self {
         let x = Interval::from_intervals(&a.x, &b.x);
         let y = Interval::from_intervals(&a.y, &b.y);
@@ -31,6 +34,7 @@ impl Aabb {
         Self::new(x, y, z)
     }
 
+    #[must_use]
     pub fn axis_interval(&self, index: u8) -> &Interval {
         match index {
             0 => &self.x,
@@ -40,6 +44,7 @@ impl Aabb {
         }
     }
 
+    #[must_use]
     pub fn hit(&self, r: &Ray, ray_t: &Interval) -> bool {
         for axis in 0..3 {
             let ax = self.axis_interval(axis);
@@ -63,6 +68,7 @@ impl Aabb {
         true
     }
 
+    #[must_use]
     pub fn longest_axis(&self) -> u8 {
         [&self.x, &self.y, &self.z]
             .into_iter()
@@ -76,13 +82,13 @@ impl Aabb {
 
     fn pad_to_minimums(mut self) -> Self {
         if self.x.size() < Self::DELTA {
-            self.x = self.x.expand(Self::DELTA)
+            self.x = self.x.expand(Self::DELTA);
         }
         if self.y.size() < Self::DELTA {
-            self.y = self.y.expand(Self::DELTA)
+            self.y = self.y.expand(Self::DELTA);
         }
         if self.z.size() < Self::DELTA {
-            self.z = self.z.expand(Self::DELTA)
+            self.z = self.z.expand(Self::DELTA);
         }
 
         self

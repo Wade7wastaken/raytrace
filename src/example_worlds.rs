@@ -3,17 +3,18 @@ use std::sync::Arc;
 use crate::{
     camera::{Camera, CameraOptions},
     hittables::{
-        constant_medium_from_color, cube, quad, rotate_y, sphere, sphere_moving, translate,
-        triangle, BvhNode, Hittable, HittableList,
+        BvhNode, Hittable, HittableList, constant_medium_from_color, cube, quad, rotate_y, sphere,
+        sphere_moving, translate, triangle,
     },
     materials::{
-        dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal, Material,
+        Material, dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal,
     },
-    primitives::{color, point3, vec3, Color, Point3},
+    primitives::{Color, Point3, color, point3, vec3},
     rand::{self, rand, rand_range},
     textures::{checker_texture_from_colors, image_texture_from_bytes, noise_texture},
 };
 
+#[must_use]
 pub fn simple() -> (HittableList, Camera) {
     let mut world = HittableList::default();
 
@@ -41,6 +42,7 @@ pub fn simple() -> (HittableList, Camera) {
     (world, cam)
 }
 
+#[must_use]
 pub fn bouncing_spheres() -> (BvhNode, Camera) {
     let mut world = HittableList::default();
 
@@ -55,7 +57,11 @@ pub fn bouncing_spheres() -> (BvhNode, Camera) {
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = rand();
-            let center = point3(a as f64 + 0.9 * rand(), 0.2, b as f64 + 0.9 * rand());
+            let center = point3(
+                f64::from(a) + 0.9 * rand(),
+                0.2,
+                f64::from(b) + 0.9 * rand(),
+            );
 
             if (center - point3(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
@@ -106,6 +112,7 @@ pub fn bouncing_spheres() -> (BvhNode, Camera) {
     (world_bvh, cam)
 }
 
+#[must_use]
 pub fn checkered_spheres() -> (HittableList, Camera) {
     let mut world = HittableList::default();
 
@@ -129,6 +136,7 @@ pub fn checkered_spheres() -> (HittableList, Camera) {
     (world, cam)
 }
 
+#[must_use]
 pub fn earth() -> (HittableList, Camera) {
     let mut world = HittableList::default();
     let earth_texture = image_texture_from_bytes(include_bytes!("../textures/earthmap.png"))
@@ -151,6 +159,7 @@ pub fn earth() -> (HittableList, Camera) {
     (world, cam)
 }
 
+#[must_use]
 pub fn perlin_spheres() -> (HittableList, Camera) {
     let mut world = HittableList::default();
 
@@ -170,6 +179,7 @@ pub fn perlin_spheres() -> (HittableList, Camera) {
     (world, cam)
 }
 
+#[must_use]
 pub fn quads() -> (HittableList, Camera) {
     let mut world = HittableList::default();
 
@@ -222,6 +232,7 @@ pub fn quads() -> (HittableList, Camera) {
     (world, cam)
 }
 
+#[must_use]
 pub fn simple_light() -> (HittableList, Camera) {
     let mut world = HittableList::default();
 
@@ -249,6 +260,7 @@ pub fn simple_light() -> (HittableList, Camera) {
     (world, cam)
 }
 
+#[must_use]
 pub fn cornell_box() -> (HittableList, Camera) {
     let mut world = HittableList::default();
 
@@ -329,6 +341,7 @@ pub fn cornell_box() -> (HittableList, Camera) {
     (world, cam)
 }
 
+#[must_use]
 pub fn triangles() -> (HittableList, Camera) {
     let mut world = HittableList::default();
 
@@ -355,6 +368,7 @@ pub fn triangles() -> (HittableList, Camera) {
     (world, cam)
 }
 
+#[must_use]
 pub fn room() -> (BvhNode, Camera) {
     let (gltf, buffers, _) = gltf::import("src/res/room.gltf").unwrap();
 
@@ -362,30 +376,34 @@ pub fn room() -> (BvhNode, Camera) {
 
     let materials: [Arc<dyn Material>; 8] = [
         lambertian_from_color(color(
-            0.137254998087883,
-            0.137254998087883,
-            0.137254998087883,
+            0.137_254_998_087_883,
+            0.137_254_998_087_883,
+            0.137_254_998_087_883,
         )),
         lambertian_from_color(color(
-            0.22745099663734436,
-            0.22745099663734436,
-            0.22745099663734436,
+            0.227_450_996_637_344_36,
+            0.227_450_996_637_344_36,
+            0.227_450_996_637_344_36,
         )),
         lambertian_from_color(color(
-            0.20000000298023224,
-            0.20000000298023224,
-            0.20000000298023224,
+            0.200_000_002_980_232_24,
+            0.200_000_002_980_232_24,
+            0.200_000_002_980_232_24,
         )),
         lambertian_from_color(color(0.7, 0.7, 0.7)),
         lambertian(image_texture_from_bytes(include_bytes!("./res/Wood_Floor_Light.png")).unwrap()),
         lambertian(image_texture_from_bytes(include_bytes!("./res/Wood_Floor.png")).unwrap()),
         diffuse_light_from_color(
-            color(0.3921569883823395, 0.5843139886856079, 0.9294120073318481) * 15.0,
+            color(
+                0.392_156_988_382_339_5,
+                0.584_313_988_685_607_9,
+                0.929_412_007_331_848_1,
+            ) * 15.0,
         ),
         lambertian_from_color(color(
-            0.11764699965715408,
-            0.11764699965715408,
-            0.11764699965715408,
+            0.117_646_999_657_154_08,
+            0.117_646_999_657_154_08,
+            0.117_646_999_657_154_08,
         )),
     ];
 
@@ -396,7 +414,7 @@ pub fn room() -> (BvhNode, Camera) {
         let positions = reader
             .read_positions()
             .unwrap()
-            .map(|x| Point3::new(x[0] as f64, x[1] as f64, x[2] as f64))
+            .map(|x| Point3::new(f64::from(x[0]), f64::from(x[1]), f64::from(x[2])))
             .collect::<Vec<_>>();
         let indices = reader
             .read_indices()
@@ -434,11 +452,11 @@ pub fn room() -> (BvhNode, Camera) {
 }
 
 pub fn book_2_final() -> (HittableList, Camera) {
+    const BOXES_PER_SIDE: u8 = 20;
+
     let mut boxes1 = HittableList::default();
 
     let ground = lambertian_from_color(color(0.48, 0.83, 0.53));
-
-    const BOXES_PER_SIDE: u8 = 20;
 
     for i in (0..BOXES_PER_SIDE).map(f64::from) {
         for j in (0..BOXES_PER_SIDE).map(f64::from) {
