@@ -14,19 +14,11 @@ pub struct Perlin {
 impl Perlin {
     pub fn new() -> Self {
         Self {
-            rand_vec: Self::generate_rand_vecs(),
+            rand_vec: rand::random(),
             perm_x: Self::generate_perm(),
             perm_y: Self::generate_perm(),
             perm_z: Self::generate_perm(),
         }
-    }
-
-    fn generate_rand_vecs() -> [Vec3; POINT_COUNT] {
-        let mut rand_floats = [Vec3::default(); POINT_COUNT];
-        for rand_float in rand_floats.iter_mut() {
-            *rand_float = Vec3::random_unit_vector();
-        }
-        rand_floats
     }
 
     fn generate_perm() -> [usize; POINT_COUNT] {
@@ -34,7 +26,7 @@ impl Perlin {
         for (i, p) in perm.iter_mut().enumerate() {
             *p = i;
         }
-        perm.shuffle(&mut rand::thread_rng());
+        perm.shuffle(&mut rand::rng());
         perm
     }
 
@@ -52,9 +44,11 @@ impl Perlin {
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    c[di][dj][dk] = self.rand_vec[self.perm_x[((i + di as i32) & 255) as usize]
+                    c[di][dj][dk] = self.rand_vec[
+                        self.perm_x[((i + di as i32) & 255) as usize]
                         ^ self.perm_y[((j + dj as i32) & 255) as usize]
-                        ^ self.perm_z[((k + dk as i32) & 255) as usize]]
+                        ^ self.perm_z[((k + dk as i32) & 255) as usize]
+                    ]
                 }
             }
         }

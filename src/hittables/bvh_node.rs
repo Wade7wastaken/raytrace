@@ -1,41 +1,38 @@
 use std::{cmp::Ordering, fmt, sync::Arc};
 
-use crate::primitives::{interval, Aabb, Interval, Ray};
+use crate::primitives::{Aabb, Interval, Ray, interval};
 
 use super::{HitRecord, Hittable, HittableList};
 
 pub struct BvhNode {
     left: Arc<dyn Hittable>,
-    right: Arc<dyn Hittable>,
+    right: Option<Arc<dyn Hittable>>,
     bbox: Aabb,
 }
 
 impl BvhNode {
-    pub fn new(objects: &mut Vec<Arc<dyn Hittable>>, start: usize, end: usize) -> Self {
-        let mut bbox = Aabb::default();
-        for object in &objects[start..end] {
-            bbox = Aabb::from_boxes(&bbox, object.bounding_box());
-        }
+    pub fn new(objects: &mut [Arc<dyn Hittable>]) -> Self {
+        let bbox = objects.iter().fold(Aabb::default(), |bbox, object| {
+            Aabb::from_boxes(&bbox, object.bounding_box())
+        });
 
-        let comparator = match bbox.longest_axis() {
-            0 => compare(0),
-            1 => compare(1),
-            2 => compare(2),
-            _ => unreachable!(),
-        };
-
-        let object_span = end - start;
-
-        let (left, right): (Arc<dyn Hittable>, Arc<dyn Hittable>) = match object_span {
-            1 => (objects[start].to_owned(), objects[start].to_owned()),
-            2 => (objects[start].to_owned(), objects[start + 1].to_owned()),
+        let (left, right): (Arc<dyn Hittable>, Option<Arc<dyn Hittable>>) = match &objects[..] {
+            [] => panic!("Can't create a BVHNode with 0 elements"),
+            [first] => (first.clone(), None),
+            [first, last] => (first.clone(), Some(last.clone())),
             _ => {
-                objects[start..end].sort_by(comparator);
+                let comparator = match bbox.longest_axis() {
+                    0 => compare(0),
+                    1 => compare(1),
+                    2 => compare(2),
+                    _ => unreachable!(),
+                };
+                objects.sort_by(comparator);
 
-                let mid = start + object_span / 2;
+                let mid = objects.len() / 2;
                 (
-                    Arc::new(Self::new(objects, start, mid)),
-                    Arc::new(Self::new(objects, mid, end)),
+                    Arc::new(Self::new(&mut objects[..mid])),
+                    Some(Arc::new(Self::new(&mut objects[mid..]))),
                 )
             }
         };
@@ -44,8 +41,7 @@ impl BvhNode {
     }
 
     pub fn from_hittable_list(mut list: HittableList) -> Self {
-        let len = list.objects.len();
-        Self::new(&mut list.objects, 0, len)
+        Self::new(&mut list.objects)
     }
 }
 
@@ -63,16 +59,16 @@ impl Hittable for BvhNode {
             return None;
         }
 
-        let hit_left = self.left.hit(r, ray_t);
-        let max = if let Some(ref rec) = hit_left {
-            rec.t
-        } else {
-            ray_t.max
-        };
-        let right_hit = self.right.hit(r, &interval(ray_t.min, max));
+        let hit_right = self.right.as_ref().and_then(|right| right.hit(r, ray_t));
 
-        // if the right side hit something, it is closer than anything that was hit on the left
-        right_hit.or(hit_left)
+        let max = hit_right.as_ref().map(|rec| rec.t).unwrap_or(ray_t.max);
+
+        let hit_left = self.left.hit(r, &interval(ray_t.min, max));
+
+        // if the left side hit something, it is closer than anything that was
+        // hit on the right because we limited the left range to
+        // [min..right_hit.t]
+        hit_left.or(hit_right)
     }
 
     fn bounding_box(&self) -> &Aabb {
@@ -82,6 +78,10 @@ impl Hittable for BvhNode {
 
 impl fmt::Display for BvhNode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "bvh({}, {})", self.left, self.right)
+        if let Some(right) = &self.right {
+            write!(f, "bvh({}, {})", self.left, right)
+        } else {
+            write!(f, "bvh({})", self.left)
+        }
     }
 }

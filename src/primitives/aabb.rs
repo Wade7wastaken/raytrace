@@ -1,6 +1,8 @@
 use std::{fmt, ops::Add};
 
-use super::{interval, Interval, Point3, Ray, Vec3};
+use crate::misc::tern;
+
+use super::{Interval, Point3, Ray, Vec3, interval};
 
 #[derive(Debug, Clone)]
 pub struct Aabb {
@@ -15,30 +17,18 @@ impl Aabb {
     }
 
     pub fn from_points(a: Point3, b: Point3) -> Self {
-        let x = if a.x <= b.x {
-            interval(a.x, b.x)
-        } else {
-            interval(b.x, a.x)
-        };
-        let y = if a.y <= b.y {
-            interval(a.y, b.y)
-        } else {
-            interval(b.y, a.y)
-        };
-        let z = if a.z <= b.z {
-            interval(a.z, b.z)
-        } else {
-            interval(b.z, a.z)
-        };
+        let x = interval(a.x.min(b.x), a.x.max(b.x));
+        let y = interval(a.y.min(b.y), a.y.max(b.y));
+        let z = interval(a.z.min(b.y), a.z.max(b.y));
 
-        Self { x, y, z }.pad_to_minimums()
+        Self::new(x, y, z)
     }
 
     pub fn from_boxes(a: &Self, b: &Self) -> Self {
         let x = Interval::from_intervals(&a.x, &b.x);
         let y = Interval::from_intervals(&a.y, &b.y);
         let z = Interval::from_intervals(&a.z, &b.z);
-        Self { x, y, z }.pad_to_minimums()
+        Self::new(x, y, z)
     }
 
     pub fn axis_interval(&self, index: u8) -> &Interval {
@@ -53,29 +43,17 @@ impl Aabb {
     pub fn hit(&self, r: &Ray, ray_t: &Interval) -> bool {
         for axis in 0..3 {
             let ax = self.axis_interval(axis);
-            let adinv = 1.0 / r.dir.axis(axis);
+            let ad = r.dir.axis(axis);
 
-            let t0 = (ax.min - r.orig.axis(axis)) * adinv;
-            let t1 = (ax.max - r.orig.axis(axis)) * adinv;
+            let r_orig = r.orig.axis(axis);
 
-            let mut min = ray_t.min;
-            let mut max = ray_t.max;
+            let (t0, t1) = tern(
+                ad >= 0.0,
+                ((ax.min - r_orig) / ad, (ax.max - r_orig) / ad),
+                ((ax.max - r_orig) / ad, (ax.min - r_orig) / ad),
+            );
 
-            if t0 < t1 {
-                if t0 > ray_t.min {
-                    min = t0;
-                }
-                if t1 < ray_t.max {
-                    max = t1;
-                }
-            } else {
-                if t0 > ray_t.min {
-                    min = t1;
-                }
-                if t1 < ray_t.max {
-                    max = t0;
-                }
-            }
+            let (min, max) = (t0.max(ray_t.min), t1.min(ray_t.max));
 
             if max <= min {
                 return false;

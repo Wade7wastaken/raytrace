@@ -1,14 +1,11 @@
-use rand::{
-    distributions::uniform::{SampleRange, SampleUniform},
-    Rng,
-};
+use rand::distr::uniform::{SampleRange, SampleUniform};
 
 pub fn rand_range<T, R>(range: R) -> T
 where
     T: SampleUniform,
     R: SampleRange<T>,
 {
-    rand::thread_rng().gen_range(range)
+    rand::random_range(range)
 }
 
 pub fn rand() -> f64 {

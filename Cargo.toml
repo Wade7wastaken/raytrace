@@ -1,13 +1,13 @@
 [package]
 name = "raytrace"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.8"
-derive_more = { version = "1.0.0", features = ["full"] }
+rand = "0.9"
+derive_more = { version = "2.0.1", features = ["full"] }
 rayon = "1.10.0"
-png = "0.17.14"
+png = "0.17.16"
 gltf = { version = "1.4.1", features = ["extras"] }

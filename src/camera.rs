@@ -41,14 +41,10 @@ impl Default for CameraOptions {
 }
 
 pub struct Camera {
-    // aspect_ratio: f64,
-    pub image_height: usize, // public so they can be accessed by image writers
-    pub image_width: usize,
-    // focal_length: f64,
+    image_height: usize,
+    image_width: usize,
     samples_per_pixel: u32,
     max_depth: u32,
-    // viewport_width: f64,
-    // viewport_height: f64,
     look_from: Point3,
     pixel_00_loc: Point3,
     pixel_delta_u: Vec3,
@@ -74,13 +70,12 @@ impl Camera {
             focus_dist,
             background,
         } = options;
-        let image_height = (image_width as f64 / aspect_ratio) as usize;
+        let image_height = (image_width as f64 / aspect_ratio).round() as usize;
 
         // ensure dimensions are more than 0
         assert!(image_width > 0);
         assert!(image_height > 0);
 
-        // let focal_length = (look_from - look_at).length();
         let theta = v_fov.to_radians();
         let h = (theta / 2.0).tan();
         let viewport_height = 2.0 * h * focus_dist;
@@ -105,14 +100,10 @@ impl Camera {
         let defocus_disk_v = v * defocus_radius;
 
         Self {
-            // aspect_ratio,
             image_height,
             image_width,
-            // focal_length,
             samples_per_pixel,
             max_depth,
-            // viewport_width,
-            // viewport_height,
             look_from,
             pixel_00_loc,
             pixel_delta_u,

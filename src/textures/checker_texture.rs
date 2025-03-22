@@ -3,7 +3,10 @@ use std::{
     sync::Arc,
 };
 
-use crate::primitives::{Color, Point3};
+use crate::{
+    misc::tern,
+    primitives::{Color, Point3},
+};
 
 use super::{SolidColor, Texture};
 
@@ -38,11 +41,7 @@ impl Texture for CheckerTexture {
 
         let is_even = (x + y + z) % 2 == 0;
 
-        if is_even {
-            self.even.value(u, v, p)
-        } else {
-            self.odd.value(u, v, p)
-        }
+        tern(is_even, &self.even, &self.odd).value(u, v, p)
     }
 }
 

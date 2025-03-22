@@ -1,6 +1,8 @@
 use crate::rand::rand;
 use crate::rand::rand_range;
 use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use rand::distr::Distribution;
+use rand::distr::StandardUniform;
 use std::fmt;
 use std::ops::Range;
 
@@ -126,6 +128,12 @@ impl Vec3 {
     pub fn is_near_zero(&self) -> bool {
         let s = 1e-8;
         (self.x.abs() < s) && (self.y.abs() < s) && (self.z.abs() < s)
+    }
+}
+
+impl Distribution<Vec3> for StandardUniform {
+    fn sample<R: rand::Rng + ?Sized>(&self, _rng: &mut R) -> Vec3 {
+        Vec3::random_in_unit_sphere().unit_vector()
     }
 }
 
