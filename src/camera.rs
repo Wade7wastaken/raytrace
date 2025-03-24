@@ -122,30 +122,39 @@ impl Camera {
             background,
         }
     }
+
+    // Renders a scanline into Vec of colors
+    pub fn scanline(&self, world: &dyn Hittable, y: usize) -> Vec<Color> {
+        (0..self.image_width)
+            .map(|x| {
+                (0..self.samples_per_pixel)
+                    .map(|_| self.ray_color(&self.get_ray(x, y), self.max_depth, world))
+                    .sum::<Color>()
+                    / f64::from(self.samples_per_pixel)
+            })
+            .collect()
+    }
+
+    // Renders a hittable into a 2d array of colors
     pub fn render(&self, world: &dyn Hittable) -> Vec<Vec<Color>> {
+        // AtomicUsize is faster than Mutex
         let count = Arc::new(AtomicUsize::new(0));
+
         (0..self.image_height)
             .into_par_iter()
             .map(|y| {
-                let prev = count.fetch_add(1, Ordering::Relaxed);
+                let prev = count.fetch_add(1, Ordering::SeqCst);
                 print!(
                     "starting {prev} / {} ({:.2}%)",
                     self.image_height,
                     prev as f64 / self.image_height as f64 * 100.0
                 );
-                (0..self.image_width)
-                    .map(|x| {
-                        (0..self.samples_per_pixel)
-                            .into_par_iter()
-                            .map(|_| self.ray_color(&self.get_ray(x, y), self.max_depth, world))
-                            .sum::<Color>()
-                            / f64::from(self.samples_per_pixel)
-                    })
-                    .collect()
+                self.scanline(world, y)
             })
             .collect()
     }
 
+    // Renders a hittable and saves it to a given image_writer
     pub fn render_and_save(
         &self,
         world: &dyn Hittable,
@@ -159,6 +168,8 @@ impl Camera {
         Ok(())
     }
 
+    // Gets the final color of a ray through a given world. Recursively calls
+    // itself for scattered rays
     fn ray_color(&self, r: &Ray, depth: u32, world: &dyn Hittable) -> Color {
         // if we hit the bounce limit, no more light is gathered
         if depth == 0 {
