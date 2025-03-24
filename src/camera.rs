@@ -1,5 +1,11 @@
 use rayon::prelude::*;
-use std::error::Error;
+use std::{
+    error::Error,
+    sync::{
+        Arc,
+        atomic::{AtomicUsize, Ordering},
+    },
+};
 
 use crate::{
     hittables::Hittable,
@@ -117,14 +123,18 @@ impl Camera {
         }
     }
     pub fn render(&self, world: &dyn Hittable) -> Vec<Vec<Color>> {
+        let count = Arc::new(AtomicUsize::new(0));
         (0..self.image_height)
             .into_par_iter()
             .map(|y| {
-                println!("scanline {y}");
+                let prev = count.fetch_add(1, Ordering::Relaxed);
+                print!(
+                    "starting {prev} / {} ({:.2}%)",
+                    self.image_height,
+                    prev as f64 / self.image_height as f64 * 100.0
+                );
                 (0..self.image_width)
-                    .into_par_iter()
                     .map(|x| {
-                        // println!("pixel {x}");
                         (0..self.samples_per_pixel)
                             .into_par_iter()
                             .map(|_| self.ray_color(&self.get_ray(x, y), self.max_depth, world))
