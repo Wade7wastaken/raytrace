@@ -21,7 +21,7 @@ impl Aabb {
     pub fn from_points(a: Point3, b: Point3) -> Self {
         let x = interval(a.x.min(b.x), a.x.max(b.x));
         let y = interval(a.y.min(b.y), a.y.max(b.y));
-        let z = interval(a.z.min(b.y), a.z.max(b.y));
+        let z = interval(a.z.min(b.z), a.z.max(b.z));
 
         Self::new(x, y, z)
     }

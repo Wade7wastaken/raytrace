@@ -144,7 +144,7 @@ impl Camera {
             .into_par_iter()
             .map(|y| {
                 let prev = count.fetch_add(1, Ordering::SeqCst);
-                print!(
+                println!(
                     "starting {prev} / {} ({:.2}%)",
                     self.image_height,
                     prev as f64 / self.image_height as f64 * 100.0

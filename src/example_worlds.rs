@@ -51,7 +51,7 @@ pub fn bouncing_spheres() -> (BvhNode, Camera) {
         color(0.2, 0.3, 0.1),
         color(0.9, 0.9, 0.9),
     ));
-
+    
     world.add(sphere(point3(0.0, -1000.0, 0.0), 1000.0, ground_material));
 
     for a in -11..11 {
@@ -99,6 +99,9 @@ pub fn bouncing_spheres() -> (BvhNode, Camera) {
     world.add(sphere(point3(4.0, 1.0, 0.0), 1.0, material3));
 
     let cam = Camera::new(CameraOptions {
+        image_width: 600,
+        aspect_ratio: 16.0 / 9.0,
+        samples_per_pixel: 100,
         v_fov: 20.0,
         look_from: point3(13.0, 2.0, 3.0),
         look_at: point3(0.0, 0.0, 0.0),
@@ -440,7 +443,7 @@ pub fn room() -> (BvhNode, Camera) {
         aspect_ratio: 1.0,
         image_width: 1000,
         v_fov: 50.0,
-        samples_per_pixel: 1000,
+        samples_per_pixel: 500,
         look_from: point3(4.0, 10.0, -15.0),
         look_at: point3(4.0, -5.0, 0.0),
         background: color(0.0, 0.0, 0.0),
@@ -547,7 +550,7 @@ pub fn book_2_final() -> (HittableList, Camera) {
         aspect_ratio: 1.0,
         image_width: 1000,
         v_fov: 40.0,
-        samples_per_pixel: 10000,
+        samples_per_pixel: 500,
         look_from: point3(478.0, 278.0, -600.0),
         look_at: point3(270.0, 278.0, 0.0),
         background: color(0.0, 0.0, 0.0),
