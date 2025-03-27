@@ -17,7 +17,7 @@ pub struct Triangle {
     c: Point3,
     edge1: Vec3,
     edge2: Vec3,
-    pub outward_normal: Vec3,
+    outward_normal: Vec3,
     mat: Arc<dyn Material>,
     bbox: Aabb,
 }

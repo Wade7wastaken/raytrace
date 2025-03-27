@@ -16,7 +16,7 @@ impl BvhNode {
             Aabb::from_boxes(&bbox, object.bounding_box())
         });
 
-        let (left, right): (Arc<dyn Hittable>, Option<Arc<dyn Hittable>>) = match &objects[..] {
+        let (left, right): (_, _) = match &objects[..] {
             [] => panic!("Can't create a BVHNode with 0 elements"),
             [first] => (first.clone(), None),
             [first, last] => (first.clone(), Some(last.clone())),

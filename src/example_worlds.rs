@@ -3,8 +3,8 @@ use std::sync::Arc;
 use crate::{
     camera::{Camera, CameraOptions},
     hittables::{
-        BvhNode, Hittable, HittableList, constant_medium_from_color, cube, quad, rotate_y, sphere,
-        sphere_moving, translate, triangle,
+        BvhNode, Hittable, HittableList, constant_medium_from_color, cube, moving, quad, rotate_y,
+        sphere, translate, triangle,
     },
     materials::{
         Material, dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal,
@@ -51,12 +51,11 @@ pub fn bouncing_spheres() -> (BvhNode, Camera) {
         color(0.2, 0.3, 0.1),
         color(0.9, 0.9, 0.9),
     ));
-    
+
     world.add(sphere(point3(0.0, -1000.0, 0.0), 1000.0, ground_material));
 
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat = rand();
             let center = point3(
                 f64::from(a) + 0.9 * rand(),
                 0.2,
@@ -64,26 +63,28 @@ pub fn bouncing_spheres() -> (BvhNode, Camera) {
             );
 
             if (center - point3(4.0, 0.2, 0.0)).length() > 0.9 {
-                if choose_mat < 0.8 {
+                match rand() {
                     // diffuse
-                    let albedo = Color::random() * Color::random();
-                    let mat = lambertian_from_color(albedo);
-                    world.add(sphere_moving(
-                        center,
-                        vec3(0.0, rand::rand_range(0.0..0.5), 0.0),
-                        0.2,
-                        mat,
-                    ));
-                } else if choose_mat < 0.95 {
+                    0.0..0.8 => {
+                        let albedo = Color::random() * Color::random();
+                        let mat = lambertian_from_color(albedo);
+                        world.add(moving(
+                            sphere(center, 0.2, mat),
+                            vec3(0.0, rand::rand_range(0.0..0.5), 0.0),
+                        ));
+                    }
                     // metal
-                    let albedo = Color::random_range(0.5..1.0);
-                    let fuzz = rand::rand_range(0.0..0.5);
-                    let mat = metal(albedo, fuzz);
-                    world.add(sphere(center, 0.2, mat));
-                } else {
+                    0.8..0.95 => {
+                        let albedo = Color::random_range(0.5..1.0);
+                        let fuzz = rand::rand_range(0.0..0.5);
+                        let mat = metal(albedo, fuzz);
+                        world.add(sphere(center, 0.2, mat));
+                    }
                     // glass
-                    let mat = dielectric(1.5);
-                    world.add(sphere(center, 0.2, mat));
+                    _ => {
+                        let mat = dielectric(1.5);
+                        world.add(sphere(center, 0.2, mat));
+                    }
                 }
             }
         }
@@ -317,7 +318,7 @@ pub fn cornell_box() -> (HittableList, Camera) {
     );
     box1 = rotate_y(box1, 15.0);
     box1 = translate(box1, vec3(265.0, 0.0, 295.0));
-    // world.add(box1);
+    world.add(box1);
     let mut box2: Arc<dyn Hittable> = cube(
         point3(0.0, 0.0, 0.0),
         point3(165.0, 165.0, 165.0),
@@ -325,16 +326,16 @@ pub fn cornell_box() -> (HittableList, Camera) {
     );
     box2 = rotate_y(box2, -18.0);
     box2 = translate(box2, vec3(130.0, 0.0, 65.0));
-    // world.add(box2);
+    world.add(box2);
 
-    world.add(constant_medium_from_color(box1, 0.01, color(0.0, 0.0, 0.0)));
-    world.add(constant_medium_from_color(box2, 0.01, color(1.0, 1.0, 1.0)));
+    // world.add(constant_medium_from_color(box1, 0.01, color(0.0, 0.0, 0.0)));
+    // world.add(constant_medium_from_color(box2, 0.01, color(1.0, 1.0, 1.0)));
 
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,
-        image_width: 600,
+        image_width: 200,
         v_fov: 40.0,
-        samples_per_pixel: 200,
+        samples_per_pixel: 1000,
         look_from: point3(278.0, 278.0, -800.0),
         look_at: point3(278.0, 278.0, 0.0),
         background: color(0.0, 0.0, 0.0),
@@ -489,11 +490,9 @@ pub fn book_2_final() -> (HittableList, Camera) {
 
     let center1 = point3(400.0, 400.0, 200.0);
     let sphere_mat = lambertian_from_color(color(0.7, 0.3, 0.1));
-    world.add(sphere_moving(
-        center1,
+    world.add(moving(
+        sphere(center1, 50.0, sphere_mat),
         point3(30.0, 0.0, 0.0),
-        50.0,
-        sphere_mat,
     ));
 
     world.add(sphere(point3(260.0, 150.0, 45.0), 50.0, dielectric(1.5)));
