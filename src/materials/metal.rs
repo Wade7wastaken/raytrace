@@ -28,11 +28,7 @@ impl Material for Metal {
         let attenuation = self.albedo;
 
         // if we scatter below the surface, just absorb the ray
-        if scattered.dir.dot(rec.normal) > 0.0 {
-            Some((attenuation, scattered))
-        } else {
-            None
-        }
+        (scattered.dir.dot(rec.normal) > 0.0).then_some((attenuation, scattered))
     }
 }
 

@@ -6,7 +6,7 @@ use std::{
 use crate::{
     materials::{Isotropic, Material},
     primitives::{Color, Interval, Ray, interval, vec3},
-    rand::rand,
+    misc::rand_f64,
     textures::Texture,
 };
 
@@ -62,7 +62,7 @@ impl Hittable for ConstantMedium {
 
         let ray_length = r.dir.length();
         let distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
-        let hit_distance = self.neg_inv_density * rand().ln();
+        let hit_distance = self.neg_inv_density * rand_f64().ln();
 
         if hit_distance > distance_inside_boundary {
             return None;

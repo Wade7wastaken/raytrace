@@ -1,4 +1,4 @@
-use crate::rand::{rand, rand_range};
+use crate::misc::rand_f64;
 use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, derive::Sum};
 use std::{
     fmt,
@@ -12,12 +12,12 @@ use std::{
     Copy,
     PartialEq,
     Add,
-    AddAssign,
     Sub,
-    SubAssign,
     Mul,
-    MulAssign,
     Div,
+    AddAssign,
+    SubAssign,
+    MulAssign,
     DivAssign,
     Sum,
 )]
@@ -36,18 +36,18 @@ impl Color {
     #[must_use]
     pub fn random() -> Self {
         Self {
-            r: rand(),
-            g: rand(),
-            b: rand(),
+            r: rand_f64(),
+            g: rand_f64(),
+            b: rand_f64(),
         }
     }
 
     #[must_use]
     pub fn random_range(range: Range<f64>) -> Self {
         Self {
-            r: rand_range(range.clone()),
-            g: rand_range(range.clone()),
-            b: rand_range(range.clone()),
+            r: rand::random_range(range.clone()),
+            g: rand::random_range(range.clone()),
+            b: rand::random_range(range.clone()),
         }
     }
 

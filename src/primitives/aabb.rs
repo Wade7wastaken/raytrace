@@ -1,6 +1,6 @@
 use std::{fmt, ops::Add};
 
-use crate::misc::tern;
+use crate::tern;
 
 use super::{Interval, Point3, Ray, Vec3, interval};
 
@@ -52,10 +52,10 @@ impl Aabb {
 
             let r_orig = r.orig.axis(axis);
 
-            let (t0, t1) = tern(
+            let (t0, t1) = tern!(
                 ad >= 0.0,
                 ((ax.min - r_orig) / ad, (ax.max - r_orig) / ad),
-                ((ax.max - r_orig) / ad, (ax.min - r_orig) / ad),
+                ((ax.max - r_orig) / ad, (ax.min - r_orig) / ad)
             );
 
             let (min, max) = (t0.max(ray_t.min), t1.min(ray_t.max));

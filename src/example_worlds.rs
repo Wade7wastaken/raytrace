@@ -9,8 +9,8 @@ use crate::{
     materials::{
         Material, dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal,
     },
+    misc::rand_f64,
     primitives::{Color, Point3, color, point3, vec3},
-    rand::{self, rand, rand_range},
     textures::{checker_texture_from_colors, image_texture_from_bytes, noise_texture},
 };
 
@@ -57,26 +57,26 @@ pub fn bouncing_spheres() -> (BvhNode, Camera) {
     for a in -11..11 {
         for b in -11..11 {
             let center = point3(
-                f64::from(a) + 0.9 * rand(),
+                f64::from(a) + 0.9 * rand_f64(),
                 0.2,
-                f64::from(b) + 0.9 * rand(),
+                f64::from(b) + 0.9 * rand_f64(),
             );
 
             if (center - point3(4.0, 0.2, 0.0)).length() > 0.9 {
-                match rand() {
+                match rand_f64() {
                     // diffuse
                     0.0..0.8 => {
                         let albedo = Color::random() * Color::random();
                         let mat = lambertian_from_color(albedo);
                         world.add(moving(
                             sphere(center, 0.2, mat),
-                            vec3(0.0, rand::rand_range(0.0..0.5), 0.0),
+                            vec3(0.0, rand::random_range(0.0..0.5), 0.0),
                         ));
                     }
                     // metal
                     0.8..0.95 => {
                         let albedo = Color::random_range(0.5..1.0);
-                        let fuzz = rand::rand_range(0.0..0.5);
+                        let fuzz = rand::random_range(0.0..0.5);
                         let mat = metal(albedo, fuzz);
                         world.add(sphere(center, 0.2, mat));
                     }
@@ -452,7 +452,9 @@ pub fn room() -> (BvhNode, Camera) {
         ..Default::default()
     });
 
-    (BvhNode::from_hittable_list(world), cam)
+    let bvh_node = BvhNode::from_hittable_list(world);
+
+    (bvh_node, cam)
 }
 
 pub fn book_2_final() -> (HittableList, Camera) {
@@ -469,7 +471,7 @@ pub fn book_2_final() -> (HittableList, Camera) {
             let z0 = -1000.0 + j * w;
             let y0 = 0.0;
             let x1 = x0 + w;
-            let y1 = rand_range(1.0..101.0);
+            let y1 = rand::random_range(1.0..101.0);
             let z1 = z0 + w;
 
             boxes1.add(cube(point3(x0, y0, z0), point3(x1, y1, z1), ground.clone()));

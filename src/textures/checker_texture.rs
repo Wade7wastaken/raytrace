@@ -4,8 +4,8 @@ use std::{
 };
 
 use crate::{
-    misc::tern,
     primitives::{Color, Point3},
+    tern,
 };
 
 use super::{SolidColor, Texture};
@@ -42,7 +42,7 @@ impl Texture for CheckerTexture {
 
         let is_even = (x + y + z) % 2 == 0;
 
-        tern(is_even, &self.even, &self.odd).value(u, v, p)
+        tern!(is_even, &self.even, &self.odd).value(u, v, p)
     }
 }
 

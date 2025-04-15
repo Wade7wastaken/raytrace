@@ -3,6 +3,7 @@ use std::{fmt, sync::Arc};
 use crate::{
     materials::Material,
     primitives::{Aabb, Interval, Point3, Ray, Vec3},
+    tern,
 };
 
 #[derive(Clone)]
@@ -28,11 +29,7 @@ impl HitRecord {
         outward_normal: Vec3,
     ) -> Self {
         let front_face = r.dir.dot(outward_normal) < 0.0;
-        let normal = if front_face {
-            outward_normal
-        } else {
-            -outward_normal
-        };
+        let normal = tern!(front_face, outward_normal, -outward_normal);
 
         Self {
             p,

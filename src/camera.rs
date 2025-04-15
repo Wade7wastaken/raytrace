@@ -11,7 +11,7 @@ use crate::{
     hittables::Hittable,
     image_writer::ImageWriter,
     primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
-    rand::rand,
+    misc::rand_f64,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -202,7 +202,7 @@ impl Camera {
         };
         let ray_direction = pixel_sample - ray_origin;
 
-        ray(ray_origin, ray_direction, rand())
+        ray(ray_origin, ray_direction, rand_f64())
     }
 
     fn defocus_disk_sample(&self) -> Point3 {
@@ -212,5 +212,5 @@ impl Camera {
 }
 
 fn sample_square() -> Vec3 {
-    vec3(rand() - 0.5, rand() - 0.5, 0.0)
+    vec3(rand_f64() - 0.5, rand_f64() - 0.5, 0.0)
 }

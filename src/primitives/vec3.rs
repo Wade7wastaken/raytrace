@@ -1,5 +1,4 @@
-use crate::rand::rand;
-use crate::rand::rand_range;
+use crate::misc::rand_f64;
 use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use rand::distr::Distribution;
 use rand::distr::StandardUniform;
@@ -37,18 +36,18 @@ impl Vec3 {
     #[must_use]
     pub fn random() -> Self {
         Self {
-            x: rand(),
-            y: rand(),
-            z: rand(),
+            x: rand_f64(),
+            y: rand_f64(),
+            z: rand_f64(),
         }
     }
 
     #[must_use]
     pub fn random_range(range: Range<f64>) -> Self {
         Self {
-            x: rand_range(range.clone()),
-            y: rand_range(range.clone()),
-            z: rand_range(range.clone()),
+            x: rand::random_range(range.clone()),
+            y: rand::random_range(range.clone()),
+            z: rand::random_range(range.clone()),
         }
     }
 
@@ -65,7 +64,7 @@ impl Vec3 {
     #[must_use]
     pub fn random_in_unit_disk() -> Self {
         loop {
-            let p = vec3(rand(), rand(), 0.0);
+            let p = vec3(rand_f64(), rand_f64(), 0.0);
             if p.length_squared() < 1.0 {
                 return p;
             }

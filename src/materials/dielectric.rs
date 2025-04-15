@@ -3,7 +3,8 @@ use std::{fmt, sync::Arc};
 use crate::{
     hittables::HitRecord,
     primitives::{Color, Ray, color, ray},
-    rand::rand,
+    misc::rand_f64,
+    tern,
 };
 
 use super::Material;
@@ -28,11 +29,11 @@ impl Dielectric {
 impl Material for Dielectric {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
         let attenuation = color(1.0, 1.0, 1.0);
-        let refraction_index = if rec.front_face {
-            1.0 / self.refraction_index
-        } else {
+        let refraction_index = tern!(
+            rec.front_face,
+            1.0 / self.refraction_index,
             self.refraction_index
-        };
+        );
 
         let unit_direction = r.dir.unit_vector();
 
@@ -41,12 +42,11 @@ impl Material for Dielectric {
 
         let cannot_refract = refraction_index * sin_theta > 1.0;
 
-        let direction =
-            if cannot_refract || Dielectric::reflectance(cos_theta, refraction_index) > rand() {
-                unit_direction.reflect(rec.normal)
-            } else {
-                unit_direction.refract(rec.normal, refraction_index)
-            };
+        let direction = tern!(
+            cannot_refract || Dielectric::reflectance(cos_theta, refraction_index) > rand_f64(),
+            unit_direction.reflect(rec.normal),
+            unit_direction.refract(rec.normal, refraction_index)
+        );
 
         let scattered = ray(rec.p, direction, r.time);
         Some((attenuation, scattered))
