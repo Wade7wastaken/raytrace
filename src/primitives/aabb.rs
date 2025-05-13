@@ -113,7 +113,6 @@ impl Default for Aabb {
             Interval::default(),
             Interval::default(),
         )
-        .pad_to_minimums()
     }
 }
 

@@ -1,4 +1,5 @@
 use crate::misc::rand_f64;
+use crate::tern;
 use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use rand::distr::Distribution;
 use rand::distr::StandardUniform;
@@ -47,7 +48,7 @@ impl Vec3 {
         Self {
             x: rand::random_range(range.clone()),
             y: rand::random_range(range.clone()),
-            z: rand::random_range(range.clone()),
+            z: rand::random_range(range),
         }
     }
 
@@ -79,12 +80,8 @@ impl Vec3 {
     #[must_use]
     pub fn random_on_hemisphere(normal: Self) -> Self {
         let on_unit_sphere = Self::random_unit_vector();
-        if on_unit_sphere.dot(normal) > 0.0 {
-            // In the same hemisphere as normal
-            on_unit_sphere
-        } else {
-            -on_unit_sphere
-        }
+        // flip the vector if its not on the right hemisphere
+        on_unit_sphere * tern!(on_unit_sphere.dot(normal) > 0.0, 1.0, -1.0)
     }
 
     #[must_use]

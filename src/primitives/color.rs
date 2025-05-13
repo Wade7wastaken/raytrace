@@ -35,24 +35,21 @@ impl Color {
 
     #[must_use]
     pub fn random() -> Self {
-        Self {
-            r: rand_f64(),
-            g: rand_f64(),
-            b: rand_f64(),
-        }
+        Self::default().map(|_| rand_f64())
     }
 
     #[must_use]
     pub fn random_range(range: Range<f64>) -> Self {
-        Self {
-            r: rand::random_range(range.clone()),
-            g: rand::random_range(range.clone()),
-            b: rand::random_range(range.clone()),
-        }
+        Self::default().map(|_| rand::random_range(range.clone()))
     }
 
     #[must_use]
-    pub fn map(&self, pred: fn(f64) -> f64) -> Self {
+    pub fn tuple(self) -> (f64, f64, f64) {
+        (self.r, self.g, self.b)
+    }
+
+    #[must_use]
+    pub fn map(&self, pred: impl Fn(f64) -> f64) -> Self {
         Self {
             r: pred(self.r),
             g: pred(self.g),
