@@ -2,8 +2,8 @@ use std::{fmt, sync::Arc};
 
 use crate::{
     hittables::HitRecord,
-    primitives::{Color, Ray, color, ray},
     misc::rand_f64,
+    primitives::{Color, Ray, color, ray},
     tern,
 };
 

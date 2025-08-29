@@ -10,8 +10,8 @@ use std::{
 use crate::{
     hittables::Hittable,
     image_writer::ImageWriter,
-    primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
     misc::rand_f64,
+    primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };
 
 #[derive(Debug, Clone, Copy)]
