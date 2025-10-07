@@ -1,6 +1,9 @@
 use rand::seq::SliceRandom;
 
-use crate::primitives::{Point3, Vec3, vec3};
+use crate::{
+    misc::IterExt,
+    primitives::{Point3, Vec3, vec3},
+};
 
 const POINT_COUNT: usize = 256;
 
@@ -39,17 +42,36 @@ impl Perlin {
         let j = p.y.floor() as i32;
         let k = p.z.floor() as i32;
 
-        let mut c = [[[Vec3::default(); 2]; 2]; 2];
+        // let mut c = [[[Vec3::default(); 2]; 2]; 2];
 
-        for di in 0..2 {
-            for dj in 0..2 {
-                for dk in 0..2 {
-                    c[di][dj][dk] = self.rand_vec[self.perm_x[((i + di as i32) & 255) as usize]
-                        ^ self.perm_y[((j + dj as i32) & 255) as usize]
-                        ^ self.perm_z[((k + dk as i32) & 255) as usize]];
-                }
-            }
-        }
+        let c = (0..2)
+            .map(|di| {
+                (0..2)
+                    .map(|dj| {
+                        (0..2)
+                            .map(|dk| {
+                                self.rand_vec[self.perm_x[((i + di) & 255) as usize]
+                                    ^ self.perm_y[((j + dj) & 255) as usize]
+                                    ^ self.perm_z[((k + dk) & 255) as usize]]
+                            })
+                            .collect_arr()
+                            .unwrap()
+                    })
+                    .collect_arr()
+                    .unwrap()
+            })
+            .collect_arr()
+            .unwrap();
+
+        // for di in 0..2 {
+        //     for dj in 0..2 {
+        //         for dk in 0..2 {
+        //             c[di][dj][dk] = self.rand_vec[self.perm_x[((i + di as i32) & 255) as usize]
+        //                 ^ self.perm_y[((j + dj as i32) & 255) as usize]
+        //                 ^ self.perm_z[((k + dk as i32) & 255) as usize]];
+        //         }
+        //     }
+        // }
 
         Self::perlin_interp(c, u, v, w)
     }
