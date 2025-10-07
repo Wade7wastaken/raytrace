@@ -31,6 +31,8 @@ pub fn simple() -> (HittableList, Camera) {
     world.add(sphere(point3(1.0, 0.0, -1.0), 0.5, mat_right));
 
     let cam = Camera::new(CameraOptions {
+        samples_per_pixel: 500,
+        image_width: 1920,
         look_from: point3(-2.0, 2.0, 1.0),
         v_fov: 20.0,
         defocus_angle: 10.0,

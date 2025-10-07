@@ -1,73 +1,67 @@
-use std::{error::Error, fmt::Write as _, fs::File, io::Write as _, path::Path};
+use std::{
+    error::Error,
+    fs::File,
+    io::{BufWriter, Write as _},
+    path::Path,
+};
 
 use crate::primitives::Color;
 
-pub trait ImageWriter {
+pub trait ImageWriter<T>: Sized {
+    fn new(data: T, width: usize, height: usize) -> Result<Self, Box<dyn Error>>;
     fn write(&mut self, pixels: Vec<Vec<Color>>) -> Result<(), Box<dyn Error>>;
+    fn finalize(&mut self) -> Result<(), Box<dyn Error>>;
 }
 
 pub struct PPMImageWriter {
-    f: File,
-    buffer: String,
+    f: BufWriter<File>,
 }
 
-impl PPMImageWriter {
-    pub fn new(
-        path: impl AsRef<Path>,
-        image_width: u32,
-        image_height: u32,
-    ) -> Result<Self, Box<dyn Error>> {
-        let f = File::create(path)?;
-        let mut buffer = String::new();
+impl<T: AsRef<Path>> ImageWriter<T> for PPMImageWriter {
+    fn new(data: T, width: usize, height: usize) -> Result<Self, Box<dyn Error>> {
+        let f = File::create(data)?;
+        let mut writer = BufWriter::new(f);
 
-        let pixel_expected_value = 4.0;
-        let reserve_length =
-            (f64::from(image_width) * f64::from(image_height) * 3.0 * pixel_expected_value).round(); // add 3 for space, space, newline
+        writeln!(writer, "P3\n{width} {height}\n255")?;
 
-        println!("Reserving {reserve_length} bytes");
-        buffer.reserve((reserve_length) as usize);
-        writeln!(buffer, "P3\n{image_width} {image_height}\n255")?;
-
-        Ok(Self { f, buffer })
+        Ok(Self { f: writer })
     }
-}
 
-impl ImageWriter for PPMImageWriter {
     fn write(&mut self, pixels: Vec<Vec<Color>>) -> Result<(), Box<dyn Error>> {
         for row in pixels {
             for pixel in row {
                 let (r, g, b) = pixel.map(linear_to_gamma).to_rgb();
 
-                writeln!(self.buffer, "{r} {g} {b}")?;
+                writeln!(self.f, "{r} {g} {b}")?;
             }
         }
 
-        println!("Final buffer capacity: {}", self.buffer.capacity());
-        println!("Final buffer len: {}", self.buffer.len());
-        self.f.write_all(self.buffer.as_bytes())?;
-
         Ok(())
+    }
+
+    fn finalize(&mut self) -> Result<(), Box<dyn Error>> {
+        Ok(self.f.flush()?)
     }
 }
 
 pub struct PNGImageWriter {
     f: File,
+    width: usize,
+    height: usize,
 }
 
-impl PNGImageWriter {
-    pub fn new(path: impl AsRef<Path>) -> Result<Self, Box<dyn Error>> {
+impl<T: AsRef<Path>> ImageWriter<T> for PNGImageWriter {
+    fn new(path: T, width: usize, height: usize) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
             f: File::create(path)?,
+            width,
+            height,
         })
     }
-}
 
-impl ImageWriter for PNGImageWriter {
     fn write(&mut self, pixels: Vec<Vec<Color>>) -> Result<(), Box<dyn Error>> {
-        let height = pixels.len();
-        let width = pixels.first().map_or(0, Vec::len);
-
-        let mut encoder = png::Encoder::new(&self.f, width.try_into()?, height.try_into()?);
+        let mut encoder =
+            png::Encoder::new(&self.f, self.width.try_into()?, self.height.try_into()?);
         encoder.set_color(png::ColorType::Rgb);
         encoder.set_depth(png::BitDepth::Eight);
         encoder.set_source_gamma(png::ScaledFloat::new(1.0 / 2.2));
@@ -86,12 +80,15 @@ impl ImageWriter for PNGImageWriter {
 
         Ok(())
     }
+
+    fn finalize(&mut self) -> Result<(), Box<dyn Error>> {
+        Ok(())
+    }
 }
 
 fn linear_to_gamma(linear_component: f64) -> f64 {
     if linear_component > 0.0 {
         linear_component.powf(1.0 / 2.2)
-        // linear_component.sqrt()
     } else {
         0.0
     }

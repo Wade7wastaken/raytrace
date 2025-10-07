@@ -22,12 +22,11 @@ impl BvhNode {
             [first, last] => (first.clone(), last.clone()),
             [first, _, _] => (first.clone(), Arc::new(BvhNode::new(&mut objects[1..]))),
             _ => {
-                let comparator = |a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>| {
+                objects.sort_by(|a, b| {
                     let a_axis_interval = a.bounding_box().axis_interval(bbox.longest_axis());
                     let b_axis_interval = b.bounding_box().axis_interval(bbox.longest_axis());
                     a_axis_interval.min.total_cmp(&b_axis_interval.min)
-                };
-                objects.sort_by(comparator);
+                });
 
                 let (left, right) = objects.split_at_mut(objects.len() / 2);
                 (Arc::new(Self::new(left)), Arc::new(Self::new(right)))

@@ -140,10 +140,12 @@ impl Camera {
         // AtomicUsize is faster than Mutex
         let count = Arc::new(AtomicUsize::new(0));
 
+        let mut result = vec![];
+
         (0..self.image_height)
             .into_par_iter()
             .map(|y| {
-                let prev = count.fetch_add(1, Ordering::SeqCst);
+                let prev = count.fetch_add(1, Ordering::Relaxed);
                 println!(
                     "starting {prev} / {} ({:.2}%)",
                     self.image_height,
@@ -151,19 +153,22 @@ impl Camera {
                 );
                 self.scanline(world, y)
             })
-            .collect()
+            .collect_into_vec(&mut result);
+
+        result
     }
 
     // Renders a hittable and saves it to a given image_writer
-    pub fn render_and_save(
+    pub fn render_and_save<T, Writer: ImageWriter<T>>(
         &self,
         world: &dyn Hittable,
-        mut image_writer: impl ImageWriter,
+        data: T,
     ) -> Result<(), Box<dyn Error>> {
+        let mut writer = Writer::new(data, self.image_width, self.image_height)?;
         let pixels = self.render(world);
         println!("Done rendering");
 
-        image_writer.write(pixels)?;
+        writer.write(pixels)?;
         println!("Done Saving");
         Ok(())
     }
