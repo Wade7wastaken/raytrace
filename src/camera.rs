@@ -14,18 +14,33 @@ use crate::{
     primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };
 
+fn opt_assert(cond: bool) -> Option<()> {
+    cond.then_some(())
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct CameraOptions {
+    /// The aspect ratio of the output image.
     pub aspect_ratio: f64,
+    /// The width of the output image.
     pub image_width: usize,
+    /// The number of rays to sample per pixel.
     pub samples_per_pixel: u32,
+    /// The maximum depth a ray is allowed to search.
     pub max_depth: u32,
+    /// The field of view in degrees.
     pub v_fov: f64,
+    /// The origin of the camera.
     pub look_from: Point3,
+    /// The target of the camera.
     pub look_at: Point3,
+    /// A vector representing the upwards direction.
     pub vup: Vec3,
+    /// The angle of the defocus cone.
     pub defocus_angle: f64,
+    /// The distance where objects are perfectly in focus.
     pub focus_dist: f64,
+    /// The default color if a ray doesn't collide with anything.
     pub background: Color,
 }
 
@@ -64,7 +79,7 @@ pub struct Camera {
 
 impl Camera {
     #[must_use]
-    pub fn new(options: CameraOptions) -> Self {
+    pub fn new(options: CameraOptions) -> Option<Self> {
         let CameraOptions {
             aspect_ratio,
             image_width,
@@ -80,9 +95,10 @@ impl Camera {
         } = options;
         let image_height = (image_width as f64 / aspect_ratio).round() as usize;
 
-        // ensure dimensions are more than 0
-        assert!(image_width > 0);
-        assert!(image_height > 0);
+        // ensure dimensions are greater than 0.
+        opt_assert(aspect_ratio > 0.0)?;
+        opt_assert(image_width > 0)?;
+        opt_assert(image_height > 0)?;
 
         let theta = v_fov.to_radians();
         let h = (theta / 2.0).tan();
@@ -107,20 +123,20 @@ impl Camera {
         let defocus_disk_u = u * defocus_radius;
         let defocus_disk_v = v * defocus_radius;
 
-        Self {
-            image_height,
-            image_width,
-            samples_per_pixel,
-            max_depth,
-            look_from,
-            pixel_00_loc,
-            pixel_delta_u,
-            pixel_delta_v,
-            defocus_angle,
-            defocus_disk_u,
-            defocus_disk_v,
-            background,
-        }
+        Some(Self {
+                    image_height,
+                    image_width,
+                    samples_per_pixel,
+                    max_depth,
+                    look_from,
+                    pixel_00_loc,
+                    pixel_delta_u,
+                    pixel_delta_v,
+                    defocus_angle,
+                    defocus_disk_u,
+                    defocus_disk_v,
+                    background,
+                })
     }
 
     // Renders a scanline into Vec of colors

@@ -37,7 +37,7 @@ pub fn simple() -> (HittableList, Camera) {
         focus_dist: 3.4,
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     (world, cam)
 }
@@ -109,7 +109,7 @@ pub fn bouncing_spheres() -> (BvhNode, Camera) {
         defocus_angle: 0.6,
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     let world_bvh = BvhNode::from_hittable_list(world);
 
@@ -135,7 +135,7 @@ pub fn checkered_spheres() -> (HittableList, Camera) {
         look_at: point3(0.0, 0.0, 0.0),
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     (world, cam)
 }
@@ -158,7 +158,7 @@ pub fn earth() -> (HittableList, Camera) {
         vup: vec3(0.0, 1.0, 0.0),
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     (world, cam)
 }
@@ -178,7 +178,7 @@ pub fn perlin_spheres() -> (HittableList, Camera) {
         look_at: point3(0.0, 0.0, 0.0),
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     (world, cam)
 }
@@ -231,7 +231,7 @@ pub fn quads() -> (HittableList, Camera) {
         look_at: point3(0.0, 0.0, 0.0),
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     (world, cam)
 }
@@ -259,7 +259,7 @@ pub fn simple_light() -> (HittableList, Camera) {
         look_at: point3(0.0, 2.0, 0.0),
         background: color(0.0, 0.0, 0.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     (world, cam)
 }
@@ -340,7 +340,7 @@ pub fn cornell_box() -> (HittableList, Camera) {
         look_at: point3(278.0, 278.0, 0.0),
         background: color(0.0, 0.0, 0.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     (world, cam)
 }
@@ -367,7 +367,7 @@ pub fn triangles() -> (HittableList, Camera) {
         look_at: point3(0.0, 0.0, 0.0),
         background: color(1.0, 1.0, 1.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     (world, cam)
 }
@@ -450,7 +450,7 @@ pub fn room() -> (BvhNode, Camera) {
         background: color(0.0, 0.0, 0.0),
         vup: vec3(0.0, 0.0, -1.0),
         ..Default::default()
-    });
+    }).unwrap();
 
     let bvh_node = BvhNode::from_hittable_list(world);
 
@@ -558,7 +558,7 @@ pub fn book_2_final() -> (HittableList, Camera) {
         vup: vec3(0.0, 1.0, 0.0),
         defocus_angle: 0.0,
         ..Default::default()
-    });
+    }).unwrap();
 
     (world, cam)
 }
