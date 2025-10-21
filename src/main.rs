@@ -15,14 +15,14 @@ fn run<H: Hittable>((world, cam): (H, Camera), name: &str) {
 }
 
 fn main() {
-    run(simple(), "simple");
+    // run(simple(), "simple");
     // run(bouncing_spheres(), "bouncing_spheres");
     // run(checkered_spheres(), "checkered_spheres");
     // run(earth(), "earth");
     // run(perlin_spheres(), "perlin_spheres");
     // run(quads(), "quads");
     // run(simple_light(), "simple_light");
-    // run(cornell_box(), "cornel_box");
+    run(cornell_box(), "cornel_box");
     // run(triangles(), "triangles");
     // run(room(), "room");
     // run(book_2_final(), "book_2_final");

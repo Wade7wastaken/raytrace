@@ -335,9 +335,9 @@ pub fn cornell_box() -> (HittableList, Camera) {
 
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,
-        image_width: 200,
+        image_width: 1080,
         v_fov: 40.0,
-        samples_per_pixel: 1000,
+        samples_per_pixel: 200,
         look_from: point3(278.0, 278.0, -800.0),
         look_at: point3(278.0, 278.0, 0.0),
         background: color(0.0, 0.0, 0.0),
