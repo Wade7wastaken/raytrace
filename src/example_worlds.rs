@@ -3,8 +3,8 @@ use std::sync::Arc;
 use crate::{
     camera::{Camera, CameraOptions},
     hittables::{
-        BvhNode, Hittable, HittableList, constant_medium_from_color, cube, moving, quad, rotate_y,
-        sphere, translate, triangle,
+        BvhNode, HittableList, constant_medium_from_color, cube, moving, quad, rotate_y, sphere,
+        translate, triangle,
     },
     materials::{
         Material, dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal,
@@ -39,7 +39,8 @@ pub fn simple() -> (HittableList, Camera) {
         focus_dist: 3.4,
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     (world, cam)
 }
@@ -111,7 +112,8 @@ pub fn bouncing_spheres() -> (BvhNode, Camera) {
         defocus_angle: 0.6,
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     let world_bvh = BvhNode::from_hittable_list(world);
 
@@ -137,7 +139,8 @@ pub fn checkered_spheres() -> (HittableList, Camera) {
         look_at: point3(0.0, 0.0, 0.0),
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     (world, cam)
 }
@@ -160,7 +163,8 @@ pub fn earth() -> (HittableList, Camera) {
         vup: vec3(0.0, 1.0, 0.0),
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     (world, cam)
 }
@@ -180,7 +184,8 @@ pub fn perlin_spheres() -> (HittableList, Camera) {
         look_at: point3(0.0, 0.0, 0.0),
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     (world, cam)
 }
@@ -233,7 +238,8 @@ pub fn quads() -> (HittableList, Camera) {
         look_at: point3(0.0, 0.0, 0.0),
         background: color(0.7, 0.8, 1.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     (world, cam)
 }
@@ -261,7 +267,8 @@ pub fn simple_light() -> (HittableList, Camera) {
         look_at: point3(0.0, 2.0, 0.0),
         background: color(0.0, 0.0, 0.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     (world, cam)
 }
@@ -274,75 +281,75 @@ pub fn cornell_box() -> (HittableList, Camera) {
     let white = lambertian_from_color(color(0.73, 0.73, 0.73));
     let green = lambertian_from_color(color(0.12, 0.45, 0.15));
 
-    let light = diffuse_light_from_color(color(7.0, 7.0, 7.0));
+    let light = diffuse_light_from_color(color(15.0, 15.0, 15.0));
 
     world.add(quad(
         point3(555.0, 0.0, 0.0),
-        point3(0.0, 555.0, 0.0),
         vec3(0.0, 0.0, 555.0),
+        vec3(0.0, 555.0, 0.0),
         green,
     ));
     world.add(quad(
-        point3(0.0, 0.0, 0.0),
-        point3(0.0, 555.0, 0.0),
-        vec3(0.0, 0.0, 555.0),
+        point3(0.0, 0.0, 555.0),
+        vec3(0.0, 0.0, -555.0),
+        vec3(0.0, 555.0, 0.0),
         red,
     ));
     world.add(quad(
-        point3(113.0, 554.0, 127.0),
-        point3(330.0, 0.0, 0.0),
-        vec3(0.0, 0.0, 305.0),
-        light,
-    ));
-    world.add(quad(
         point3(0.0, 555.0, 0.0),
-        point3(555.0, 0.0, 0.0),
-        vec3(0.0, 0.0, 555.0),
-        white.clone(),
-    ));
-    world.add(quad(
-        point3(0.0, 0.0, 0.0),
-        point3(555.0, 0.0, 0.0),
+        vec3(555.0, 0.0, 0.0),
         vec3(0.0, 0.0, 555.0),
         white.clone(),
     ));
     world.add(quad(
         point3(0.0, 0.0, 555.0),
-        point3(555.0, 0.0, 0.0),
+        vec3(555.0, 0.0, 0.0),
+        vec3(0.0, 0.0, -555.0),
+        white.clone(),
+    ));
+    world.add(quad(
+        point3(555.0, 0.0, 555.0),
+        vec3(-555.0, 0.0, 0.0),
         vec3(0.0, 555.0, 0.0),
         white.clone(),
     ));
 
-    let mut box1: Arc<dyn Hittable> = cube(
+    world.add(quad(
+        point3(213.0, 554.0, 226.0),
+        vec3(130.0, 0.0, 0.0),
+        vec3(0.0, 0.0, 105.0),
+        light,
+    ));
+
+    let box1 = cube(
         point3(0.0, 0.0, 0.0),
         point3(165.0, 330.0, 165.0),
         white.clone(),
     );
-    box1 = rotate_y(box1, 15.0);
-    box1 = translate(box1, vec3(265.0, 0.0, 295.0));
+    let box1 = rotate_y(box1, 15.0);
+    let box1 = translate(box1, vec3(265.0, 0.0, 295.0));
     world.add(box1);
-    let mut box2: Arc<dyn Hittable> = cube(
+
+    let box2 = cube(
         point3(0.0, 0.0, 0.0),
         point3(165.0, 165.0, 165.0),
         white.clone(),
     );
-    box2 = rotate_y(box2, -18.0);
-    box2 = translate(box2, vec3(130.0, 0.0, 65.0));
+    let box2 = rotate_y(box2, -18.0);
+    let box2 = translate(box2, vec3(130.0, 0.0, 65.0));
     world.add(box2);
-
-    // world.add(constant_medium_from_color(box1, 0.01, color(0.0, 0.0, 0.0)));
-    // world.add(constant_medium_from_color(box2, 0.01, color(1.0, 1.0, 1.0)));
 
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,
-        image_width: 1080,
-        v_fov: 40.0,
+        image_width: 600,
         samples_per_pixel: 200,
+        v_fov: 40.0,
         look_from: point3(278.0, 278.0, -800.0),
         look_at: point3(278.0, 278.0, 0.0),
         background: color(0.0, 0.0, 0.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     (world, cam)
 }
@@ -369,7 +376,8 @@ pub fn triangles() -> (HittableList, Camera) {
         look_at: point3(0.0, 0.0, 0.0),
         background: color(1.0, 1.0, 1.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     (world, cam)
 }
@@ -452,7 +460,8 @@ pub fn room() -> (BvhNode, Camera) {
         background: color(0.0, 0.0, 0.0),
         vup: vec3(0.0, 0.0, -1.0),
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     let bvh_node = BvhNode::from_hittable_list(world);
 
@@ -560,7 +569,8 @@ pub fn book_2_final() -> (HittableList, Camera) {
         vup: vec3(0.0, 1.0, 0.0),
         defocus_angle: 0.0,
         ..Default::default()
-    }).unwrap();
+    })
+    .unwrap();
 
     (world, cam)
 }
