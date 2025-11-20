@@ -1,9 +1,7 @@
-use std::{fmt, sync::Arc};
+use std::{f64::consts::PI, fmt, sync::Arc};
 
 use crate::{
-    hittables::HitRecord,
-    primitives::{Color, Ray, Vec3, ray},
-    textures::{SolidColor, Texture},
+    hittables::HitRecord, misc::random_cosine_direction, primitives::{ray, Color, Onb, Ray, Vec3}, tern, textures::{SolidColor, Texture}
 };
 
 use super::Material;
@@ -26,16 +24,19 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
-        let mut scatter_direction = rec.normal + Vec3::random_unit_vector();
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray, f64)> {
+        let uvw = Onb::new(rec.normal);
+        let scatter_direction = uvw.transform(random_cosine_direction());
 
-        if scatter_direction.is_near_zero() {
-            scatter_direction = rec.normal;
-        }
-
-        let scattered = ray(rec.p, scatter_direction, r.time);
+        let scattered = ray(rec.p, scatter_direction.unit_vector(), r.time);
         let attenuation = self.tex.value(rec.u, rec.v, rec.p);
-        Some((attenuation, scattered))
+        let pdf = uvw.w().dot(scattered.dir) / PI;
+        Some((attenuation, scattered, pdf))
+    }
+
+    fn scattering_pdf(&self, _r_in: &Ray, rec: &HitRecord, scattered: &Ray) -> f64 {
+        let cos_theta = rec.normal.dot(scattered.dir.unit_vector());
+        tern!(cos_theta < 0.0, 0.0, cos_theta / PI)
     }
 }
 

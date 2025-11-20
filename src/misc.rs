@@ -1,4 +1,6 @@
-use std::mem;
+use std::{f64::consts::PI, mem};
+
+use crate::primitives::{Vec3, vec3};
 
 #[macro_export]
 macro_rules! tern {
@@ -10,6 +12,19 @@ macro_rules! tern {
 #[must_use]
 pub fn rand_f64() -> f64 {
     rand::random_range(0.0..1.0)
+}
+
+#[must_use]
+pub fn random_cosine_direction() -> Vec3 {
+    let r1 = rand_f64();
+    let r2 = rand_f64();
+
+    let phi = 2.0 * PI * r1;
+    let x = phi.cos() * r2.sqrt();
+    let y = phi.sin() * r2.sqrt();
+    let z = (1.0 - r2).sqrt();
+
+    vec3(x, y, z)
 }
 
 pub trait IterExt: Iterator {

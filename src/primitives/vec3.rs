@@ -4,6 +4,7 @@ use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubA
 use rand::distr::Distribution;
 use rand::distr::StandardUniform;
 use std::fmt;
+use std::ops::Mul;
 use std::ops::Range;
 
 #[derive(
@@ -140,6 +141,13 @@ impl Vec3 {
     pub fn is_near_zero(&self) -> bool {
         let s = 1e-8;
         (self.x.abs() < s) && (self.y.abs() < s) && (self.z.abs() < s)
+    }
+}
+
+impl Mul<Vec3> for f64 {
+    type Output = Vec3;
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        rhs * self
     }
 }
 

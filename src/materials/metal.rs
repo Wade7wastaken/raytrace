@@ -21,14 +21,14 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray, f64)> {
         let reflected = r.dir.reflect(rec.normal);
         let reflected_fuzzed = reflected.unit_vector() + (Vec3::random_unit_vector() * self.fuzz);
         let scattered = ray(rec.p, reflected_fuzzed, r.time);
         let attenuation = self.albedo;
 
         // if we scatter below the surface, just absorb the ray
-        (scattered.dir.dot(rec.normal) > 0.0).then_some((attenuation, scattered))
+        (scattered.dir.dot(rec.normal) > 0.0).then_some((attenuation, scattered, 0.0))
     }
 }
 

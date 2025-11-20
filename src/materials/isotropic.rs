@@ -1,4 +1,5 @@
 use std::{
+    f64::consts::PI,
     fmt::{self, Display},
     sync::Arc,
 };
@@ -29,10 +30,14 @@ impl Isotropic {
 }
 
 impl Material for Isotropic {
-    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray, f64)> {
         let scattered = ray(rec.p, Vec3::random_unit_vector(), r.time);
         let attenuation = self.tex.value(rec.u, rec.v, rec.p);
-        Some((attenuation, scattered))
+        Some((attenuation, scattered, 1.0 / (4.0 * PI)))
+    }
+
+    fn scattering_pdf(&self, _r_in: &Ray, _rec: &HitRecord, _scattered: &Ray) -> f64 {
+        1.0 / (4.0 * PI)
     }
 }
 

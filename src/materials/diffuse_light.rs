@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     hittables::HitRecord,
-    primitives::{Color, Point3, Ray},
+    primitives::{Color, Point3, Ray, color},
     textures::{Texture, solid_color},
 };
 
@@ -28,11 +28,14 @@ impl DiffuseLight {
 }
 
 impl Material for DiffuseLight {
-    fn scatter(&self, _r: &Ray, _rec: &HitRecord) -> Option<(Color, Ray)> {
+    fn scatter(&self, _r: &Ray, _rec: &HitRecord) -> Option<(Color, Ray, f64)> {
         None
     }
 
-    fn emitted(&self, u: f64, v: f64, p: Point3) -> Color {
+    fn emitted(&self, _r: &Ray, rec: &HitRecord, u: f64, v: f64, p: Point3) -> Color {
+        if !rec.front_face {
+            return color(0.0, 0.0, 0.0);
+        }
         self.tex.value(u, v, p)
     }
 }

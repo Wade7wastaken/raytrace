@@ -27,7 +27,7 @@ pub struct CameraOptions {
     /// The number of rays to sample per pixel.
     pub samples_per_pixel: u32,
     /// The maximum depth a ray is allowed to search.
-    pub max_depth: usize,
+    pub max_depth: u32,
     /// The field of view in degrees.
     pub v_fov: f64,
     /// The origin of the camera.
@@ -66,7 +66,7 @@ pub struct Camera {
     image_height: usize,
     image_width: usize,
     samples_per_pixel: u32,
-    max_depth: usize,
+    max_depth: u32,
     look_from: Point3,
     pixel_00_loc: Point3,
     pixel_delta_u: Vec3,
@@ -139,19 +139,16 @@ impl Camera {
         })
     }
 
-    // Renders a hittable and saves it to a given image_writer
-    pub fn render_and_save<T, Writer: ImageWriter<T>>(
-        &self,
-        world: &dyn Hittable,
-        data: T,
-    ) -> Result<(), Box<dyn Error>> {
-        let mut writer = Writer::new(data, self.image_width, self.image_height)?;
-        let pixels = self.render(world);
-        println!("Done rendering");
-
-        writer.write(pixels)?;
-        println!("Done Saving");
-        Ok(())
+    // Renders a scanline into Vec of colors
+    pub fn scanline(&self, world: &dyn Hittable, y: usize) -> Vec<Color> {
+        (0..self.image_width)
+            .map(|x| {
+                (0..self.samples_per_pixel)
+                    .map(|_| self.ray_color(&self.get_ray(x, y), self.max_depth, world))
+                    .sum::<Color>()
+                    / f64::from(self.samples_per_pixel)
+            })
+            .collect()
     }
 
     // Renders a hittable into a 2d array of colors
@@ -177,75 +174,63 @@ impl Camera {
         result
     }
 
-    // Renders a scanline into Vec of colors
-    pub fn scanline(&self, world: &dyn Hittable, y: usize) -> Vec<Color> {
-        let mut emitted_values = Vec::with_capacity(self.max_depth);
-        let mut attenuation_values = Vec::with_capacity(self.max_depth);
+    // Renders a hittable and saves it to a given image_writer
+    pub fn render_and_save<T, Writer: ImageWriter<T>>(
+        &self,
+        world: &dyn Hittable,
+        data: T,
+    ) -> Result<(), Box<dyn Error>> {
+        let mut writer = Writer::new(data, self.image_width, self.image_height)?;
+        let pixels = self.render(world);
+        println!("Done rendering");
 
-        (0..self.image_width)
-            .map(|x| {
-                (0..self.samples_per_pixel)
-                    .map(|_| {
-                        self.ray_color(
-                            self.get_ray(x, y),
-                            world,
-                            &mut emitted_values,
-                            &mut attenuation_values,
-                        )
-                    })
-                    .sum::<Color>()
-                    / f64::from(self.samples_per_pixel)
-            })
-            .collect()
+        writer.write(pixels)?;
+        println!("Done Saving");
+        Ok(())
     }
 
     // Gets the final color of a ray through a given world. Recursively calls
     // itself for scattered rays
-    fn ray_color(
-        &self,
-        r: Ray,
-        world: &dyn Hittable,
-        emitted_values: &mut Vec<Color>,
-        attenuation_values: &mut Vec<Color>,
-    ) -> Color {
-        let ending_color = self.bounce_ray(r, world, emitted_values, attenuation_values);
+    fn ray_color(&self, r: &Ray, depth: u32, world: &dyn Hittable) -> Color {
+        // if we hit the bounce limit, no more light is gathered
+        if depth == 0 {
+            return color(0.0, 0.0, 0.0);
+        }
 
-        emitted_values
-            .iter()
-            .zip(attenuation_values)
-            .fold(ending_color, |prev, (emitted, attenuation)| {
-                (prev * *attenuation) + *emitted
-            })
-    }
+        if let Some(rec) = world.hit(r, &interval(0.001, f64::INFINITY)) {
+            let emitted = rec.mat.emitted(r, &rec, rec.u, rec.v, rec.p);
 
-    // old took 210.883
-    // new took 191.507
+            if let Some((attenuation, scattered, pdf_value)) = rec.mat.scatter(r, &rec) {
+                let on_light = point3(rand::random_range(213.0..=343.0), 554.0, rand::random_range(227.0..=332.0));
+                let to_light = on_light - rec.p;
+                let distance_squared = to_light.length_squared();
+                let to_light = to_light.unit_vector();
 
-    fn bounce_ray(
-        &self,
-        mut r: Ray,
-        world: &dyn Hittable,
-        emitted_values: &mut Vec<Color>,
-        attenuation_values: &mut Vec<Color>,
-    ) -> Color {
-        attenuation_values.clear();
-        emitted_values.clear();
-        for _ in 0..self.max_depth {
-            if let Some(rec) = world.hit(&r, &interval(0.001, f64::INFINITY)) {
-                let emitted = rec.mat.emitted(rec.u, rec.v, rec.p);
-
-                if let Some((attenuation, scattered)) = rec.mat.scatter(&r, &rec) {
-                    attenuation_values.push(attenuation);
-                    emitted_values.push(emitted);
-                    r = scattered;
-                } else {
+                if to_light.dot(rec.normal) < 0.0 {
                     return emitted;
                 }
+
+                let light_area = (343.0-213.0)*(332.0-227.0);
+                let light_cosine = to_light.y.abs();
+                if light_cosine < 0.000_001 {
+                    return emitted;
+                }
+
+                let pdf_value = distance_squared / (light_cosine * light_area);
+                let scattered = ray(rec.p, to_light, r.time);
+
+                let scattering_pdf = rec.mat.scattering_pdf(r, &rec, &scattered);
+
+                let color_from_scatter =
+                    (attenuation * scattering_pdf * self.ray_color(&scattered, depth - 1, world))
+                        / pdf_value;
+                emitted + color_from_scatter
             } else {
-                return self.background;
+                emitted
             }
+        } else {
+            self.background
         }
-        color(0.0, 0.0, 0.0)
     }
 
     fn get_ray(&self, x: usize, y: usize) -> Ray {

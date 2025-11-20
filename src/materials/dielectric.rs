@@ -27,7 +27,7 @@ impl Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray, f64)> {
         let attenuation = color(1.0, 1.0, 1.0);
         let refraction_index = tern!(
             rec.front_face,
@@ -49,7 +49,7 @@ impl Material for Dielectric {
         );
 
         let scattered = ray(rec.p, direction, r.time);
-        Some((attenuation, scattered))
+        Some((attenuation, scattered, 0.0))
     }
 }
 
