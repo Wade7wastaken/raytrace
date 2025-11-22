@@ -118,10 +118,8 @@ pub fn cornell_box() -> (HittableList, Camera) {
         v_fov: 40.0,
         look_from: point3(278.0, 278.0, -800.0),
         look_at: point3(278.0, 278.0, 0.0),
-        background: color(0.0, 0.0, 0.0),
         ..Default::default()
-    })
-    .unwrap();
+    });
 
     (world, cam)
 }
@@ -136,7 +134,12 @@ fn main() {
     println!("Rendering took {:.3}", end.as_secs_f64());
 
     let start = Instant::now();
-    write_png("output/cornel_box.png", pixels, cam.image_width, cam.image_height);
+    write_png(
+        "output/cornel_box.png",
+        pixels,
+        cam.image_width,
+        cam.image_height,
+    );
     let end = start.elapsed();
 
     println!("Saving took {:.3}", end.as_secs_f64());

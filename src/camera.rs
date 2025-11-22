@@ -10,10 +10,6 @@ use crate::{
     primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };
 
-fn opt_assert(cond: bool) -> Option<()> {
-    cond.then_some(())
-}
-
 #[derive(Debug, Clone, Copy)]
 pub struct CameraOptions {
     /// The aspect ratio of the output image.
@@ -32,12 +28,6 @@ pub struct CameraOptions {
     pub look_at: Point3,
     /// A vector representing the upwards direction.
     pub vup: Vec3,
-    /// The angle of the defocus cone.
-    pub defocus_angle: f64,
-    /// The distance where objects are perfectly in focus.
-    pub focus_dist: f64,
-    /// The default color if a ray doesn't collide with anything.
-    pub background: Color,
 }
 
 impl Default for CameraOptions {
@@ -51,9 +41,6 @@ impl Default for CameraOptions {
             look_from: Point3::default(),
             look_at: point3(0.0, 0.0, -1.0),
             vup: vec3(0.0, 1.0, 0.0),
-            defocus_angle: 0.0,
-            focus_dist: 10.0,
-            background: color(0.0, 0.0, 0.0),
         }
     }
 }
@@ -67,15 +54,11 @@ pub struct Camera {
     pixel_00_loc: Point3,
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
-    defocus_angle: f64,
-    defocus_disk_u: Vec3,
-    defocus_disk_v: Vec3,
-    background: Color,
 }
 
 impl Camera {
     #[must_use]
-    pub fn new(options: CameraOptions) -> Option<Self> {
+    pub fn new(options: CameraOptions) -> Self {
         let CameraOptions {
             aspect_ratio,
             image_width,
@@ -85,20 +68,18 @@ impl Camera {
             look_from,
             look_at,
             vup,
-            defocus_angle,
-            focus_dist,
-            background,
         } = options;
         let image_height = (image_width as f64 / aspect_ratio).round() as usize;
 
         // ensure dimensions are greater than 0.
-        opt_assert(aspect_ratio > 0.0)?;
-        opt_assert(image_width > 0)?;
-        opt_assert(image_height > 0)?;
+        assert!(aspect_ratio > 0.0);
+        assert!(image_width > 0);
+        assert!(image_height > 0);
 
+        let focal_length = (look_from - look_at).length();
         let theta = v_fov.to_radians();
         let h = (theta / 2.0).tan();
-        let viewport_height = 2.0 * h * focus_dist;
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
 
         let w = (look_from - look_at).unit_vector();
@@ -112,14 +93,10 @@ impl Camera {
         let pixel_delta_v = viewport_v / image_height as f64;
 
         let viewport_upper_left =
-            look_from - (w * focus_dist) - viewport_u / 2.0 - viewport_v / 2.0;
+            look_from - (w * focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
         let pixel_00_loc = viewport_upper_left + (pixel_delta_u + pixel_delta_v) * 0.5;
 
-        let defocus_radius = focus_dist * (defocus_angle / 2.0).to_radians().tan();
-        let defocus_disk_u = u * defocus_radius;
-        let defocus_disk_v = v * defocus_radius;
-
-        Some(Self {
+        Self {
             image_height,
             image_width,
             samples_per_pixel,
@@ -128,16 +105,10 @@ impl Camera {
             pixel_00_loc,
             pixel_delta_u,
             pixel_delta_v,
-            defocus_angle,
-            defocus_disk_u,
-            defocus_disk_v,
-            background,
-        })
+        }
     }
 
-    // Renders a hittable into a 2d array of colors
     pub fn render(&self, world: &dyn Hittable) -> Vec<Vec<Color>> {
-        // AtomicUsize is faster than Mutex
         let count = Arc::new(AtomicUsize::new(0));
 
         let mut result = vec![];
@@ -158,7 +129,6 @@ impl Camera {
         result
     }
 
-    // Renders a scanline into Vec of colors
     pub fn scanline(&self, world: &dyn Hittable, y: usize) -> Vec<Color> {
         let mut emitted_values = Vec::with_capacity(self.max_depth);
         let mut attenuation_values = Vec::with_capacity(self.max_depth);
@@ -180,8 +150,6 @@ impl Camera {
             .collect()
     }
 
-    // Gets the final color of a ray through a given world. Recursively calls
-    // itself for scattered rays
     fn ray_color(
         &self,
         r: Ray,
@@ -199,8 +167,6 @@ impl Camera {
             })
     }
 
-    // old took 210.883
-    // new took 191.507
 
     fn bounce_ray(
         &self,
@@ -223,7 +189,7 @@ impl Camera {
                     return emitted;
                 }
             } else {
-                return self.background;
+                return color(0.0, 0.0, 0.0);
             }
         }
         color(0.0, 0.0, 0.0)
@@ -235,19 +201,9 @@ impl Camera {
             + (self.pixel_delta_u * (x as f64 + offset.x))
             + (self.pixel_delta_v * (y as f64 + offset.y));
 
-        let ray_origin = if self.defocus_angle <= 0.0 {
-            self.look_from
-        } else {
-            self.defocus_disk_sample()
-        };
-        let ray_direction = pixel_sample - ray_origin;
+        let ray_direction = pixel_sample - self.look_from;
 
-        ray(ray_origin, ray_direction)
-    }
-
-    fn defocus_disk_sample(&self) -> Point3 {
-        let p = Vec3::random_in_unit_disk();
-        self.look_from + (self.defocus_disk_u * p.x) + (self.defocus_disk_v * p.y)
+        ray(self.look_from, ray_direction)
     }
 }
 
