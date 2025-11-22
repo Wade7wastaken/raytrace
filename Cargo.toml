@@ -9,5 +9,4 @@ edition = "2024"
 rand = "0.9"
 derive_more = { version = "2.0.1", features = ["full"] }
 rayon = "1.10.0"
-png = "0.17.16"
-gltf = { version = "1.4.1", features = ["extras"] }
+png = "0.18.0"
