@@ -1,6 +1,6 @@
 use super::{Point3, Vec3};
 
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Ray {
     pub orig: Point3,
     pub dir: Vec3,

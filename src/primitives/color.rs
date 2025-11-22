@@ -1,9 +1,5 @@
-use crate::misc::rand_f64;
 use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, derive::Sum};
-use std::{
-    fmt,
-    ops::{self, Range},
-};
+use std::ops;
 
 #[derive(
     Debug,
@@ -34,21 +30,6 @@ impl Color {
     }
 
     #[must_use]
-    pub fn random() -> Self {
-        Self::default().map(|_| rand_f64())
-    }
-
-    #[must_use]
-    pub fn random_range(range: Range<f64>) -> Self {
-        Self::default().map(|_| rand::random_range(range.clone()))
-    }
-
-    #[must_use]
-    pub fn tuple(self) -> (f64, f64, f64) {
-        (self.r, self.g, self.b)
-    }
-
-    #[must_use]
     pub fn map(&self, pred: impl Fn(f64) -> f64) -> Self {
         Self {
             r: pred(self.r),
@@ -64,13 +45,6 @@ impl Color {
             channel_to_rgb(self.g),
             channel_to_rgb(self.b),
         )
-    }
-}
-
-impl fmt::Display for Color {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let (r, g, b) = self.to_rgb();
-        write!(f, "#{r:02x}{g:02x}{b:02x}")
     }
 }
 

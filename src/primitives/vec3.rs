@@ -1,9 +1,5 @@
 use crate::misc::rand_f64;
-use crate::tern;
 use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
-use rand::distr::Distribution;
-use rand::distr::StandardUniform;
-use std::fmt;
 use std::ops::Range;
 
 #[derive(
@@ -78,23 +74,6 @@ impl Vec3 {
     }
 
     #[must_use]
-    pub fn random_on_hemisphere(normal: Self) -> Self {
-        let on_unit_sphere = Self::random_unit_vector();
-        // flip the vector if its not on the right hemisphere
-        on_unit_sphere * tern!(on_unit_sphere.dot(normal) > 0.0, 1.0, -1.0)
-    }
-
-    #[must_use]
-    pub fn axis(&self, index: u8) -> f64 {
-        match index {
-            0 => self.x,
-            1 => self.y,
-            2 => self.z,
-            _ => panic!("Incorrect index passed to axis"),
-        }
-    }
-
-    #[must_use]
     pub fn length_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
@@ -119,19 +98,6 @@ impl Vec3 {
     }
 
     #[must_use]
-    pub fn reflect(&self, n: Vec3) -> Vec3 {
-        *self - n * self.dot(n) * 2.0
-    }
-
-    #[must_use]
-    pub fn refract(&self, n: Vec3, eta_i_over_eta_t: f64) -> Vec3 {
-        let cos_theta = (-*self).dot(n).min(1.0);
-        let r_out_perp = (*self + n * cos_theta) * eta_i_over_eta_t;
-        let r_out_parallel = n * -((1.0 - r_out_perp.length_squared()).abs()).sqrt();
-        r_out_parallel + r_out_parallel
-    }
-
-    #[must_use]
     pub fn unit_vector(&self) -> Self {
         *self / self.length()
     }
@@ -140,18 +106,6 @@ impl Vec3 {
     pub fn is_near_zero(&self) -> bool {
         let s = 1e-8;
         (self.x.abs() < s) && (self.y.abs() < s) && (self.z.abs() < s)
-    }
-}
-
-impl Distribution<Vec3> for StandardUniform {
-    fn sample<R: rand::Rng + ?Sized>(&self, _rng: &mut R) -> Vec3 {
-        Vec3::random_in_unit_sphere().unit_vector()
-    }
-}
-
-impl fmt::Display for Vec3 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }
 }
 
