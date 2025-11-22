@@ -1,15 +1,11 @@
 use rayon::prelude::*;
-use std::{
-    error::Error,
-    sync::{
-        Arc,
-        atomic::{AtomicUsize, Ordering},
-    },
+use std::sync::{
+    Arc,
+    atomic::{AtomicUsize, Ordering},
 };
 
 use crate::{
     hittables::Hittable,
-    image_writer::ImageWriter,
     misc::rand_f64,
     primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };
@@ -63,8 +59,8 @@ impl Default for CameraOptions {
 }
 
 pub struct Camera {
-    image_height: usize,
-    image_width: usize,
+    pub image_height: usize,
+    pub image_width: usize,
     samples_per_pixel: u32,
     max_depth: usize,
     look_from: Point3,
@@ -137,21 +133,6 @@ impl Camera {
             defocus_disk_v,
             background,
         })
-    }
-
-    // Renders a hittable and saves it to a given image_writer
-    pub fn render_and_save<T, Writer: ImageWriter<T>>(
-        &self,
-        world: &dyn Hittable,
-        data: T,
-    ) -> Result<(), Box<dyn Error>> {
-        let mut writer = Writer::new(data, self.image_width, self.image_height)?;
-        let pixels = self.render(world);
-        println!("Done rendering");
-
-        writer.write(pixels)?;
-        println!("Done Saving");
-        Ok(())
     }
 
     // Renders a hittable into a 2d array of colors

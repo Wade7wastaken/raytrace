@@ -1,19 +1,49 @@
 mod camera;
 mod hittables;
-mod image_writer;
 mod material;
 mod misc;
 mod primitives;
 
-use std::time::Instant;
+use std::{fs::File, time::Instant};
 
 use camera::{Camera, CameraOptions};
 use hittables::{HittableList, cube, quad, rotate_y, translate};
-use image_writer::PNGImageWriter;
 
 use primitives::{color, point3, vec3};
 
-use crate::{material::{diffuse_light, lambertian}};
+use crate::{
+    material::{diffuse_light, lambertian},
+    primitives::Color,
+};
+
+fn write_png(path: &str, pixels: Vec<Vec<Color>>, width: usize, height: usize) {
+    let f = File::create(path).unwrap();
+
+    let mut encoder = png::Encoder::new(f, width as u32, height as u32);
+    encoder.set_color(png::ColorType::Rgb);
+    encoder.set_depth(png::BitDepth::Eight);
+    encoder.set_source_gamma(png::ScaledFloat::new(1.0 / 2.2));
+    let mut writer = encoder.write_header().unwrap();
+
+    let data: Vec<u8> = pixels
+        .into_iter()
+        .flat_map(|row| {
+            row.into_iter().flat_map(|pixel| {
+                let (r, g, b) = pixel.map(linear_to_gamma).to_rgb();
+                [r, g, b]
+            })
+        })
+        .collect();
+    writer.write_image_data(data.as_slice()).unwrap();
+}
+
+fn linear_to_gamma(linear_component: f64) -> f64 {
+    if linear_component > 0.0 {
+        linear_component.powf(1.0 / 2.2)
+    } else {
+        0.0
+    }
+}
 
 #[must_use]
 pub fn cornell_box() -> (HittableList, Camera) {
@@ -98,10 +128,16 @@ pub fn cornell_box() -> (HittableList, Camera) {
 
 fn main() {
     let (world, cam) = cornell_box();
-    let name: &str = "cornel_box";
+
     let start = Instant::now();
-    cam.render_and_save::<_, PNGImageWriter>(&world, format!("./output/{name}.png"))
-        .expect("failed to save image");
+    let pixels = cam.render(&world);
     let end = start.elapsed();
-    println!("Took {:.3}", end.as_secs_f64());
+
+    println!("Rendering took {:.3}", end.as_secs_f64());
+
+    let start = Instant::now();
+    write_png("output/cornel_box.png", pixels, cam.image_width, cam.image_height);
+    let end = start.elapsed();
+
+    println!("Saving took {:.3}", end.as_secs_f64());
 }
