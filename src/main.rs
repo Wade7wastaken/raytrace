@@ -13,7 +13,7 @@ use image_writer::PNGImageWriter;
 
 use primitives::{color, point3, vec3};
 
-use crate::material::{diffuse_light, lambertian};
+use crate::{material::{diffuse_light, lambertian}};
 
 #[must_use]
 pub fn cornell_box() -> (HittableList, Camera) {
@@ -84,7 +84,7 @@ pub fn cornell_box() -> (HittableList, Camera) {
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,
         image_width: 600,
-        samples_per_pixel: 50,
+        samples_per_pixel: 1000,
         v_fov: 40.0,
         look_from: point3(278.0, 278.0, -800.0),
         look_at: point3(278.0, 278.0, 0.0),
