@@ -1,6 +1,6 @@
 use crate::{
     material::Material,
-    primitives::{Aabb, Interval, Point3, Ray, Vec3},
+    primitives::{Interval, Point3, Ray, Vec3},
     tern,
 };
 
@@ -43,6 +43,4 @@ impl HitRecord {
 
 pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord>;
-
-    fn bounding_box(&self) -> &Aabb;
 }

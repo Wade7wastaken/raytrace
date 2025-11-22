@@ -1,23 +1,17 @@
 use std::sync::Arc;
 
-use crate::primitives::{Aabb, Interval, Ray, Vec3};
+use crate::primitives::{Interval, Ray, Vec3};
 
 use super::{HitRecord, Hittable};
 
 pub struct Translate {
     object: Arc<dyn Hittable>,
     offset: Vec3,
-    bbox: Aabb,
 }
 
 impl Translate {
     pub fn new(object: Arc<dyn Hittable>, offset: Vec3) -> Self {
-        let bbox = object.bounding_box() + offset;
-        Self {
-            object,
-            offset,
-            bbox,
-        }
+        Self { object, offset }
     }
 }
 
@@ -31,10 +25,6 @@ impl Hittable for Translate {
         rec.p += self.offset;
 
         Some(rec)
-    }
-
-    fn bounding_box(&self) -> &Aabb {
-        &self.bbox
     }
 }
 

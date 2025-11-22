@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::{
     material::Material,
-    primitives::{Aabb, Interval, Point3, Ray, Vec3, point3, vec3},
+    primitives::{Interval, Point3, Ray, Vec3, point3, vec3},
 };
 
 use super::{HitRecord, Hittable, HittableList};
@@ -13,16 +13,12 @@ pub struct Quad {
     v: Vec3,
     w: Vec3,
     mat: Material,
-    bbox: Aabb,
     normal: Vec3,
     d: f64,
 }
 
 impl Quad {
     pub fn new(q: Point3, u: Vec3, v: Vec3, mat: Material) -> Self {
-        let bbox_diag_1 = Aabb::from_points(q, q + u + v);
-        let bbox_diag_2 = Aabb::from_points(q + u, q + v);
-
         let n = u.cross(v);
         let normal = n.unit_vector();
         let d = normal.dot(q);
@@ -34,7 +30,6 @@ impl Quad {
             v,
             w,
             mat,
-            bbox: Aabb::from_boxes(&bbox_diag_1, &bbox_diag_2),
             normal,
             d,
         }
@@ -86,10 +81,6 @@ impl Hittable for Quad {
             r,
             self.normal,
         ))
-    }
-
-    fn bounding_box(&self) -> &Aabb {
-        &self.bbox
     }
 }
 
