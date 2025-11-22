@@ -97,12 +97,6 @@ impl Hittable for RotateY {
     }
 }
 
-impl Display for RotateY {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "rotate_y({}, {})", self.object, self.angle)
-    }
-}
-
 pub fn rotate_y(object: Arc<dyn Hittable>, angle: f64) -> Arc<RotateY> {
     Arc::new(RotateY::new(object, angle))
 }

@@ -96,12 +96,6 @@ impl Hittable for Quad {
     }
 }
 
-impl Display for Quad {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "quad({}, {}, {}, {})", self.q, self.u, self.v, self.mat)
-    }
-}
-
 pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Arc<dyn Material>) -> Arc<Quad> {
     Arc::new(Quad::new(q, u, v, mat))
 }

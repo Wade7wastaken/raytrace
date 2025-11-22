@@ -64,23 +64,3 @@ impl Hittable for BvhNode {
         &self.bbox
     }
 }
-
-impl fmt::Display for BvhNode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let left_str = self
-            .left
-            .to_string()
-            .lines()
-            .map(|l| format!("\t{l}"))
-            .collect::<Vec<_>>()
-            .join("\n");
-        let right_str = self
-            .right
-            .to_string()
-            .lines()
-            .map(|l| format!("\t{l}"))
-            .collect::<Vec<_>>()
-            .join("\n");
-        write!(f, "bvh\n\t{left_str}\n\t{right_str}")
-    }
-}

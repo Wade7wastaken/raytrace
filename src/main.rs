@@ -4,7 +4,6 @@ mod image_writer;
 mod materials;
 mod misc;
 mod primitives;
-mod textures;
 
 use std::time::Instant;
 
@@ -12,18 +11,18 @@ use camera::{Camera, CameraOptions};
 use hittables::{HittableList, cube, quad, rotate_y, translate};
 use image_writer::PNGImageWriter;
 
-use materials::{diffuse_light_from_color, lambertian_from_color};
+use materials::{diffuse_light, lambertian};
 use primitives::{color, point3, vec3};
 
 #[must_use]
 pub fn cornell_box() -> (HittableList, Camera) {
     let mut world = HittableList::default();
 
-    let red = lambertian_from_color(color(0.65, 0.05, 0.05));
-    let white = lambertian_from_color(color(0.73, 0.73, 0.73));
-    let green = lambertian_from_color(color(0.12, 0.45, 0.15));
+    let red = lambertian(color(0.65, 0.05, 0.05));
+    let white = lambertian(color(0.73, 0.73, 0.73));
+    let green = lambertian(color(0.12, 0.45, 0.15));
 
-    let light = diffuse_light_from_color(color(15.0, 15.0, 15.0));
+    let light = diffuse_light(color(15.0, 15.0, 15.0));
 
     world.add(quad(
         point3(555.0, 0.0, 0.0),

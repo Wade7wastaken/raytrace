@@ -41,12 +41,6 @@ impl Hittable for Translate {
     }
 }
 
-impl Display for Translate {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "translate({}, {})", self.object, self.offset)
-    }
-}
-
 pub fn translate(object: Arc<dyn Hittable>, offset: Vec3) -> Arc<Translate> {
     Arc::new(Translate::new(object, offset))
 }

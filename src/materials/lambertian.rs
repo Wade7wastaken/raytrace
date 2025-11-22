@@ -1,27 +1,21 @@
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 use crate::{
     hittables::HitRecord,
     primitives::{Color, Ray, Vec3, ray},
-    textures::{SolidColor, Texture},
 };
 
 use super::Material;
 
 #[derive(Clone)]
 pub struct Lambertian {
-    tex: Arc<dyn Texture>,
+    albedo: Color,
 }
 
 impl Lambertian {
-    pub fn new(tex: Arc<dyn Texture>) -> Self {
-        Self { tex }
-    }
     #[must_use]
-    pub fn from_color(albedo: Color) -> Self {
-        Self {
-            tex: Arc::new(SolidColor::new(albedo)),
-        }
+    pub fn new(albedo: Color) -> Self {
+        Self { albedo }
     }
 }
 
@@ -34,22 +28,12 @@ impl Material for Lambertian {
         }
 
         let scattered = ray(rec.p, scatter_direction, r.time);
-        let attenuation = self.tex.value(rec.u, rec.v, rec.p);
+        let attenuation = self.albedo;
         Some((attenuation, scattered))
     }
 }
 
-impl fmt::Display for Lambertian {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "lambertian{}", self.tex)
-    }
-}
-
-pub fn lambertian(tex: Arc<dyn Texture>) -> Arc<Lambertian> {
-    Arc::new(Lambertian::new(tex))
-}
-
 #[must_use]
-pub fn lambertian_from_color(albedo: Color) -> Arc<Lambertian> {
-    Arc::new(Lambertian::from_color(albedo))
+pub fn lambertian(albedo: Color) -> Arc<Lambertian> {
+    Arc::new(Lambertian::new(albedo))
 }
