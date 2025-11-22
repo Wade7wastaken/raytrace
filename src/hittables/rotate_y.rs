@@ -38,7 +38,7 @@ impl Hittable for RotateY {
             self.sin_theta * r.dir.x + self.cos_theta * r.dir.z,
         );
 
-        let rotated_ray = ray(orig, dir, r.time);
+        let rotated_ray = ray(orig, dir);
 
         // check collision
 

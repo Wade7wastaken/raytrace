@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::primitives::{Interval, Ray, Vec3};
+use crate::primitives::{Interval, Ray, Vec3, ray};
 
 use super::{HitRecord, Hittable};
 
@@ -18,7 +18,7 @@ impl Translate {
 impl Hittable for Translate {
     fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord> {
         // move the ray backwards
-        let offset_ray = Ray::new(r.orig - self.offset, r.dir, r.time);
+        let offset_ray = ray(r.orig - self.offset, r.dir);
 
         // check for a hit and move the hit position forward if there was a hit
         let mut rec = self.object.hit(&offset_ray, ray_t)?;

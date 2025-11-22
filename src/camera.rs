@@ -234,7 +234,7 @@ impl Camera {
             if let Some(rec) = world.hit(&r, &interval(0.001, f64::INFINITY)) {
                 let emitted = rec.mat.emitted();
 
-                if let Some((attenuation, scattered)) = rec.mat.scatter(&r, &rec) {
+                if let Some((attenuation, scattered)) = rec.mat.scatter(&rec) {
                     attenuation_values.push(attenuation);
                     emitted_values.push(emitted);
                     r = scattered;
@@ -261,7 +261,7 @@ impl Camera {
         };
         let ray_direction = pixel_sample - ray_origin;
 
-        ray(ray_origin, ray_direction, rand_f64())
+        ray(ray_origin, ray_direction)
     }
 
     fn defocus_disk_sample(&self) -> Point3 {

@@ -9,22 +9,22 @@ pub enum Material {
     DiffuseLight { emit: Color },
 }
 
-fn lambertian_scatter(albedo: Color, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
+fn lambertian_scatter(albedo: Color, rec: &HitRecord) -> Option<(Color, Ray)> {
     let mut scatter_direction = rec.normal + Vec3::random_unit_vector();
 
     if scatter_direction.is_near_zero() {
         scatter_direction = rec.normal;
     }
 
-    let scattered = ray(rec.p, scatter_direction, r.time);
+    let scattered = ray(rec.p, scatter_direction);
     let attenuation = albedo;
     Some((attenuation, scattered))
 }
 
 impl Material {
-    pub fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
+    pub fn scatter(&self, rec: &HitRecord) -> Option<(Color, Ray)> {
         match self {
-            Self::Lambertian { albedo } => lambertian_scatter(*albedo, r, rec),
+            Self::Lambertian { albedo } => lambertian_scatter(*albedo, rec),
             Self::DiffuseLight { emit: _ } => None,
         }
     }
