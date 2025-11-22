@@ -1,7 +1,5 @@
-use std::{fmt, sync::Arc};
-
 use crate::{
-    materials::Material,
+    material::Material,
     primitives::{Aabb, Interval, Point3, Ray, Vec3},
     tern,
 };
@@ -10,7 +8,7 @@ use crate::{
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub mat: Arc<dyn Material>,
+    pub mat: Material,
     pub t: f64,
     pub u: f64,
     pub v: f64,
@@ -21,7 +19,7 @@ impl HitRecord {
     /// `outward_normal` is assumed to have unit length
     pub fn new(
         p: Point3,
-        mat: Arc<dyn Material>,
+        mat: Material,
         t: f64,
         u: f64,
         v: f64,

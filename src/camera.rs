@@ -232,7 +232,7 @@ impl Camera {
         emitted_values.clear();
         for _ in 0..self.max_depth {
             if let Some(rec) = world.hit(&r, &interval(0.001, f64::INFINITY)) {
-                let emitted = rec.mat.emitted(rec.u, rec.v, rec.p);
+                let emitted = rec.mat.emitted();
 
                 if let Some((attenuation, scattered)) = rec.mat.scatter(&r, &rec) {
                     attenuation_values.push(attenuation);

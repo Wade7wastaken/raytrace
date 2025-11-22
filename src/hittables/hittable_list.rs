@@ -1,4 +1,4 @@
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 
 use crate::primitives::{Aabb, Interval, Ray, interval};
 

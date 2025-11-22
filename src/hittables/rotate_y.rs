@@ -1,8 +1,5 @@
 use core::f64;
-use std::{
-    fmt::{self, Display},
-    sync::Arc,
-};
+use std::sync::Arc;
 
 use crate::primitives::{Aabb, Interval, Ray, point3, ray, vec3};
 

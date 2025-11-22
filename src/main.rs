@@ -1,7 +1,7 @@
 mod camera;
 mod hittables;
 mod image_writer;
-mod materials;
+mod material;
 mod misc;
 mod primitives;
 
@@ -11,8 +11,9 @@ use camera::{Camera, CameraOptions};
 use hittables::{HittableList, cube, quad, rotate_y, translate};
 use image_writer::PNGImageWriter;
 
-use materials::{diffuse_light, lambertian};
 use primitives::{color, point3, vec3};
+
+use crate::material::{diffuse_light, lambertian};
 
 #[must_use]
 pub fn cornell_box() -> (HittableList, Camera) {

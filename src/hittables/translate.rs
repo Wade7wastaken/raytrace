@@ -1,7 +1,4 @@
-use std::{
-    fmt::{self, Display},
-    sync::Arc,
-};
+use std::sync::Arc;
 
 use crate::primitives::{Aabb, Interval, Ray, Vec3};
 

@@ -1,10 +1,7 @@
-use std::{
-    fmt::{self, Display},
-    sync::Arc,
-};
+use std::sync::Arc;
 
 use crate::{
-    materials::Material,
+    material::Material,
     primitives::{Aabb, Interval, Point3, Ray, Vec3, point3, vec3},
 };
 
@@ -15,14 +12,14 @@ pub struct Quad {
     u: Vec3,
     v: Vec3,
     w: Vec3,
-    mat: Arc<dyn Material>,
+    mat: Material,
     bbox: Aabb,
     normal: Vec3,
     d: f64,
 }
 
 impl Quad {
-    pub fn new(q: Point3, u: Vec3, v: Vec3, mat: Arc<dyn Material>) -> Self {
+    pub fn new(q: Point3, u: Vec3, v: Vec3, mat: Material) -> Self {
         let bbox_diag_1 = Aabb::from_points(q, q + u + v);
         let bbox_diag_2 = Aabb::from_points(q + u, q + v);
 
@@ -96,11 +93,11 @@ impl Hittable for Quad {
     }
 }
 
-pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Arc<dyn Material>) -> Arc<Quad> {
+pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Material) -> Arc<Quad> {
     Arc::new(Quad::new(q, u, v, mat))
 }
 
-pub fn cube(a: Point3, b: Point3, material: Arc<dyn Material>) -> Arc<HittableList> {
+pub fn cube(a: Point3, b: Point3, material: Material) -> Arc<HittableList> {
     let mut sides = HittableList::default();
 
     let min = point3(a.x.min(b.x), a.y.min(b.y), a.z.min(b.z));
