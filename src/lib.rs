@@ -19,3 +19,4 @@ pub mod materials;
 pub mod misc;
 pub mod primitives;
 pub mod textures;
+pub mod pdfs;

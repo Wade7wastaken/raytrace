@@ -11,7 +11,8 @@ use crate::{
     hittables::Hittable,
     image_writer::ImageWriter,
     misc::rand_f64,
-    primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
+    pdfs::{CosinePdf, HittablePdf, MixturePdf, Pdf},
+    primitives::{Color, Onb, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };
 
 fn opt_assert(cond: bool) -> Option<()> {
@@ -140,11 +141,11 @@ impl Camera {
     }
 
     // Renders a scanline into Vec of colors
-    pub fn scanline(&self, world: &dyn Hittable, y: usize) -> Vec<Color> {
+    pub fn scanline(&self, world: &dyn Hittable, lights: &dyn Hittable, y: usize) -> Vec<Color> {
         (0..self.image_width)
             .map(|x| {
                 (0..self.samples_per_pixel)
-                    .map(|_| self.ray_color(&self.get_ray(x, y), self.max_depth, world))
+                    .map(|_| self.ray_color(&self.get_ray(x, y), self.max_depth, world, lights))
                     .sum::<Color>()
                     / f64::from(self.samples_per_pixel)
             })
@@ -152,7 +153,7 @@ impl Camera {
     }
 
     // Renders a hittable into a 2d array of colors
-    pub fn render(&self, world: &dyn Hittable) -> Vec<Vec<Color>> {
+    pub fn render(&self, world: &dyn Hittable, lights: &dyn Hittable) -> Vec<Vec<Color>> {
         // AtomicUsize is faster than Mutex
         let count = Arc::new(AtomicUsize::new(0));
 
@@ -167,7 +168,7 @@ impl Camera {
                     self.image_height,
                     prev as f64 / self.image_height as f64 * 100.0
                 );
-                self.scanline(world, y)
+                self.scanline(world, lights, y)
             })
             .collect_into_vec(&mut result);
 
@@ -178,10 +179,11 @@ impl Camera {
     pub fn render_and_save<T, Writer: ImageWriter<T>>(
         &self,
         world: &dyn Hittable,
+        lights: &dyn Hittable,
         data: T,
     ) -> Result<(), Box<dyn Error>> {
         let mut writer = Writer::new(data, self.image_width, self.image_height)?;
-        let pixels = self.render(world);
+        let pixels = self.render(world, lights);
         println!("Done rendering");
 
         writer.write(pixels)?;
@@ -191,7 +193,7 @@ impl Camera {
 
     // Gets the final color of a ray through a given world. Recursively calls
     // itself for scattered rays
-    fn ray_color(&self, r: &Ray, depth: u32, world: &dyn Hittable) -> Color {
+    fn ray_color(&self, r: &Ray, depth: u32, world: &dyn Hittable, lights: &dyn Hittable) -> Color {
         // if we hit the bounce limit, no more light is gathered
         if depth == 0 {
             return color(0.0, 0.0, 0.0);
@@ -201,29 +203,18 @@ impl Camera {
             let emitted = rec.mat.emitted(r, &rec, rec.u, rec.v, rec.p);
 
             if let Some((attenuation, scattered, pdf_value)) = rec.mat.scatter(r, &rec) {
-                let on_light = point3(rand::random_range(213.0..=343.0), 554.0, rand::random_range(227.0..=332.0));
-                let to_light = on_light - rec.p;
-                let distance_squared = to_light.length_squared();
-                let to_light = to_light.unit_vector();
+                let p0 = HittablePdf::new(lights, rec.p);
+                let p1 = CosinePdf::new(Onb::new(rec.normal));
+                let mixed_pdf = MixturePdf::new(&p0, &p1);
 
-                if to_light.dot(rec.normal) < 0.0 {
-                    return emitted;
-                }
-
-                let light_area = (343.0-213.0)*(332.0-227.0);
-                let light_cosine = to_light.y.abs();
-                if light_cosine < 0.000_001 {
-                    return emitted;
-                }
-
-                let pdf_value = distance_squared / (light_cosine * light_area);
-                let scattered = ray(rec.p, to_light, r.time);
+                let scattered = ray(rec.p, mixed_pdf.generate(), r.time);
+                let pdf_value = mixed_pdf.value(scattered.dir);
 
                 let scattering_pdf = rec.mat.scattering_pdf(r, &rec, &scattered);
 
-                let color_from_scatter =
-                    (attenuation * scattering_pdf * self.ray_color(&scattered, depth - 1, world))
-                        / pdf_value;
+                let color_sample = self.ray_color(&scattered, depth - 1, world, lights);
+
+                let color_from_scatter = (attenuation * scattering_pdf * color_sample) / pdf_value;
                 emitted + color_from_scatter
             } else {
                 emitted

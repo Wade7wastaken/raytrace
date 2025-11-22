@@ -1,11 +1,13 @@
 use std::{
+    f64::INFINITY,
     fmt::{self, Display},
     sync::Arc,
 };
 
 use crate::{
     materials::Material,
-    primitives::{Aabb, Interval, Point3, Ray, Vec3, point3, vec3},
+    misc::rand_f64,
+    primitives::{Aabb, Interval, Point3, Ray, Vec3, interval, point3, ray, vec3},
 };
 
 use super::{HitRecord, Hittable, HittableList};
@@ -19,6 +21,7 @@ pub struct Quad {
     bbox: Aabb,
     normal: Vec3,
     d: f64,
+    area: f64,
 }
 
 impl Quad {
@@ -40,6 +43,7 @@ impl Quad {
             bbox: Aabb::from_boxes(&bbox_diag_1, &bbox_diag_2),
             normal,
             d,
+            area: n.length(),
         }
     }
 
@@ -93,6 +97,22 @@ impl Hittable for Quad {
 
     fn bounding_box(&self) -> &Aabb {
         &self.bbox
+    }
+
+    fn pdf_value(&self, origin: Point3, dir: Vec3) -> f64 {
+        if let Some(rec) = self.hit(&ray(origin, dir, 0.0), &interval(0.001, f64::INFINITY)) {
+            let distance_squared = rec.t * rec.t * dir.length_squared();
+            let cosine = (dir.dot(rec.normal) / dir.length()).abs();
+
+            distance_squared / (cosine * self.area)
+        } else {
+            0.0
+        }
+    }
+
+    fn random(&self, origin: Point3) -> Vec3 {
+        let p = self.q + (rand_f64() * self.u) + (rand_f64() * self.v);
+        p - origin
     }
 }
 

@@ -3,8 +3,7 @@ use std::sync::Arc;
 use crate::{
     camera::{Camera, CameraOptions},
     hittables::{
-        BvhNode, HittableList, constant_medium_from_color, cube, moving, quad, rotate_y, sphere,
-        translate, triangle,
+        BvhNode, HittableList, Quad, constant_medium_from_color, cube, moving, quad, rotate_y, sphere, translate, triangle
     },
     materials::{
         Material, dielectric, diffuse_light_from_color, lambertian, lambertian_from_color, metal,
@@ -274,7 +273,7 @@ pub fn simple_light() -> (HittableList, Camera) {
 }
 
 #[must_use]
-pub fn cornell_box() -> (HittableList, Camera) {
+pub fn cornell_box() -> (HittableList, Quad, Camera) {
     let mut world = HittableList::default();
 
     let red = lambertian_from_color(color(0.65, 0.05, 0.05));
@@ -318,8 +317,15 @@ pub fn cornell_box() -> (HittableList, Camera) {
         point3(213.0, 554.0, 226.0),
         vec3(130.0, 0.0, 0.0),
         vec3(0.0, 0.0, 105.0),
-        light,
+        light.clone(),
     ));
+
+    let lights = Quad::new(
+        point3(213.0, 554.0, 226.0),
+        vec3(130.0, 0.0, 0.0),
+        vec3(0.0, 0.0, 105.0),
+        light,
+    );
 
     let box1 = cube(
         point3(0.0, 0.0, 0.0),
@@ -351,7 +357,7 @@ pub fn cornell_box() -> (HittableList, Camera) {
     })
     .unwrap();
 
-    (world, cam)
+    (world, lights, cam)
 }
 
 #[must_use]

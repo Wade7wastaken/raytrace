@@ -2,7 +2,7 @@ use std::{fmt, sync::Arc};
 
 use crate::{
     materials::Material,
-    primitives::{Aabb, Interval, Point3, Ray, Vec3},
+    primitives::{Aabb, Interval, Point3, Ray, Vec3, vec3},
     tern,
 };
 
@@ -47,4 +47,14 @@ pub trait Hittable: Sync + Send + fmt::Display {
     fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord>;
 
     fn bounding_box(&self) -> &Aabb;
+
+    fn pdf_value(&self, origin: Point3, dir: Vec3) -> f64 {
+        _ = (origin, dir);
+        0.0
+    }
+
+    fn random(&self, origin: Point3) -> Vec3 {
+        _ = origin;
+        vec3(1.0, 0.0, 0.0)
+    }
 }

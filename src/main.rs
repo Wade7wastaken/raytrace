@@ -6,9 +6,9 @@ use raytrace::image_writer::PNGImageWriter;
 
 use raytrace::example_worlds::*;
 
-fn run<H: Hittable>((world, cam): (H, Camera), name: &str) {
+fn run<H: Hittable, L: Hittable>((world, lights, cam): (H, L, Camera), name: &str) {
     let start = Instant::now();
-    cam.render_and_save::<_, PNGImageWriter>(&world, format!("./output/{name}.png"))
+    cam.render_and_save::<_, PNGImageWriter>(&world, &lights, format!("./output/{name}.png"))
         .expect("failed to save image");
     let end = start.elapsed();
     println!("Took {:.3}", end.as_secs_f64());
