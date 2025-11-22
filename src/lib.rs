@@ -12,7 +12,6 @@
 #![allow(clippy::cast_possible_wrap)]
 
 pub mod camera;
-pub mod example_worlds;
 pub mod hittables;
 pub mod image_writer;
 pub mod materials;
