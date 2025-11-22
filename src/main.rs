@@ -1,11 +1,19 @@
+mod camera;
+mod hittables;
+mod image_writer;
+mod materials;
+mod misc;
+mod primitives;
+mod textures;
+
 use std::time::Instant;
 
-use raytrace::camera::{Camera, CameraOptions};
-use raytrace::hittables::{HittableList, cube, quad, rotate_y, translate};
-use raytrace::image_writer::PNGImageWriter;
+use camera::{Camera, CameraOptions};
+use hittables::{HittableList, cube, quad, rotate_y, translate};
+use image_writer::PNGImageWriter;
 
-use raytrace::materials::{diffuse_light_from_color, lambertian_from_color};
-use raytrace::primitives::{color, point3, vec3};
+use materials::{diffuse_light_from_color, lambertian_from_color};
+use primitives::{color, point3, vec3};
 
 #[must_use]
 pub fn cornell_box() -> (HittableList, Camera) {
