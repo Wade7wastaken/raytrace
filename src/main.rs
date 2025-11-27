@@ -105,7 +105,7 @@ pub fn cornell_box() -> (HittableList, Camera) {
     let box2 = cube(
         point3(0.0, 0.0, 0.0),
         point3(165.0, 165.0, 165.0),
-        white.clone(),
+        white,
     );
     let box2 = rotate_y(box2, -18.0);
     let box2 = translate(box2, vec3(130.0, 0.0, 65.0));

@@ -1,18 +1,17 @@
 use core::f64;
-use std::sync::Arc;
 
 use crate::primitives::{Interval, Ray, point3, ray, vec3};
 
 use super::{HitRecord, Hittable};
 
-pub struct RotateY {
-    object: Arc<dyn Hittable>,
+pub struct RotateY<H: Hittable> {
+    object: H,
     sin_theta: f64,
     cos_theta: f64,
 }
 
-impl RotateY {
-    pub fn new(object: Arc<dyn Hittable>, angle: f64) -> Self {
+impl<H: Hittable> RotateY<H> {
+    pub fn new(object: H, angle: f64) -> Self {
         let (sin_theta, cos_theta) = angle.to_radians().sin_cos();
 
         Self {
@@ -23,7 +22,7 @@ impl RotateY {
     }
 }
 
-impl Hittable for RotateY {
+impl<H: Hittable> Hittable for RotateY<H> {
     fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord<'_>> {
         // transform to object space
         let orig = point3(
@@ -58,6 +57,6 @@ impl Hittable for RotateY {
     }
 }
 
-pub fn rotate_y(object: Arc<dyn Hittable>, angle: f64) -> Arc<RotateY> {
-    Arc::new(RotateY::new(object, angle))
+pub fn rotate_y<H: Hittable>(object: H, angle: f64) -> RotateY<H> {
+    RotateY::new(object, angle)
 }

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::{
     material::Material,
     primitives::{Interval, Point3, Ray, Vec3, point3, vec3},
@@ -73,11 +71,11 @@ impl Hittable for Quad {
     }
 }
 
-pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Material) -> Arc<Quad> {
-    Arc::new(Quad::new(q, u, v, mat))
+pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Material) -> Quad {
+    Quad::new(q, u, v, mat)
 }
 
-pub fn cube(a: Point3, b: Point3, material: Material) -> Arc<HittableList> {
+pub fn cube(a: Point3, b: Point3, material: Material) -> HittableList {
     let mut sides = HittableList::default();
 
     let min = point3(a.x.min(b.x), a.y.min(b.y), a.z.min(b.z));
@@ -94,5 +92,5 @@ pub fn cube(a: Point3, b: Point3, material: Material) -> Arc<HittableList> {
     sides.add(quad(point3(min.x, max.y, max.z), dx, -dz, material.clone())); // top
     sides.add(quad(point3(min.x, min.y, min.z), dx, dz, material)); // bottom
 
-    Arc::new(sides)
+    sides
 }

@@ -1,21 +1,19 @@
-use std::sync::Arc;
-
 use crate::primitives::{Interval, Ray, Vec3, ray};
 
 use super::{HitRecord, Hittable};
 
-pub struct Translate {
-    object: Arc<dyn Hittable>,
+pub struct Translate<H: Hittable> {
+    object: H,
     offset: Vec3,
 }
 
-impl Translate {
-    pub fn new(object: Arc<dyn Hittable>, offset: Vec3) -> Self {
+impl<H: Hittable> Translate<H> {
+    pub const fn new(object: H, offset: Vec3) -> Self {
         Self { object, offset }
     }
 }
 
-impl Hittable for Translate {
+impl<H: Hittable> Hittable for Translate<H> {
     fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord<'_>> {
         // move the ray backwards
         let offset_ray = ray(r.orig - self.offset, r.dir);
@@ -28,6 +26,6 @@ impl Hittable for Translate {
     }
 }
 
-pub fn translate(object: Arc<dyn Hittable>, offset: Vec3) -> Arc<Translate> {
-    Arc::new(Translate::new(object, offset))
+pub const fn translate<H: Hittable>(object: H, offset: Vec3) -> Translate<H> {
+    Translate::new(object, offset)
 }
