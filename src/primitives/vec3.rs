@@ -1,4 +1,3 @@
-use crate::misc::rand_f64;
 use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::ops::Range;
 
@@ -26,20 +25,13 @@ pub struct Vec3 {
 
 impl Vec3 {
     #[must_use]
+    #[inline]
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
     }
 
     #[must_use]
-    pub fn random() -> Self {
-        Self {
-            x: rand_f64(),
-            y: rand_f64(),
-            z: rand_f64(),
-        }
-    }
-
-    #[must_use]
+    #[inline]
     pub fn random_range(range: Range<f64>) -> Self {
         Self {
             x: rand::random_range(range.clone()),
@@ -49,46 +41,35 @@ impl Vec3 {
     }
 
     #[must_use]
-    pub fn random_in_unit_sphere() -> Self {
+    pub fn random_unit_vector() -> Self {
         loop {
             let p = Self::random_range(-1.0..1.0);
             if p.length_squared() < 1.0 {
-                return p;
+                return p.unit_vector();
             }
         }
     }
 
     #[must_use]
-    pub fn random_in_unit_disk() -> Self {
-        loop {
-            let p = vec3(rand_f64(), rand_f64(), 0.0);
-            if p.length_squared() < 1.0 {
-                return p;
-            }
-        }
-    }
-
-    #[must_use]
-    pub fn random_unit_vector() -> Self {
-        Self::random_in_unit_sphere().unit_vector()
-    }
-
-    #[must_use]
+    #[inline]
     pub fn length_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     #[must_use]
+    #[inline]
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
 
     #[must_use]
+    #[inline]
     pub fn dot(&self, rhs: Self) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
     #[must_use]
+    #[inline]
     pub fn cross(&self, rhs: Self) -> Self {
         Self {
             x: self.y * rhs.z - self.z * rhs.y,
@@ -98,11 +79,13 @@ impl Vec3 {
     }
 
     #[must_use]
+    #[inline]
     pub fn unit_vector(&self) -> Self {
         *self / self.length()
     }
 
     #[must_use]
+    #[inline]
     pub fn is_near_zero(&self) -> bool {
         let s = 1e-8;
         (self.x.abs() < s) && (self.y.abs() < s) && (self.z.abs() < s)
@@ -113,11 +96,13 @@ pub type Point3 = Vec3;
 
 // helper initializer to make code look pretty
 #[must_use]
+#[inline]
 pub fn vec3(x: f64, y: f64, z: f64) -> Vec3 {
     Vec3::new(x, y, z)
 }
 
 #[must_use]
+#[inline]
 pub fn point3(x: f64, y: f64, z: f64) -> Point3 {
     Point3::new(x, y, z)
 }
