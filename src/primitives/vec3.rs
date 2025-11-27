@@ -26,7 +26,7 @@ pub struct Vec3 {
 impl Vec3 {
     #[must_use]
     #[inline]
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
+    pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
     }
 
@@ -52,7 +52,7 @@ impl Vec3 {
 
     #[must_use]
     #[inline]
-    pub fn length_squared(&self) -> f64 {
+    pub const fn length_squared(&self) -> f64 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
@@ -64,13 +64,13 @@ impl Vec3 {
 
     #[must_use]
     #[inline]
-    pub fn dot(&self, rhs: Self) -> f64 {
+    pub const fn dot(&self, rhs: Self) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
     #[must_use]
     #[inline]
-    pub fn cross(&self, rhs: Self) -> Self {
+    pub const fn cross(&self, rhs: Self) -> Self {
         Self {
             x: self.y * rhs.z - self.z * rhs.y,
             y: self.z * rhs.x - self.x * rhs.z,
@@ -86,7 +86,7 @@ impl Vec3 {
 
     #[must_use]
     #[inline]
-    pub fn is_near_zero(&self) -> bool {
+    pub const fn is_near_zero(&self) -> bool {
         let s = 1e-8;
         (self.x.abs() < s) && (self.y.abs() < s) && (self.z.abs() < s)
     }
@@ -97,12 +97,12 @@ pub type Point3 = Vec3;
 // helper initializer to make code look pretty
 #[must_use]
 #[inline]
-pub fn vec3(x: f64, y: f64, z: f64) -> Vec3 {
+pub const fn vec3(x: f64, y: f64, z: f64) -> Vec3 {
     Vec3::new(x, y, z)
 }
 
 #[must_use]
 #[inline]
-pub fn point3(x: f64, y: f64, z: f64) -> Point3 {
+pub const fn point3(x: f64, y: f64, z: f64) -> Point3 {
     Point3::new(x, y, z)
 }

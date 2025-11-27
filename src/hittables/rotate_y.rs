@@ -24,7 +24,7 @@ impl RotateY {
 }
 
 impl Hittable for RotateY {
-    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord<'_>> {
         // transform to object space
         let orig = point3(
             self.cos_theta * r.orig.x - self.sin_theta * r.orig.z,

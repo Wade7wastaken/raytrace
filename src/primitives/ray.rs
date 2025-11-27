@@ -8,7 +8,7 @@ pub struct Ray {
 
 impl Ray {
     #[must_use]
-    pub fn new(orig: Point3, dir: Vec3) -> Self {
+    pub const fn new(orig: Point3, dir: Vec3) -> Self {
         Self { orig, dir }
     }
 
@@ -19,6 +19,6 @@ impl Ray {
 }
 
 #[must_use]
-pub fn ray(orig: Point3, dir: Vec3) -> Ray {
+pub const fn ray(orig: Point3, dir: Vec3) -> Ray {
     Ray::new(orig, dir)
 }

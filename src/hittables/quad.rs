@@ -34,22 +34,10 @@ impl Quad {
             d,
         }
     }
-
-    fn is_within_surface(alpha: f64, beta: f64) -> bool {
-        // parallelogram
-        let unit_interval = Interval::new(0.0, 1.0);
-        unit_interval.contains(alpha) && unit_interval.contains(beta)
-
-        // disk
-        // (alpha * alpha + beta * beta) < 1.0
-
-        // triangle
-        // alpha > 0.0 && beta > 0.0 && alpha + beta < 1.0
-    }
 }
 
 impl Hittable for Quad {
-    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord<'_>> {
         let denom = self.normal.dot(r.dir);
 
         if denom.abs() < 1e-8 {
@@ -68,16 +56,17 @@ impl Hittable for Quad {
         let alpha = self.w.dot(planar_hitpoint.cross(self.v));
         let beta = self.w.dot(self.u.cross(planar_hitpoint));
 
-        if !Self::is_within_surface(alpha, beta) {
+
+        let unit_interval = Interval::new(0.0, 1.0);
+
+        if !(unit_interval.contains(alpha) && unit_interval.contains(beta)) {
             return None;
         }
 
         Some(HitRecord::new(
             intersection,
-            self.mat.clone(),
+            &self.mat,
             t,
-            alpha,
-            beta,
             r,
             self.normal,
         ))

@@ -5,24 +5,19 @@ use crate::{
 };
 
 #[derive(Clone)]
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub p: Point3,
     pub normal: Vec3,
-    pub mat: Material,
+    pub mat: &'a Material,
     pub t: f64,
-    pub u: f64,
-    pub v: f64,
-    pub front_face: bool,
 }
 
-impl HitRecord {
+impl<'a> HitRecord<'a> {
     /// `outward_normal` is assumed to have unit length
     pub fn new(
         p: Point3,
-        mat: Material,
+        mat: &'a Material,
         t: f64,
-        u: f64,
-        v: f64,
         r: &Ray,
         outward_normal: Vec3,
     ) -> Self {
@@ -34,13 +29,10 @@ impl HitRecord {
             normal,
             mat,
             t,
-            u,
-            v,
-            front_face,
         }
     }
 }
 
 pub trait Hittable: Sync + Send {
-    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord>;
+    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord<'_>>;
 }

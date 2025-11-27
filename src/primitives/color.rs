@@ -25,7 +25,7 @@ pub struct Color {
 
 impl Color {
     #[must_use]
-    pub fn new(r: f64, g: f64, b: f64) -> Self {
+    pub const fn new(r: f64, g: f64, b: f64) -> Self {
         Self { r, g, b }
     }
 
@@ -72,6 +72,6 @@ fn channel_to_rgb(channel: f64) -> u8 {
 }
 
 #[must_use]
-pub fn color(r: f64, g: f64, b: f64) -> Color {
+pub const fn color(r: f64, g: f64, b: f64) -> Color {
     Color::new(r, g, b)
 }

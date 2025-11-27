@@ -53,7 +53,7 @@ impl Material {
         }
     }
 
-    pub fn emitted(&self) -> Color {
+    pub const fn emitted(&self) -> Color {
         match self {
             Self::Lambertian { albedo: _ } => color(0.0, 0.0, 0.0),
             Self::DiffuseLight { emit } => *emit,
@@ -61,10 +61,10 @@ impl Material {
     }
 }
 
-pub fn lambertian(albedo: Color) -> Material {
+pub const fn lambertian(albedo: Color) -> Material {
     Material::Lambertian { albedo }
 }
 
-pub fn diffuse_light(emit: Color) -> Material {
+pub const fn diffuse_light(emit: Color) -> Material {
     Material::DiffuseLight { emit }
 }

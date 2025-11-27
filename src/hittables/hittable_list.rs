@@ -16,7 +16,7 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord<'_>> {
         self.objects.iter().fold(None, |rec, object| {
             let max = rec.as_ref().map_or(ray_t.max, |r| r.t);
             object.hit(r, &interval(ray_t.min, max)).or(rec)
