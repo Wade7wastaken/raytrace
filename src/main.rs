@@ -7,7 +7,7 @@ mod primitives;
 use std::{fs::File, time::Instant};
 
 use camera::{Camera, CameraOptions};
-use hittables::{HittableList, cube, quad, rotate_y, translate};
+use hittables::{HittableList, quad};
 
 use primitives::{color, point3, vec3};
 
@@ -93,23 +93,19 @@ pub fn cornell_box() -> (HittableList, Camera) {
         light,
     ));
 
-    let box1 = cube(
-        point3(0.0, 0.0, 0.0),
-        point3(165.0, 330.0, 165.0),
-        white.clone(),
-    );
-    let box1 = rotate_y(box1, 15.0);
-    let box1 = translate(box1, vec3(265.0, 0.0, 295.0));
-    world.add(box1);
+    // tall box
+    world.add(quad(point3(424.377761, 0.000000, 252.294858), vec3(42.705142, 0.000000, 159.377761), vec3(0.000000, 330.000000, 0.000000), white.clone()));
+    world.add(quad(point3(265.000000, 0.000000, 295.000000), vec3(42.705142, 0.000000, 159.377761), vec3(0.000000, 330.000000, 0.000000), white.clone()));
+    world.add(quad(point3(307.705142, 0.000000, 454.377761), vec3(159.377761, 0.000000, -42.705142), vec3(0.000000, 330.000000, 0.000000), white.clone()));
+    world.add(quad(point3(265.000000, 0.000000, 295.000000), vec3(159.377761, 0.000000, -42.705142), vec3(0.000000, 330.000000, 0.000000), white.clone()));
+    world.add(quad(point3(265.000000, 330.000000, 295.000000), vec3(159.377761, 0.000000, -42.705142), vec3(42.705142, 0.000000, 159.377761), white.clone()));
 
-    let box2 = cube(
-        point3(0.0, 0.0, 0.0),
-        point3(165.0, 165.0, 165.0),
-        white,
-    );
-    let box2 = rotate_y(box2, -18.0);
-    let box2 = translate(box2, vec3(130.0, 0.0, 65.0));
-    world.add(box2);
+    // short box
+    world.add(quad(point3(286.924325, 0.000000, 115.987804), vec3(-50.987804, 0.000000, 156.924325), vec3(0.000000, 165.000000, 0.000000), white.clone()));
+    world.add(quad(point3(130.000000, 0.000000, 65.000000), vec3(-50.987804, 0.000000, 156.924325), vec3(0.000000, 165.000000, 0.000000), white.clone()));
+    world.add(quad(point3(79.012196, 0.000000, 221.924325), vec3(156.924325, 0.000000, 50.987804), vec3(0.000000, 165.000000, 0.000000), white.clone()));
+    world.add(quad(point3(130.000000, 0.000000, 65.000000), vec3(156.924325, 0.000000, 50.987804), vec3(0.000000, 165.000000, 0.000000), white.clone()));
+    world.add(quad(point3(130.000000, 165.000000, 65.000000), vec3(156.924325, 0.000000, 50.987804), vec3(-50.987804, 0.000000, 156.924325), white.clone()));
 
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,
