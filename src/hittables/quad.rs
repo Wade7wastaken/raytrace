@@ -1,9 +1,9 @@
 use crate::{
     material::Material,
-    primitives::{Interval, Point3, Ray, Vec3, point3, vec3},
+    primitives::{Interval, Point3, Ray, Vec3},
 };
 
-use super::{HitRecord, Hittable, HittableList};
+use super::HitRecord;
 
 pub struct Quad {
     q: Point3,
@@ -32,10 +32,8 @@ impl Quad {
             d,
         }
     }
-}
 
-impl Hittable for Quad {
-    fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord<'_>> {
+    pub fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord<'_>> {
         let denom = self.normal.dot(r.dir);
 
         if denom.abs() < 1e-8 {
@@ -54,43 +52,16 @@ impl Hittable for Quad {
         let alpha = self.w.dot(planar_hitpoint.cross(self.v));
         let beta = self.w.dot(self.u.cross(planar_hitpoint));
 
-
         let unit_interval = Interval::new(0.0, 1.0);
 
         if !(unit_interval.contains(alpha) && unit_interval.contains(beta)) {
             return None;
         }
 
-        Some(HitRecord::new(
-            intersection,
-            &self.mat,
-            t,
-            r,
-            self.normal,
-        ))
+        Some(HitRecord::new(intersection, &self.mat, t, r, self.normal))
     }
 }
 
 pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Material) -> Quad {
     Quad::new(q, u, v, mat)
-}
-
-pub fn cube(a: Point3, b: Point3, material: Material) -> HittableList {
-    let mut sides = HittableList::default();
-
-    let min = point3(a.x.min(b.x), a.y.min(b.y), a.z.min(b.z));
-    let max = point3(a.x.max(b.x), a.y.max(b.y), a.z.max(b.z));
-
-    let dx = vec3(max.x - min.x, 0.0, 0.0);
-    let dy = vec3(0.0, max.y - min.y, 0.0);
-    let dz = vec3(0.0, 0.0, max.z - min.z);
-
-    sides.add(quad(point3(min.x, min.y, max.z), dx, dy, material.clone())); // front
-    sides.add(quad(point3(max.x, min.y, max.z), -dz, dy, material.clone())); // right
-    sides.add(quad(point3(max.x, min.y, min.z), -dx, dy, material.clone())); // back
-    sides.add(quad(point3(min.x, min.y, min.z), dz, dy, material.clone())); // left
-    sides.add(quad(point3(min.x, max.y, max.z), dx, -dz, material.clone())); // top
-    sides.add(quad(point3(min.x, min.y, min.z), dx, dz, material)); // bottom
-
-    sides
 }

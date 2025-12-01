@@ -5,7 +5,7 @@ use std::sync::{
 };
 
 use crate::{
-    hittables::Hittable,
+    hittables::HittableList,
     misc::rand_f64,
     primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };
@@ -108,7 +108,7 @@ impl Camera {
         }
     }
 
-    pub fn render(&self, world: &dyn Hittable) -> Vec<Vec<Color>> {
+    pub fn render(&self, world: &HittableList) -> Vec<Vec<Color>> {
         let count = Arc::new(AtomicUsize::new(0));
 
         let mut result = vec![];
@@ -129,7 +129,7 @@ impl Camera {
         result
     }
 
-    pub fn scanline(&self, world: &dyn Hittable, y: usize) -> Vec<Color> {
+    pub fn scanline(&self, world: &HittableList, y: usize) -> Vec<Color> {
         let mut emitted_values = Vec::with_capacity(self.max_depth);
         let mut attenuation_values = Vec::with_capacity(self.max_depth);
 
@@ -153,7 +153,7 @@ impl Camera {
     fn ray_color(
         &self,
         r: Ray,
-        world: &dyn Hittable,
+        world: &HittableList,
         emitted_values: &mut Vec<Color>,
         attenuation_values: &mut Vec<Color>,
     ) -> Color {
@@ -167,11 +167,10 @@ impl Camera {
             })
     }
 
-
     fn bounce_ray(
         &self,
         mut r: Ray,
-        world: &dyn Hittable,
+        world: &HittableList,
         emitted_values: &mut Vec<Color>,
         attenuation_values: &mut Vec<Color>,
     ) -> Color {
