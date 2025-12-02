@@ -51,9 +51,7 @@ impl Quad {
         let alpha = self.w.dot(planar_hitpoint.cross(self.v));
         let beta = self.w.dot(self.u.cross(planar_hitpoint));
 
-        let unit_interval = Interval::new(0.0, 1.0);
-
-        if !(unit_interval.contains(alpha) && unit_interval.contains(beta)) {
+        if alpha < 0.0 || alpha > 1.0 || beta < 0.0 || beta > 1.0 {
             return None;
         }
 
