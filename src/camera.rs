@@ -5,7 +5,7 @@ use std::sync::{
 };
 
 use crate::{
-    hittables::{HitRecord, Quad},
+    geometry::{HitRecord, Quad},
     misc::rand_f64,
     primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };

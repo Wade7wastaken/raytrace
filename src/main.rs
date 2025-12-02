@@ -1,5 +1,5 @@
 mod camera;
-mod hittables;
+mod geometry;
 mod material;
 mod misc;
 mod primitives;
@@ -7,15 +7,9 @@ mod primitives;
 use std::{fs::File, time::Instant};
 
 use camera::{Camera, CameraOptions};
-use hittables::quad;
-
-use primitives::{color, point3, vec3};
-
-use crate::{
-    hittables::Quad,
-    material::{diffuse_light, lambertian},
-    primitives::Color,
-};
+use geometry::{Quad, quad};
+use material::{diffuse_light, lambertian};
+use primitives::{Color, color, point3, vec3};
 
 fn write_png(path: &str, pixels: Vec<Vec<Color>>, width: usize, height: usize) {
     let f = File::create(path).unwrap();

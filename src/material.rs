@@ -1,7 +1,7 @@
 use std::f64::consts::PI;
 
 use crate::{
-    hittables::HitRecord,
+    geometry::HitRecord,
     misc::rand_f64,
     primitives::{Color, Ray, Vec3, color, ray, vec3},
     tern,
