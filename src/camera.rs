@@ -1,8 +1,4 @@
 use rayon::prelude::*;
-use std::sync::{
-    Arc,
-    atomic::{AtomicUsize, Ordering},
-};
 
 use crate::{
     geometry::{HitRecord, Quad},
@@ -108,27 +104,21 @@ impl Camera {
         }
     }
 
+    #[must_use]
+    #[inline]
     pub fn render(&self, world: &[Quad]) -> Vec<Vec<Color>> {
-        let count = Arc::new(AtomicUsize::new(0));
-
         let mut result = vec![];
 
         (0..self.image_height)
             .into_par_iter()
-            .map(|y| {
-                let prev = count.fetch_add(1, Ordering::Relaxed);
-                println!(
-                    "starting {prev} / {} ({:.2}%)",
-                    self.image_height,
-                    prev as f64 / self.image_height as f64 * 100.0
-                );
-                self.scanline(world, y)
-            })
+            .map(|y| self.scanline(world, y))
             .collect_into_vec(&mut result);
 
         result
     }
 
+    #[must_use]
+    #[inline]
     pub fn scanline(&self, world: &[Quad], y: usize) -> Vec<Color> {
         let mut emitted_values = Vec::with_capacity(self.max_depth);
         let mut attenuation_values = Vec::with_capacity(self.max_depth);
@@ -150,6 +140,8 @@ impl Camera {
             .collect()
     }
 
+    #[must_use]
+    #[inline]
     fn ray_color(
         &self,
         r: Ray,
@@ -167,6 +159,8 @@ impl Camera {
             })
     }
 
+    #[must_use]
+    #[inline]
     fn bounce_ray(
         &self,
         mut r: Ray,
@@ -200,6 +194,8 @@ impl Camera {
         color(0.0, 0.0, 0.0)
     }
 
+    #[must_use]
+    #[inline]
     fn get_ray(&self, x: usize, y: usize) -> Ray {
         let offset = sample_square();
         let pixel_sample = self.pixel_00_loc
@@ -212,6 +208,8 @@ impl Camera {
     }
 }
 
+#[must_use]
+#[inline]
 fn sample_square() -> Vec3 {
     vec3(rand_f64() - 0.5, rand_f64() - 0.5, 0.0)
 }

@@ -41,6 +41,7 @@ impl Vec3 {
     }
 
     #[must_use]
+    #[inline]
     pub fn random_unit_vector() -> Self {
         loop {
             let p = Self::random_range(-1.0..1.0);

@@ -8,17 +8,20 @@ pub struct Ray {
 
 impl Ray {
     #[must_use]
+    #[inline]
     pub const fn new(orig: Point3, dir: Vec3) -> Self {
         Self { orig, dir }
     }
 
     #[must_use]
+    #[inline]
     pub fn at(&self, t: f64) -> Point3 {
         self.orig + self.dir * t
     }
 }
 
 #[must_use]
+#[inline]
 pub const fn ray(orig: Point3, dir: Vec3) -> Ray {
     Ray::new(orig, dir)
 }

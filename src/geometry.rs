@@ -14,7 +14,11 @@ pub struct Quad {
     d: f64,
 }
 
+const UNIT_INTERVAL: Interval = Interval::new(0.0, 1.0);
+
 impl Quad {
+    #[must_use]
+    #[inline]
     pub fn new(q: Point3, u: Vec3, v: Vec3, mat: Material) -> Self {
         let n = u.cross(v);
         let normal = n.unit_vector();
@@ -32,6 +36,8 @@ impl Quad {
         }
     }
 
+    #[must_use]
+    #[inline]
     pub fn hit(&self, r: &Ray, ray_t: &Interval) -> Option<HitRecord<'_>> {
         let denom = self.normal.dot(r.dir);
 
@@ -51,7 +57,7 @@ impl Quad {
         let alpha = self.w.dot(planar_hitpoint.cross(self.v));
         let beta = self.w.dot(self.u.cross(planar_hitpoint));
 
-        if alpha < 0.0 || alpha > 1.0 || beta < 0.0 || beta > 1.0 {
+        if !(UNIT_INTERVAL.contains(alpha) && UNIT_INTERVAL.contains(beta)) {
             return None;
         }
 
@@ -59,6 +65,8 @@ impl Quad {
     }
 }
 
+#[must_use]
+#[inline]
 pub fn quad(q: Point3, u: Vec3, v: Vec3, mat: Material) -> Quad {
     Quad::new(q, u, v, mat)
 }
@@ -73,6 +81,8 @@ pub struct HitRecord<'a> {
 
 impl<'a> HitRecord<'a> {
     /// `outward_normal` is assumed to have unit length
+    #[must_use]
+    #[inline]
     pub fn new(p: Point3, mat: &'a Material, t: f64, r: &Ray, outward_normal: Vec3) -> Self {
         let front_face = r.dir.dot(outward_normal) < 0.0;
         let normal = tern!(front_face, outward_normal, -outward_normal);

@@ -13,6 +13,8 @@ pub enum Material {
     DiffuseLight { emit: Color },
 }
 
+#[must_use]
+#[inline]
 fn random_cosine_direction() -> Vec3 {
     let r1 = rand_f64();
     let r2 = rand_f64();
@@ -23,6 +25,8 @@ fn random_cosine_direction() -> Vec3 {
     vec3(cos * sqrt, sin * sqrt, (1.0 - r2).sqrt()).unit_vector()
 }
 
+#[must_use]
+#[inline]
 fn onb_transform(n: Vec3, orig: Vec3) -> Vec3 {
     let w = n.unit_vector();
     let a = tern!(w.x.abs() > 0.9, vec3(0.0, 1.0, 0.0), vec3(1.0, 0.0, 0.0));
@@ -32,6 +36,8 @@ fn onb_transform(n: Vec3, orig: Vec3) -> Vec3 {
     (u * orig.x) + (v * orig.y) + (w * orig.z)
 }
 
+#[must_use]
+#[inline]
 fn lambertian_scatter(albedo: Color, rec: &HitRecord) -> (Color, Ray) {
     let scatter_direction = onb_transform(rec.normal, random_cosine_direction());
     // let mut scatter_direction = rec.normal + Vec3::random_unit_vector();
@@ -46,6 +52,8 @@ fn lambertian_scatter(albedo: Color, rec: &HitRecord) -> (Color, Ray) {
 }
 
 impl Material {
+    #[must_use]
+    #[inline]
     pub fn scatter(&self, rec: &HitRecord) -> Option<(Color, Ray)> {
         match self {
             Self::Lambertian { albedo } => Some(lambertian_scatter(*albedo, rec)),
@@ -53,6 +61,8 @@ impl Material {
         }
     }
 
+    #[must_use]
+    #[inline]
     pub const fn emitted(&self) -> Color {
         match self {
             Self::Lambertian { albedo: _ } => color(0.0, 0.0, 0.0),
@@ -61,10 +71,14 @@ impl Material {
     }
 }
 
+#[must_use]
+#[inline]
 pub const fn lambertian(albedo: Color) -> Material {
     Material::Lambertian { albedo }
 }
 
+#[must_use]
+#[inline]
 pub const fn diffuse_light(emit: Color) -> Material {
     Material::DiffuseLight { emit }
 }

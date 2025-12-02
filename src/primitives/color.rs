@@ -25,11 +25,13 @@ pub struct Color {
 
 impl Color {
     #[must_use]
+    #[inline]
     pub const fn new(r: f64, g: f64, b: f64) -> Self {
         Self { r, g, b }
     }
 
     #[must_use]
+    #[inline]
     pub fn map(&self, pred: impl Fn(f64) -> f64) -> Self {
         Self {
             r: pred(self.r),
@@ -39,6 +41,7 @@ impl Color {
     }
 
     #[must_use]
+    #[inline]
     pub fn to_rgb(self) -> (u8, u8, u8) {
         (
             channel_to_rgb(self.r),
@@ -67,11 +70,14 @@ impl ops::Mul<Color> for Color {
     }
 }
 
+#[must_use]
+#[inline]
 fn channel_to_rgb(channel: f64) -> u8 {
     ((channel * 255.999) as u8).clamp(0, 255)
 }
 
 #[must_use]
+#[inline]
 pub const fn color(r: f64, g: f64, b: f64) -> Color {
     Color::new(r, g, b)
 }

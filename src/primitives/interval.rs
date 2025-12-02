@@ -6,11 +6,13 @@ pub struct Interval {
 
 impl Interval {
     #[must_use]
+    #[inline]
     pub const fn new(min: f64, max: f64) -> Self {
         Self { min, max }
     }
 
     #[must_use]
+    #[inline]
     pub const fn contains(&self, x: f64) -> bool {
         self.min <= x && x <= self.max
     }
@@ -18,6 +20,7 @@ impl Interval {
 
 // helper initializer to make code look pretty
 #[must_use]
+#[inline]
 pub const fn interval(min: f64, max: f64) -> Interval {
     Interval::new(min, max)
 }
