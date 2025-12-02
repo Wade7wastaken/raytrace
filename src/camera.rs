@@ -5,7 +5,7 @@ use std::sync::{
 };
 
 use crate::{
-    hittables::HittableList,
+    hittables::{HitRecord, Quad},
     misc::rand_f64,
     primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };
@@ -108,7 +108,7 @@ impl Camera {
         }
     }
 
-    pub fn render(&self, world: &HittableList) -> Vec<Vec<Color>> {
+    pub fn render(&self, world: &[Quad]) -> Vec<Vec<Color>> {
         let count = Arc::new(AtomicUsize::new(0));
 
         let mut result = vec![];
@@ -129,7 +129,7 @@ impl Camera {
         result
     }
 
-    pub fn scanline(&self, world: &HittableList, y: usize) -> Vec<Color> {
+    pub fn scanline(&self, world: &[Quad], y: usize) -> Vec<Color> {
         let mut emitted_values = Vec::with_capacity(self.max_depth);
         let mut attenuation_values = Vec::with_capacity(self.max_depth);
 
@@ -153,7 +153,7 @@ impl Camera {
     fn ray_color(
         &self,
         r: Ray,
-        world: &HittableList,
+        world: &[Quad],
         emitted_values: &mut Vec<Color>,
         attenuation_values: &mut Vec<Color>,
     ) -> Color {
@@ -170,26 +170,32 @@ impl Camera {
     fn bounce_ray(
         &self,
         mut r: Ray,
-        world: &HittableList,
+        world: &[Quad],
         emitted_values: &mut Vec<Color>,
         attenuation_values: &mut Vec<Color>,
     ) -> Color {
         attenuation_values.clear();
         emitted_values.clear();
-        for _ in 0..self.max_depth {
-            if let Some(rec) = world.hit(&r, &interval(0.001, f64::INFINITY)) {
-                let emitted = rec.mat.emitted();
 
-                if let Some((attenuation, scattered)) = rec.mat.scatter(&rec) {
-                    attenuation_values.push(attenuation);
-                    emitted_values.push(emitted);
-                    r = scattered;
-                } else {
-                    return emitted;
-                }
-            } else {
+        for _ in 0..self.max_depth {
+            let world_hit = world.iter().fold(None, |rec, object| {
+                let max = rec.as_ref().map_or(f64::INFINITY, |r: &HitRecord| r.t);
+                object.hit(&r, &interval(0.001, max)).or(rec)
+            });
+
+            let Some(rec) = world_hit else {
                 return color(0.0, 0.0, 0.0);
-            }
+            };
+
+            let emitted = rec.mat.emitted();
+
+            let Some((attenuation, scattered)) = rec.mat.scatter(&rec) else {
+                return emitted;
+            };
+
+            attenuation_values.push(attenuation);
+            emitted_values.push(emitted);
+            r = scattered;
         }
         color(0.0, 0.0, 0.0)
     }
