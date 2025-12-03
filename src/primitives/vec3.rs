@@ -1,11 +1,10 @@
-use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use derive_more::derive::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::ops::Range;
 
 #[derive(
     Debug,
     Clone,
     Copy,
-    Default,
     PartialEq,
     Add,
     Sub,

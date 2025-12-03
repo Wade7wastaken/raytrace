@@ -34,7 +34,7 @@ impl Default for CameraOptions {
             samples_per_pixel: 100,
             max_depth: 50,
             v_fov: 90.0,
-            look_from: Point3::default(),
+            look_from: point3(0.0, 0.0, 0.0),
             look_at: point3(0.0, 0.0, -1.0),
             vup: vec3(0.0, 1.0, 0.0),
         }
@@ -150,12 +150,12 @@ impl Camera {
         attenuation_values: &mut Vec<Color>,
     ) -> Color {
         let ending_color = self.bounce_ray(r, world, emitted_values, attenuation_values);
-
+        
         emitted_values
             .iter()
             .zip(attenuation_values)
             .fold(ending_color, |prev, (emitted, attenuation)| {
-                (prev * *attenuation) + *emitted
+                (prev * attenuation.clone()) + emitted.clone()
             })
     }
 

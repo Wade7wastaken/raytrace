@@ -56,17 +56,17 @@ impl Material {
     #[inline]
     pub fn scatter(&self, rec: &HitRecord) -> Option<(Color, Ray)> {
         match self {
-            Self::Lambertian { albedo } => Some(lambertian_scatter(*albedo, rec)),
+            Self::Lambertian { albedo } => Some(lambertian_scatter(albedo.clone(), rec)),
             Self::DiffuseLight { emit: _ } => None,
         }
     }
 
     #[must_use]
     #[inline]
-    pub const fn emitted(&self) -> Color {
+    pub fn emitted(&self) -> Color {
         match self {
             Self::Lambertian { albedo: _ } => color(0.0, 0.0, 0.0),
-            Self::DiffuseLight { emit } => *emit,
+            Self::DiffuseLight { emit } => emit.clone(),
         }
     }
 }

@@ -1,11 +1,11 @@
-use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, derive::Sum};
+use derive_more::derive::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, Sum};
 use std::ops;
 
 #[derive(
     Debug,
     Default,
     Clone,
-    Copy,
+    // Copy,
     PartialEq,
     Add,
     Sub,
@@ -42,7 +42,7 @@ impl Color {
 
     #[must_use]
     #[inline]
-    pub fn to_rgb(self) -> (u8, u8, u8) {
+    pub fn to_rgb(&self) -> (u8, u8, u8) {
         (
             channel_to_rgb(self.r),
             channel_to_rgb(self.g),
