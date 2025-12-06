@@ -8,8 +8,9 @@ use std::{fs::File, time::Instant};
 
 use camera::{Camera, CameraOptions};
 use geometry::{Quad, quad};
-use material::{diffuse_light, lambertian};
 use primitives::{Color, color, point3, vec3};
+
+use crate::material::{diffuse_light, lambertian};
 
 fn write_png(path: &str, pixels: Vec<Vec<Color>>, width: usize, height: usize) {
     let f = File::create(path).unwrap();
@@ -90,8 +91,8 @@ pub fn cornell_box() -> ([Quad; 16], Camera) {
         // tall box
         quad(
             point3(424.377761, 0.000000, 252.294858),
-            vec3(42.705142, 0.000000, 159.377761),
-            vec3(0.000000, 330.000000, 0.000000),
+            vec3(0.000000, 330.000000, 0.000000),      // swapped
+            vec3(42.705142, 0.000000, 159.377761),    // swapped
             white.clone(),
         ),
         quad(
@@ -108,21 +109,22 @@ pub fn cornell_box() -> ([Quad; 16], Camera) {
         ),
         quad(
             point3(265.000000, 0.000000, 295.000000),
-            vec3(159.377761, 0.000000, -42.705142),
-            vec3(0.000000, 330.000000, 0.000000),
+            vec3(0.000000, 330.000000, 0.000000),      // swapped
+            vec3(159.377761, 0.000000, -42.705142),   // swapped
             white.clone(),
         ),
         quad(
             point3(265.000000, 330.000000, 295.000000),
-            vec3(159.377761, 0.000000, -42.705142),
-            vec3(42.705142, 0.000000, 159.377761),
+            vec3(42.705142, 0.000000, 159.377761),    // swapped
+            vec3(159.377761, 0.000000, -42.705142),   // swapped
             white.clone(),
         ),
+
         // short box
         quad(
             point3(286.924325, 0.000000, 115.987804),
-            vec3(-50.987804, 0.000000, 156.924325),
-            vec3(0.000000, 165.000000, 0.000000),
+            vec3(0.000000, 165.000000, 0.000000),     // swapped
+            vec3(-50.987804, 0.000000, 156.924325),   // swapped
             white.clone(),
         ),
         quad(
@@ -139,16 +141,17 @@ pub fn cornell_box() -> ([Quad; 16], Camera) {
         ),
         quad(
             point3(130.000000, 0.000000, 65.000000),
-            vec3(156.924325, 0.000000, 50.987804),
-            vec3(0.000000, 165.000000, 0.000000),
+            vec3(0.000000, 165.000000, 0.000000),     // swapped
+            vec3(156.924325, 0.000000, 50.987804),    // swapped
             white.clone(),
         ),
         quad(
             point3(130.000000, 165.000000, 65.000000),
-            vec3(156.924325, 0.000000, 50.987804),
-            vec3(-50.987804, 0.000000, 156.924325),
+            vec3(-50.987804, 0.000000, 156.924325),   // swapped
+            vec3(156.924325, 0.000000, 50.987804),    // swapped
             white,
         ),
+
     ];
 
     let cam = Camera::new(CameraOptions {

@@ -2,6 +2,7 @@ use rayon::prelude::*;
 
 use crate::{
     geometry::{HitRecord, Quad},
+    material::lambertian_scatter2,
     misc::rand_f64,
     primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };
@@ -120,20 +121,10 @@ impl Camera {
     #[must_use]
     #[inline]
     pub fn scanline(&self, world: &[Quad], y: usize) -> Vec<Color> {
-        let mut emitted_values = Vec::with_capacity(self.max_depth);
-        let mut attenuation_values = Vec::with_capacity(self.max_depth);
-
         (0..self.image_width)
             .map(|x| {
                 (0..self.samples_per_pixel)
-                    .map(|_| {
-                        self.ray_color(
-                            self.get_ray(x, y),
-                            world,
-                            &mut emitted_values,
-                            &mut attenuation_values,
-                        )
-                    })
+                    .map(|_| self.ray_color(self.get_ray(x, y), world))
                     .sum::<Color>()
                     / f64::from(self.samples_per_pixel)
             })
@@ -142,34 +133,8 @@ impl Camera {
 
     #[must_use]
     #[inline]
-    fn ray_color(
-        &self,
-        r: Ray,
-        world: &[Quad],
-        emitted_values: &mut Vec<Color>,
-        attenuation_values: &mut Vec<Color>,
-    ) -> Color {
-        let ending_color = self.bounce_ray(r, world, emitted_values, attenuation_values);
-        
-        emitted_values
-            .iter()
-            .zip(attenuation_values)
-            .fold(ending_color, |prev, (emitted, attenuation)| {
-                (prev * attenuation.clone()) + emitted.clone()
-            })
-    }
-
-    #[must_use]
-    #[inline]
-    fn bounce_ray(
-        &self,
-        mut r: Ray,
-        world: &[Quad],
-        emitted_values: &mut Vec<Color>,
-        attenuation_values: &mut Vec<Color>,
-    ) -> Color {
-        attenuation_values.clear();
-        emitted_values.clear();
+    fn ray_color(&self, mut r: Ray, world: &[Quad]) -> Color {
+        let mut ray_c = color(1.0, 1.0, 1.0);
 
         for _ in 0..self.max_depth {
             let world_hit = world.iter().fold(None, |rec, object| {
@@ -181,15 +146,14 @@ impl Camera {
                 return color(0.0, 0.0, 0.0);
             };
 
-            let emitted = rec.mat.emitted();
+            let mat = rec.mat;
 
-            let Some((attenuation, scattered)) = rec.mat.scatter(&rec) else {
-                return emitted;
-            };
+            if mat.is_light {
+                return ray_c * mat.color.clone();
+            }
 
-            attenuation_values.push(attenuation);
-            emitted_values.push(emitted);
-            r = scattered;
+            ray_c = ray_c * mat.color.clone();
+            r = lambertian_scatter2(&rec);
         }
         color(0.0, 0.0, 0.0)
     }

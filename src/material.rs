@@ -3,14 +3,14 @@ use std::f64::consts::PI;
 use crate::{
     geometry::HitRecord,
     misc::rand_f64,
-    primitives::{Color, Ray, Vec3, color, ray, vec3},
+    primitives::{Color, Ray, Vec3, ray, vec3},
     tern,
 };
 
 #[derive(Debug, Clone)]
-pub enum Material {
-    Lambertian { albedo: Color },
-    DiffuseLight { emit: Color },
+pub struct Material {
+    pub color: Color,
+    pub is_light: bool,
 }
 
 #[must_use]
@@ -36,49 +36,26 @@ fn onb_transform(n: Vec3, orig: Vec3) -> Vec3 {
     (u * orig.x) + (v * orig.y) + (w * orig.z)
 }
 
-#[must_use]
-#[inline]
-fn lambertian_scatter(albedo: Color, rec: &HitRecord) -> (Color, Ray) {
+pub fn lambertian_scatter2(rec: &HitRecord) -> Ray {
     let scatter_direction = onb_transform(rec.normal, random_cosine_direction());
-    // let mut scatter_direction = rec.normal + Vec3::random_unit_vector();
 
-    // if scatter_direction.is_near_zero() {
-    //     scatter_direction = rec.normal;
-    // }
-
-    let scattered = ray(rec.p, scatter_direction);
-    let attenuation = albedo;
-    (attenuation, scattered)
-}
-
-impl Material {
-    #[must_use]
-    #[inline]
-    pub fn scatter(&self, rec: &HitRecord) -> Option<(Color, Ray)> {
-        match self {
-            Self::Lambertian { albedo } => Some(lambertian_scatter(albedo.clone(), rec)),
-            Self::DiffuseLight { emit: _ } => None,
-        }
-    }
-
-    #[must_use]
-    #[inline]
-    pub fn emitted(&self) -> Color {
-        match self {
-            Self::Lambertian { albedo: _ } => color(0.0, 0.0, 0.0),
-            Self::DiffuseLight { emit } => emit.clone(),
-        }
-    }
+    ray(rec.p, scatter_direction)
 }
 
 #[must_use]
 #[inline]
 pub const fn lambertian(albedo: Color) -> Material {
-    Material::Lambertian { albedo }
+    Material {
+        color: albedo,
+        is_light: false,
+    }
 }
 
 #[must_use]
 #[inline]
 pub const fn diffuse_light(emit: Color) -> Material {
-    Material::DiffuseLight { emit }
+    Material {
+        color: emit,
+        is_light: true,
+    }
 }
