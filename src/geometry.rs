@@ -1,3 +1,5 @@
+use std::hint::black_box;
+
 use crate::{
     material::Material,
     primitives::{Interval, Point3, Ray, Vec3},
@@ -97,7 +99,7 @@ impl Quad {
         // compute world-space intersection point (we need it in the HitRecord)
         let intersection = r.at(t);
 
-        Some(HitRecord::new(intersection, &self.mat, t, r, self.normal))
+        Some(HitRecord::new(intersection, &self.mat, t, self.normal))
     }
 }
 
@@ -119,8 +121,9 @@ impl<'a> HitRecord<'a> {
     /// `outward_normal` is assumed to have unit length
     #[must_use]
     #[inline]
-    pub fn new(p: Point3, mat: &'a Material, t: f64, r: &Ray, outward_normal: Vec3) -> Self {
-        let front_face = r.dir.dot(outward_normal) < 0.0;
+    pub fn new(p: Point3, mat: &'a Material, t: f64, outward_normal: Vec3) -> Self {
+        // let front_face = r.dir.dot(outward_normal) < 0.0;
+        let front_face = black_box(true);
         let normal = tern!(front_face, outward_normal, -outward_normal);
 
         Self { p, normal, mat, t }
