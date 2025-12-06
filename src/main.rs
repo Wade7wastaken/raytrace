@@ -49,20 +49,22 @@ pub fn cornell_box() -> ([Quad; 16], Camera) {
     let white = lambertian(color(0.73, 0.73, 0.73));
     let green = lambertian(color(0.12, 0.45, 0.15));
 
-    let light = diffuse_light(color(15.0, 15.0, 15.0));
+    let intensity = 17.0;
+
+    let light = diffuse_light(color(1.0, 193.0 / 255.0, 104.0 / 255.0) * intensity);
 
     let world = [
         quad(
             point3(555.0, 0.0, 0.0),
             vec3(0.0, 0.0, 555.0),
             vec3(0.0, 555.0, 0.0),
-            green,
+            red,
         ),
         quad(
             point3(0.0, 0.0, 555.0),
             vec3(0.0, 0.0, -555.0),
             vec3(0.0, 555.0, 0.0),
-            red,
+            green,
         ),
         quad(
             point3(0.0, 555.0, 0.0),
@@ -154,8 +156,8 @@ pub fn cornell_box() -> ([Quad; 16], Camera) {
 
     let cam = Camera::new(CameraOptions {
         aspect_ratio: 1.0,
-        image_width: 600,
-        samples_per_pixel: 1000,
+        image_width: 1080,
+        samples_per_pixel: 50000,
         v_fov: 40.0,
         look_from: point3(278.0, 278.0, -800.0),
         look_at: point3(278.0, 278.0, 0.0),
