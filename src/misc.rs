@@ -7,6 +7,6 @@ macro_rules! tern {
 
 #[must_use]
 #[inline]
-pub fn rand_f64() -> f64 {
+pub fn rand_f32() -> f32 {
     rand::random_range(0.0..1.0)
 }

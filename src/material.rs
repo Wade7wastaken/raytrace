@@ -1,8 +1,8 @@
-use std::f64::consts::PI;
+use std::f32::consts::PI;
 
 use crate::{
     geometry::HitRecord,
-    misc::rand_f64,
+    misc::rand_f32,
     primitives::{Color, Ray, Vec3, ray, vec3},
     tern,
 };
@@ -16,8 +16,8 @@ pub struct Material {
 #[must_use]
 #[inline]
 fn random_cosine_direction() -> Vec3 {
-    let r1 = rand_f64();
-    let r2 = rand_f64();
+    let r1 = rand_f32();
+    let r2 = rand_f32();
 
     let phi = 2.0 * PI * r1;
     let (sin, cos) = phi.sin_cos();

@@ -18,21 +18,21 @@ use std::ops;
     Sum,
 )]
 pub struct Color {
-    pub r: f64,
-    pub g: f64,
-    pub b: f64,
+    pub r: f32,
+    pub g: f32,
+    pub b: f32,
 }
 
 impl Color {
     #[must_use]
     #[inline]
-    pub const fn new(r: f64, g: f64, b: f64) -> Self {
+    pub const fn new(r: f32, g: f32, b: f32) -> Self {
         Self { r, g, b }
     }
 
     #[must_use]
     #[inline]
-    pub fn map(&self, pred: impl Fn(f64) -> f64) -> Self {
+    pub fn map(&self, pred: impl Fn(f32) -> f32) -> Self {
         Self {
             r: pred(self.r),
             g: pred(self.g),
@@ -51,7 +51,7 @@ impl Color {
     }
 }
 
-impl ops::Mul<Color> for f64 {
+impl ops::Mul<Color> for f32 {
     type Output = Color;
     fn mul(self, rhs: Color) -> Self::Output {
         rhs * self
@@ -72,12 +72,12 @@ impl ops::Mul<Color> for Color {
 
 #[must_use]
 #[inline]
-fn channel_to_rgb(channel: f64) -> u8 {
+fn channel_to_rgb(channel: f32) -> u8 {
     ((channel * 255.999) as u8).clamp(0, 255)
 }
 
 #[must_use]
 #[inline]
-pub const fn color(r: f64, g: f64, b: f64) -> Color {
+pub const fn color(r: f32, g: f32, b: f32) -> Color {
     Color::new(r, g, b)
 }

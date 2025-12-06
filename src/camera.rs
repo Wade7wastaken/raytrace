@@ -3,14 +3,14 @@ use rayon::prelude::*;
 use crate::{
     geometry::{HitRecord, Quad},
     material::lambertian_scatter2,
-    misc::rand_f64,
+    misc::rand_f32,
     primitives::{Color, Point3, Ray, Vec3, color, interval, point3, ray, vec3},
 };
 
 #[derive(Debug, Clone, Copy)]
 pub struct CameraOptions {
     /// The aspect ratio of the output image.
-    pub aspect_ratio: f64,
+    pub aspect_ratio: f32,
     /// The width of the output image.
     pub image_width: usize,
     /// The number of rays to sample per pixel.
@@ -18,7 +18,7 @@ pub struct CameraOptions {
     /// The maximum depth a ray is allowed to search.
     pub max_depth: usize,
     /// The field of view in degrees.
-    pub v_fov: f64,
+    pub v_fov: f32,
     /// The origin of the camera.
     pub look_from: Point3,
     /// The target of the camera.
@@ -66,7 +66,7 @@ impl Camera {
             look_at,
             vup,
         } = options;
-        let image_height = (image_width as f64 / aspect_ratio).round() as usize;
+        let image_height = (image_width as f32 / aspect_ratio).round() as usize;
 
         // ensure dimensions are greater than 0.
         assert!(aspect_ratio > 0.0);
@@ -77,7 +77,7 @@ impl Camera {
         let theta = v_fov.to_radians();
         let h = (theta / 2.0).tan();
         let viewport_height = 2.0 * h * focal_length;
-        let viewport_width = viewport_height * (image_width as f64 / image_height as f64);
+        let viewport_width = viewport_height * (image_width as f32 / image_height as f32);
 
         let w = (look_from - look_at).unit_vector();
         let u = vup.cross(w);
@@ -86,8 +86,8 @@ impl Camera {
         let viewport_u = u * viewport_width;
         let viewport_v = -v * viewport_height;
 
-        let pixel_delta_u = viewport_u / image_width as f64;
-        let pixel_delta_v = viewport_v / image_height as f64;
+        let pixel_delta_u = viewport_u / image_width as f32;
+        let pixel_delta_v = viewport_v / image_height as f32;
 
         let viewport_upper_left =
             look_from - (w * focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
@@ -126,7 +126,7 @@ impl Camera {
                 (0..self.samples_per_pixel)
                     .map(|_| self.ray_color(self.get_ray(x, y), world))
                     .sum::<Color>()
-                    / f64::from(self.samples_per_pixel)
+                    / (self.samples_per_pixel as f32)
             })
             .collect()
     }
@@ -138,7 +138,7 @@ impl Camera {
 
         for _ in 0..self.max_depth {
             let world_hit = world.iter().fold(None, |rec, object| {
-                let max = rec.as_ref().map_or(f64::INFINITY, |r: &HitRecord| r.t);
+                let max = rec.as_ref().map_or(f32::INFINITY, |r: &HitRecord| r.t);
                 object.hit(&r, &interval(0.001, max)).or(rec)
             });
 
@@ -163,8 +163,8 @@ impl Camera {
     fn get_ray(&self, x: usize, y: usize) -> Ray {
         let offset = sample_square();
         let pixel_sample = self.pixel_00_loc
-            + (self.pixel_delta_u * (x as f64 + offset.x))
-            + (self.pixel_delta_v * (y as f64 + offset.y));
+            + (self.pixel_delta_u * (x as f32 + offset.x))
+            + (self.pixel_delta_v * (y as f32 + offset.y));
 
         let ray_direction = pixel_sample - self.look_from;
 
@@ -175,5 +175,5 @@ impl Camera {
 #[must_use]
 #[inline]
 fn sample_square() -> Vec3 {
-    vec3(rand_f64() - 0.5, rand_f64() - 0.5, 0.0)
+    vec3(rand_f32() - 0.5, rand_f32() - 0.5, 0.0)
 }

@@ -6,18 +6,20 @@ use crate::{
     tern,
 };
 
+const UNIT_INTERVAL: Interval = Interval::new(0.0, 1.0);
+
 pub struct Quad {
     q: Point3,
     u: Vec3,
     v: Vec3,
     // precomputed
     normal: Vec3,
-    d: f64,
+    d: f32,
     // 2x2 system for solving alpha/beta:
-    uu: f64,
-    uv: f64,
-    vv: f64,
-    inv_det: f64,
+    uu: f32,
+    uv: f32,
+    vv: f32,
+    inv_det: f32,
     mat: Material,
 }
 
@@ -92,7 +94,7 @@ impl Quad {
         let beta = (self.uu * vp - self.uv * up) * self.inv_det;
 
         // check within unit interval [0,1]
-        if !(alpha >= 0.0 && alpha <= 1.0 && beta >= 0.0 && beta <= 1.0) {
+        if !UNIT_INTERVAL.contains(alpha) || !UNIT_INTERVAL.contains(beta) {
             return None;
         }
 
@@ -114,14 +116,14 @@ pub struct HitRecord<'a> {
     pub p: Point3,
     pub normal: Vec3,
     pub mat: &'a Material,
-    pub t: f64,
+    pub t: f32,
 }
 
 impl<'a> HitRecord<'a> {
     /// `outward_normal` is assumed to have unit length
     #[must_use]
     #[inline]
-    pub fn new(p: Point3, mat: &'a Material, t: f64, outward_normal: Vec3) -> Self {
+    pub fn new(p: Point3, mat: &'a Material, t: f32, outward_normal: Vec3) -> Self {
         // let front_face = r.dir.dot(outward_normal) < 0.0;
         let front_face = black_box(true);
         let normal = tern!(front_face, outward_normal, -outward_normal);

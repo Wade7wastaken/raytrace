@@ -17,21 +17,21 @@ use std::ops::Range;
     DivAssign,
 )]
 pub struct Vec3 {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 impl Vec3 {
     #[must_use]
     #[inline]
-    pub const fn new(x: f64, y: f64, z: f64) -> Self {
+    pub const fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
     }
 
     #[must_use]
     #[inline]
-    pub fn random_range(range: Range<f64>) -> Self {
+    pub fn random_range(range: Range<f32>) -> Self {
         Self {
             x: rand::random_range(range.clone()),
             y: rand::random_range(range.clone()),
@@ -52,19 +52,19 @@ impl Vec3 {
 
     #[must_use]
     #[inline]
-    pub const fn length_squared(&self) -> f64 {
+    pub const fn length_squared(&self) -> f32 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     #[must_use]
     #[inline]
-    pub fn length(&self) -> f64 {
+    pub fn length(&self) -> f32 {
         self.length_squared().sqrt()
     }
 
     #[must_use]
     #[inline]
-    pub const fn dot(&self, rhs: Self) -> f64 {
+    pub const fn dot(&self, rhs: Self) -> f32 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
@@ -97,12 +97,12 @@ pub type Point3 = Vec3;
 // helper initializer to make code look pretty
 #[must_use]
 #[inline]
-pub const fn vec3(x: f64, y: f64, z: f64) -> Vec3 {
+pub const fn vec3(x: f32, y: f32, z: f32) -> Vec3 {
     Vec3::new(x, y, z)
 }
 
 #[must_use]
 #[inline]
-pub const fn point3(x: f64, y: f64, z: f64) -> Point3 {
+pub const fn point3(x: f32, y: f32, z: f32) -> Point3 {
     Point3::new(x, y, z)
 }
